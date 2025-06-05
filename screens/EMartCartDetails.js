@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
 	View,
 	Text,
@@ -8,15 +8,24 @@ import {
 	StyleSheet,
 	TextInput,
 } from 'react-native';
+import { useStoreCart } from './StoreCartContext';
 
 function EMartCartDetails({ navigation, route }) {
-	// Expecting cartItems as an array of { name, imgUrl, price, size, quantity }
-	const cartItems = route?.params?.cartItems || [];
-	const [cartItemsState, setCartItemsState] = React.useState(cartItems);
+	const { storeId, cartItems: initialCartItems } = route.params;
+	const { getCart, setCart, removeFromCart } = useStoreCart();
+	const [cartItemsState, setCartItemsState] = React.useState(initialCartItems);
 	const [discountCode, setDiscountCode] = React.useState('');
 	const [discountMessage, setDiscountMessage] = React.useState('');
 	const [discountError, setDiscountError] = React.useState('');
 	const [appliedDiscountCode, setAppliedDiscountCode] = React.useState('');
+
+	// Sync with global cart state when component mounts
+	useEffect(() => {
+		const globalCart = getCart(storeId);
+		if (globalCart.length > 0) {
+			setCartItemsState(globalCart);
+		}
+	}, [storeId]);
 
 	const total = cartItemsState.reduce(
 		(sum, item) =>
@@ -37,11 +46,11 @@ function EMartCartDetails({ navigation, route }) {
 		if (code === 'EMART10') {
 			setDiscountMessage('10% discount applied!');
 			setDiscountError('');
-			setAppliedDiscountCode(code); // <-- set the applied code
+			setAppliedDiscountCode(code);
 		} else if (code.length > 0) {
 			setDiscountMessage('');
 			setDiscountError('Invalid or expired coupon code.');
-			setAppliedDiscountCode(''); // <-- clear applied code
+			setAppliedDiscountCode('');
 		} else {
 			setDiscountMessage('');
 			setDiscountError('');
@@ -49,8 +58,13 @@ function EMartCartDetails({ navigation, route }) {
 		}
 	};
 
-	const removeFromCart = (index) => {
-		setCartItemsState((prev) => prev.filter((_, i) => i !== index));
+	const handleRemoveFromCart = (index) => {
+		// Update local state
+		const newCartItems = cartItemsState.filter((_, i) => i !== index);
+		setCartItemsState(newCartItems);
+		
+		// Update global state
+		removeFromCart(storeId, index);
 	};
 
 	const renderCartItem = ({ item, index }) => (
@@ -71,7 +85,7 @@ function EMartCartDetails({ navigation, route }) {
 				</Text>
 			</View>
 			<View style={styles.delete}>
-				<Pressable onPress={() => removeFromCart(index)}>
+				<Pressable onPress={() => handleRemoveFromCart(index)}>
 					<Text style={styles.deleteText}>Remove from cart</Text>
 				</Pressable>
 				<Text style={styles.cartItemTotal}>
@@ -146,7 +160,7 @@ function EMartCartDetails({ navigation, route }) {
 					})}
 				</Text>
 			</View>
-			<View style={styles.buttons}>
+			<View>
 				<Pressable
 					style={styles.checkoutButton}
 					onPress={() => navigation.goBack()}
@@ -155,7 +169,7 @@ function EMartCartDetails({ navigation, route }) {
 				</Pressable>
 				<Pressable
 					style={styles.checkoutButton2}
-					onPress={() => navigation.navigate('Confirmation', {cartItems})}
+					onPress={() => navigation.navigate('Confirmation', { cartItems: cartItemsState })}
 				>
 					<Text style={styles.checkoutText}>Proceed to Checkout</Text>
 				</Pressable>
