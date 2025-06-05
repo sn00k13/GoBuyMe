@@ -12,6 +12,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Alert } from 'react-native';
+import { useStoreCart } from './StoreCartContext';
 
 function SelectProductScreen({ navigation, route }) {
 	const [categories, setCategories] = useState([]);
@@ -20,29 +21,86 @@ function SelectProductScreen({ navigation, route }) {
 	);
 	const [activeSubcategory, setActiveSubcategory] = useState(null);
 	const [quantities, setQuantities] = useState({});
+	const { getCart, setCart } = useStoreCart();
+	const [cartItemCount, setCartItemCount] = useState(0);
 
 	// Get storeId from navigation params or fallback to a default
 	const storeId = route?.params?.storeId || 'J3GO05mnhnoccDG9Bchc';
 
+	// Initialize quantities from cart when component mounts and update cart count
+	useEffect(() => {
+		const cartItems = getCart(storeId);
+		if (cartItems.length > 0) {
+			const initialQuantities = {};
+			cartItems.forEach(item => {
+				initialQuantities[item.name] = item.quantity;
+			});
+			setQuantities(initialQuantities);
+			updateCartCount(initialQuantities);
+		}
+	}, [storeId]);
+
+	// Update cart count whenever quantities change
+	const updateCartCount = (newQuantities) => {
+		const count = Object.values(newQuantities).reduce(
+			(sum, q) => sum + (parseInt(q, 10) || 0),
+			0
+		);
+		setCartItemCount(count);
+	};
+
 	const handleQuantityChange = (key, value) => {
-		setQuantities((prev) => ({
-			...prev,
+		const newQuantities = {
+			...quantities,
 			[key]: value.replace(/[^0-9]/g, ''), // Only allow numbers
-		}));
+		};
+		setQuantities(newQuantities);
+		updateCartCount(newQuantities);
+		
+		// Update cart when quantity changes
+		const cartItems = products
+			.filter(item => parseInt(newQuantities[item.name], 10) > 0)
+			.map(item => ({
+				...item,
+				quantity: newQuantities[item.name],
+			}));
+		setCart(storeId, cartItems);
 	};
 
 	const increment = (key) => {
-		setQuantities((prev) => ({
-			...prev,
-			[key]: String(parseInt(prev[key] || '0', 10) + 1),
-		}));
+		const newQuantities = {
+			...quantities,
+			[key]: String(parseInt(quantities[key] || '0', 10) + 1),
+		};
+		setQuantities(newQuantities);
+		updateCartCount(newQuantities);
+		
+		// Update cart when quantity changes
+		const cartItems = products
+			.filter(item => parseInt(newQuantities[item.name], 10) > 0)
+			.map(item => ({
+				...item,
+				quantity: newQuantities[item.name],
+			}));
+		setCart(storeId, cartItems);
 	};
 
 	const decrement = (key) => {
-		setQuantities((prev) => ({
-			...prev,
-			[key]: String(Math.max(0, parseInt(prev[key] || '0', 10) - 1)),
-		}));
+		const newQuantities = {
+			...quantities,
+			[key]: String(Math.max(0, parseInt(quantities[key] || '0', 10) - 1)),
+		};
+		setQuantities(newQuantities);
+		updateCartCount(newQuantities);
+		
+		// Update cart when quantity changes
+		const cartItems = products
+			.filter(item => parseInt(newQuantities[item.name], 10) > 0)
+			.map(item => ({
+				...item,
+				quantity: newQuantities[item.name],
+			}));
+		setCart(storeId, cartItems);
 	};
 
 	useEffect(() => {
@@ -277,16 +335,16 @@ function SelectProductScreen({ navigation, route }) {
 			<View style={styles.cartFab}>
 				<Pressable
 					style={styles.cartButtonFab}
-					onPress={() => navigation.navigate('EMartCartDetails', { cartItems })}
+					onPress={() => navigation.navigate('EMartCartDetails', { 
+						cartItems,
+						storeId 
+					})}
 				>
 					<MaterialIcons name="shopping-cart" size={28} color="#fff" />
-					{Object.values(quantities).some((q) => parseInt(q, 10) > 0) && (
+					{cartItemCount > 0 && (
 						<View style={styles.cartCounter}>
 							<Text style={styles.cartCounterText}>
-								{Object.values(quantities).reduce(
-									(sum, q) => sum + (parseInt(q, 10) || 0),
-									0
-								)}
+								{cartItemCount}
 							</Text>
 						</View>
 					)}
