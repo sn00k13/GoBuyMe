@@ -107,7 +107,7 @@ export default function OrdersScreen({ navigation }) {
                         style={styles.statusIcon}
                     />
                     <Text style={styles.statusText}>
-                        {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                        {(item.status || 'pending').charAt(0).toUpperCase() + (item.status || 'pending').slice(1)}
                     </Text>
                 </View>
             </View>
@@ -133,10 +133,10 @@ export default function OrdersScreen({ navigation }) {
                 <Text style={styles.paymentMethod}>
                     {item.paymentMethod === 'cash_on_delivery' 
                         ? 'Cash on Delivery'
-                        : item.paymentMethod.charAt(0).toUpperCase() + item.paymentMethod.slice(1)}
+                        : ((item.paymentMethod || 'card').charAt(0).toUpperCase() + (item.paymentMethod || 'card').slice(1))}
                 </Text>
                 <Text style={[styles.paymentStatus, { color: getStatusColor(item.paymentStatus) }]}>
-                    {item.paymentStatus.charAt(0).toUpperCase() + item.paymentStatus.slice(1)}
+                    {(item.paymentStatus || 'pending').charAt(0).toUpperCase() + (item.paymentStatus || 'pending').slice(1)}
                 </Text>
             </View>
         </Pressable>
@@ -153,7 +153,11 @@ export default function OrdersScreen({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
+            <Pressable onPress={() => navigation.navigate('HomeMain')}>
+          <MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+        </Pressable>
                 <Text style={styles.headerText}>My Orders</Text>
+                <View></View>
             </View>
 
             <FlatList
@@ -184,6 +188,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         padding: 16,
         marginTop: 40,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         borderBottomWidth: 1,
         borderBottomColor: '#E0E0E0',
     },
@@ -191,7 +198,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#FF521B',
-        textAlign: 'center',
     },
     loadingContainer: {
         flex: 1,

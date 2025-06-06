@@ -201,7 +201,7 @@ export default function VendorListScreen({ navigation }) {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()}>
+        <Pressable onPress={() => navigation.navigate('HomeMain')}>
           <MaterialIcons name="arrow-back" size={24} color="#FF521B" />
         </Pressable>
         <Text style={styles.locationText}>Owerri</Text>

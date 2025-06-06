@@ -140,7 +140,7 @@ export default function HomeScreen({ navigation }) {
       </Pressable>
       <Pressable
         style={styles.menuContainer}
-        onPress={() => navigation.navigate('OrderHistory')}
+        onPress={() => navigation.navigate('Orders')}
       >
         <View style={styles.menuContent}>
           <Feather name="list" size={24} color="#0B3948" />

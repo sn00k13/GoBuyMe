@@ -132,7 +132,7 @@ export default function OrderDetailsScreen({ navigation, route }) {
                     </View>
                     <View style={styles.infoRow}>
                         <Text style={styles.infoLabel}>Status</Text>
-                        <Text style={[styles.infoValue, { color: getStatusColor(order.paymentStatus) }]}>
+                        <Text style={[styles.infoValue, { color: getStatusColor(order.paymentStatus || 'pending') }]}>
                             {(order.paymentStatus || 'pending').charAt(0).toUpperCase() + (order.paymentStatus || 'pending').slice(1)}
                         </Text>
                     </View>

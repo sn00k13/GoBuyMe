@@ -118,7 +118,7 @@ const ChatScreen = ({ navigation }) => {
       keyboardVerticalOffset={90}
     >
       <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Text style={styles.backButtonText}>← Back</Text>
+      <MaterialIcons name="arrow-back" size={24} color="#FF521B" />
             </Pressable>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Customer Support</Text>
@@ -192,7 +192,6 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginTop: 40,
-    marginBottom: 16,
     padding: 16,
   },
   backButtonText: {
