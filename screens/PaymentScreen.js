@@ -16,8 +16,9 @@ import { db } from '../firebase';
 import { useStoreCart } from './StoreCartContext';
 
 export default function PaymentScreen({ navigation, route }) {
-    const { cartItems = [], totalAmount = 0, userData, storeId } = route.params;
+    const { cartItems = [], totalAmount = 0, userData, storeId } = route.params || {};
     const [processing, setProcessing] = useState(false);
+    const [selectedMethod, setSelectedMethod] = useState('card'); // 'card' or 'bank'
     const auth = getAuth();
     const { clearCart } = useStoreCart();
     const paystackWebViewRef = useRef();
@@ -28,12 +29,7 @@ export default function PaymentScreen({ navigation, route }) {
             Alert.alert(
                 'Empty Cart',
                 'Your cart is empty. Please add items before proceeding to payment.',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => navigation.navigate('EMartCartDetails')
-                    }
-                ]
+                [{ text: 'OK', onPress: () => navigation.navigate('EMartCartDetails') }]
             );
             return;
         }
@@ -42,12 +38,7 @@ export default function PaymentScreen({ navigation, route }) {
             Alert.alert(
                 'Missing Information',
                 'Please complete your profile with name and phone number before proceeding.',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => navigation.navigate('Profile')
-                    }
-                ]
+                [{ text: 'OK', onPress: () => navigation.navigate('Profile') }]
             );
             return;
         }
@@ -69,9 +60,10 @@ export default function PaymentScreen({ navigation, route }) {
                 userId: auth.currentUser.uid,
                 items: cartItems,
                 totalAmount,
-                status: 'paid',
+                status: selectedMethod === 'bank' ? 'pending' : 'paid',
+                paymentStatus: selectedMethod === 'bank' ? 'pending' : 'paid',
                 paymentReference: response.transactionRef.reference,
-                paymentMethod: 'card',
+                paymentMethod: selectedMethod,
                 customerName: userData.name,
                 customerPhone: userData.phone,
                 customerEmail: userData.email,
@@ -80,13 +72,14 @@ export default function PaymentScreen({ navigation, route }) {
                 storeId
             });
 
-            // Clear cart after successful payment
+            // Clear cart after initiating payment
             clearCart(storeId);
 
-            // Navigate to success screen
+            // Navigate to success screen with appropriate message
             navigation.replace('OrderConfirmation', {
                 orderId: response.transactionRef.reference,
-                totalAmount
+                totalAmount,
+                isPendingTransfer: selectedMethod === 'bank'
             });
         } catch (error) {
             console.error('Error processing payment:', error);
@@ -132,6 +125,51 @@ export default function PaymentScreen({ navigation, route }) {
                     </View>
                 </View>
 
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Payment Method</Text>
+                    <TouchableOpacity
+                        style={[
+                            styles.methodOption,
+                            selectedMethod === 'card' && styles.methodOptionSelected
+                        ]}
+                        onPress={() => setSelectedMethod('card')}
+                    >
+                        <MaterialIcons
+                            name="credit-card"
+                            size={24}
+                            color={selectedMethod === 'card' ? '#FF521B' : '#666'}
+                        />
+                        <View style={styles.methodTextContainer}>
+                            <Text style={[
+                                styles.methodTitle,
+                                selectedMethod === 'card' && styles.methodTitleSelected
+                            ]}>Card Payment</Text>
+                            <Text style={styles.methodDescription}>Pay with your debit/credit card</Text>
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[
+                            styles.methodOption,
+                            selectedMethod === 'bank' && styles.methodOptionSelected
+                        ]}
+                        onPress={() => setSelectedMethod('bank')}
+                    >
+                        <MaterialIcons
+                            name="account-balance"
+                            size={24}
+                            color={selectedMethod === 'bank' ? '#FF521B' : '#666'}
+                        />
+                        <View style={styles.methodTextContainer}>
+                            <Text style={[
+                                styles.methodTitle,
+                                selectedMethod === 'bank' && styles.methodTitleSelected
+                            ]}>Bank Transfer</Text>
+                            <Text style={styles.methodDescription}>Pay via bank transfer</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+
                 <Paystack
                     paystackKey="pk_test_1700cc30d4e1158c6da9ca80f549205b762b9eed"
                     amount={totalAmount}
@@ -146,13 +184,16 @@ export default function PaymentScreen({ navigation, route }) {
                     billingName={userData.name}
                     billingMobile={userData.phone}
                     currency="NGN"
+                    channels={selectedMethod === 'bank' ? ['bank_transfer'] : ['card']}
                 />
 
                 <TouchableOpacity
                     style={styles.payButton}
                     onPress={() => paystackWebViewRef.current?.startTransaction()}
                 >
-                    <Text style={styles.payButtonText}>Pay Now</Text>
+                    <Text style={styles.payButtonText}>
+                        Pay ₦{totalAmount.toLocaleString()} Now
+                    </Text>
                 </TouchableOpacity>
             </ScrollView>
         </View>
@@ -244,12 +285,42 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#FF521B',
     },
+    methodOption: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: 8,
+        marginBottom: 12,
+    },
+    methodOptionSelected: {
+        borderColor: '#FF521B',
+        backgroundColor: '#FFF0EB',
+    },
+    methodTextContainer: {
+        marginLeft: 16,
+    },
+    methodTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#2A324B',
+        marginBottom: 4,
+    },
+    methodTitleSelected: {
+        color: '#FF521B',
+    },
+    methodDescription: {
+        fontSize: 14,
+        color: '#666',
+    },
     payButton: {
         backgroundColor: '#FF521B',
         borderRadius: 8,
         padding: 16,
         alignItems: 'center',
         marginTop: 24,
+        marginBottom: 24,
     },
     payButtonText: {
         color: 'white',

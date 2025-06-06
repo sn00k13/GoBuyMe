@@ -10,7 +10,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function OrderConfirmation({ navigation, route }) {
-    const { orderId = '', amount = 0 } = route.params || {};
+    const { orderId = '', amount = 0, isPendingTransfer = false } = route.params || {};
     const checkmarkScale = new Animated.Value(0);
     const checkmarkOpacity = new Animated.Value(0);
 
@@ -52,16 +52,25 @@ export default function OrderConfirmation({ navigation, route }) {
                             {
                                 transform: [{ scale: checkmarkScale }],
                                 opacity: checkmarkOpacity,
+                                backgroundColor: isPendingTransfer ? '#FF9800' : '#4CAF50'
                             },
                         ]}
                     >
-                        <MaterialIcons name="check" size={48} color="white" />
+                        <MaterialIcons 
+                            name={isPendingTransfer ? "access-time" : "check"} 
+                            size={48} 
+                            color="white" 
+                        />
                     </Animated.View>
                 </View>
 
-                <Text style={styles.title}>Order Confirmed!</Text>
+                <Text style={styles.title}>
+                    {isPendingTransfer ? 'Transfer Initiated!' : 'Order Confirmed!'}
+                </Text>
                 <Text style={styles.message}>
-                    Thank you for your purchase. Your order has been successfully placed.
+                    {isPendingTransfer 
+                        ? 'Please complete the bank transfer using the provided account details. Your order will be processed once payment is confirmed.'
+                        : 'Thank you for your purchase. Your order has been successfully placed.'}
                 </Text>
 
                 <View style={styles.orderInfo}>
@@ -70,7 +79,7 @@ export default function OrderConfirmation({ navigation, route }) {
                         <Text style={styles.infoValue}>#{(orderId || '').slice(-6)}</Text>
                     </View>
                     <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Amount Paid</Text>
+                        <Text style={styles.infoLabel}>Amount {isPendingTransfer ? 'to Pay' : 'Paid'}</Text>
                         <Text style={styles.infoValue}>₦{(amount || 0).toLocaleString()}</Text>
                     </View>
                 </View>
@@ -78,7 +87,9 @@ export default function OrderConfirmation({ navigation, route }) {
                 <View style={styles.divider} />
 
                 <Text style={styles.statusMessage}>
-                    You will receive an email confirmation shortly with your order details.
+                    {isPendingTransfer
+                        ? 'You will receive an email confirmation once your payment is confirmed. This usually takes 5-15 minutes.'
+                        : 'You will receive an email confirmation shortly with your order details.'}
                 </Text>
             </View>
 
