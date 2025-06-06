@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: 'semi-bold',
         color: '#FF521B',
         marginBottom: 16,
     },
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     },
     totalLabel: {
         fontSize: 18,
-        fontWeight: 'bold',
+        // fontWeight: 'bold',
         color: '#2A324B',
     },
     totalAmount: {
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     },
     methodTitle: {
         fontSize: 16,
-        fontWeight: 'bold',
+        // fontWeight: 'bold',
         color: '#2A324B',
         marginBottom: 4,
     },
@@ -325,6 +325,6 @@ const styles = StyleSheet.create({
     payButtonText: {
         color: 'white',
         fontSize: 18,
-        fontWeight: 'bold',
+        // fontWeight: 'bold',
     },
 }); 
