@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
 		width: 120,
 		height: 120,
 		marginBottom: 20,
-		resizeMode: 'contain'
+		resizeMode: 'contain',
 	},
 	title: {
 		fontSize: 32,

@@ -47,8 +47,8 @@ export default function ConfirmationScreen({ navigation, route }) {
 				[
 					{
 						text: 'OK',
-						onPress: () => navigation.navigate('EMartCartDetails')
-					}
+						onPress: () => navigation.navigate('EMartCartDetails'),
+					},
 				]
 			);
 			return;
@@ -66,15 +66,15 @@ export default function ConfirmationScreen({ navigation, route }) {
 				if (userDoc.exists()) {
 					const data = userDoc.data();
 					setUserData(data);
-					
+
 					// Convert addresses map to array and set default address
 					if (data.addresses) {
-						const addressArray = Object.keys(data.addresses).map(key => ({
+						const addressArray = Object.keys(data.addresses).map((key) => ({
 							...data.addresses[key],
-							id: key
+							id: key,
 						}));
 						setAddresses(addressArray);
-						const defaultAddr = addressArray.find(addr => addr.isDefault);
+						const defaultAddr = addressArray.find((addr) => addr.isDefault);
 						if (defaultAddr) {
 							setDefaultAddress(defaultAddr);
 						} else if (addressArray.length > 0) {
@@ -84,7 +84,10 @@ export default function ConfirmationScreen({ navigation, route }) {
 				}
 			} catch (error) {
 				console.error('Error fetching user data:', error);
-				Alert.alert('Error', 'Could not fetch your information. Please try again.');
+				Alert.alert(
+					'Error',
+					'Could not fetch your information. Please try again.'
+				);
 			} finally {
 				setLoading(false);
 			}
@@ -98,9 +101,9 @@ export default function ConfirmationScreen({ navigation, route }) {
 		const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
 		if (userDoc.exists() && userDoc.data().addresses) {
 			const addressesData = userDoc.data().addresses;
-			const addressArray = Object.keys(addressesData).map(key => ({
+			const addressArray = Object.keys(addressesData).map((key) => ({
 				...addressesData[key],
-				id: key
+				id: key,
 			}));
 			setAddresses(addressArray);
 		}
@@ -134,7 +137,10 @@ export default function ConfirmationScreen({ navigation, route }) {
 
 	const handleProceedToPayment = () => {
 		if (!defaultAddress) {
-			Alert.alert('Missing Address', 'Please add a delivery address before proceeding.');
+			Alert.alert(
+				'Missing Address',
+				'Please add a delivery address before proceeding.'
+			);
 			return;
 		}
 
@@ -145,8 +151,8 @@ export default function ConfirmationScreen({ navigation, route }) {
 				[
 					{
 						text: 'OK',
-						onPress: () => navigation.navigate('Profile')
-					}
+						onPress: () => navigation.navigate('Profile'),
+					},
 				]
 			);
 			return;
@@ -156,10 +162,10 @@ export default function ConfirmationScreen({ navigation, route }) {
 			cartItems,
 			userData: {
 				...userData,
-				address: defaultAddress
+				address: defaultAddress,
 			},
 			totalAmount,
-			storeId
+			storeId,
 		});
 	};
 
@@ -181,17 +187,50 @@ export default function ConfirmationScreen({ navigation, route }) {
 				<View style={{ width: 24 }} />
 			</View>
 
-			<View style={{ backgroundColor: 'white', margin: 16, borderRadius: 4, padding: 16, elevation: 1 }}>
-				<Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }}>Cart Items</Text>
+			<View
+				style={{
+					backgroundColor: 'white',
+					margin: 16,
+					borderRadius: 4,
+					padding: 16,
+					elevation: 1,
+				}}
+			>
+				<Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }}>
+					Cart Items
+				</Text>
 				{Array.isArray(cartItems) && cartItems.length > 0 ? (
 					<>
 						{cartItems.map((item, idx) => (
-							<View key={item.id || item.name + idx} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-								<Text style={{ fontSize: 15 }}>{item.name} x {item.quantity}</Text>
-								<Text style={{ fontSize: 15 }}>₦{(parseFloat(item.price) * (parseInt(item.quantity, 10) || 0)).toLocaleString()}</Text>
+							<View
+								key={item.id || item.name + idx}
+								style={{
+									flexDirection: 'row',
+									justifyContent: 'space-between',
+									marginBottom: 6,
+								}}
+							>
+								<Text style={{ fontSize: 15 }}>
+									{item.name} x {item.quantity}
+								</Text>
+								<Text style={{ fontSize: 15 }}>
+									₦
+									{(
+										parseFloat(item.price) * (parseInt(item.quantity, 10) || 0)
+									).toLocaleString()}
+								</Text>
 							</View>
 						))}
-						<View style={{ borderTopWidth: 1, borderTopColor: '#eee', marginTop: 8, paddingTop: 8, flexDirection: 'row', justifyContent: 'space-between' }}>
+						<View
+							style={{
+								borderTopWidth: 1,
+								borderTopColor: '#eee',
+								marginTop: 8,
+								paddingTop: 8,
+								flexDirection: 'row',
+								justifyContent: 'space-between',
+							}}
+						>
 							<Text style={{ fontWeight: 'bold', fontSize: 16 }}>Total:</Text>
 							<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
 								₦{totalAmount.toLocaleString()}
@@ -424,8 +463,11 @@ export default function ConfirmationScreen({ navigation, route }) {
 				</Modal>
 			</View>
 
-			<Pressable 
-				style={[styles.proceedButton, (!defaultAddress || !cartItems.length) && styles.disabledButton]}
+			<Pressable
+				style={[
+					styles.proceedButton,
+					(!defaultAddress || !cartItems.length) && styles.disabledButton,
+				]}
 				onPress={handleProceedToPayment}
 				disabled={!defaultAddress || !cartItems.length}
 			>
@@ -478,7 +520,7 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 	},
 	addressText: {
-		fontSize: 16
+		fontSize: 16,
 	},
 	modalOverlay: {
 		flex: 1,

@@ -33,11 +33,13 @@ function EMartCartDetails({ navigation, route }) {
 		}
 	}, [storeId, initialCartItems]);
 
-	const total = cartItemsState?.reduce(
-		(sum, item) =>
-			sum + parseFloat(item?.price || 0) * (parseInt(item?.quantity, 10) || 0),
-		0
-	) || 0;
+	const total =
+		cartItemsState?.reduce(
+			(sum, item) =>
+				sum +
+				parseFloat(item?.price || 0) * (parseInt(item?.quantity, 10) || 0),
+			0
+		) || 0;
 
 	// Calculates 10% discount if discount code is applied
 	const getDiscountedTotal = () => {
@@ -68,7 +70,7 @@ function EMartCartDetails({ navigation, route }) {
 		// Update local state
 		const newCartItems = cartItemsState.filter((_, i) => i !== index);
 		setCartItemsState(newCartItems);
-		
+
 		// Update global state
 		removeFromCart(storeId, index);
 
@@ -77,29 +79,32 @@ function EMartCartDetails({ navigation, route }) {
 			Alert.alert('Cart Empty', 'Your cart is now empty. Continue shopping?', [
 				{
 					text: 'Yes',
-					onPress: () => navigation.goBack()
+					onPress: () => navigation.goBack(),
 				},
 				{
 					text: 'No',
-					style: 'cancel'
-				}
+					style: 'cancel',
+				},
 			]);
 		}
 	};
 
 	const handleCheckout = () => {
 		if (!cartItemsState || cartItemsState.length === 0) {
-			Alert.alert('Empty Cart', 'Please add items to your cart before proceeding to checkout.');
+			Alert.alert(
+				'Empty Cart',
+				'Please add items to your cart before proceeding to checkout.'
+			);
 			return;
 		}
 
 		// Make sure the global cart is updated before proceeding
 		setCart(storeId, cartItemsState);
 
-		navigation.navigate('Confirmation', { 
+		navigation.navigate('Confirmation', {
 			cartItems: cartItemsState,
 			totalAmount: getDiscountedTotal(),
-			storeId
+			storeId,
 		});
 	};
 
@@ -196,17 +201,14 @@ function EMartCartDetails({ navigation, route }) {
 					})}
 				</Text>
 			</View>
-			
+
 			<Pressable
 				style={styles.checkoutButton}
 				onPress={() => navigation.goBack()}
 			>
 				<Text style={styles.checkoutText}>Continue Shopping</Text>
 			</Pressable>
-			<Pressable
-				style={styles.checkoutButton2}
-				onPress={handleCheckout}
-			>
+			<Pressable style={styles.checkoutButton2} onPress={handleCheckout}>
 				<Text style={styles.checkoutText}>Proceed to Checkout</Text>
 			</Pressable>
 		</View>
