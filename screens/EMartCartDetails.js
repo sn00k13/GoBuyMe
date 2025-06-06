@@ -7,11 +7,14 @@ import {
 	Pressable,
 	StyleSheet,
 	TextInput,
+	Alert,
 } from 'react-native';
 import { useStoreCart } from './StoreCartContext';
 
 function EMartCartDetails({ navigation, route }) {
-	const { storeId, cartItems: initialCartItems } = route.params;
+	// Provide default storeId if not passed in route params
+	const storeId = route?.params?.storeId || 'J3GO05mnhnoccDG9Bchc';
+	const initialCartItems = route?.params?.cartItems || [];
 	const { getCart, setCart, removeFromCart } = useStoreCart();
 	const [cartItemsState, setCartItemsState] = React.useState(initialCartItems);
 	const [discountCode, setDiscountCode] = React.useState('');
@@ -22,16 +25,19 @@ function EMartCartDetails({ navigation, route }) {
 	// Sync with global cart state when component mounts
 	useEffect(() => {
 		const globalCart = getCart(storeId);
-		if (globalCart.length > 0) {
+		if (globalCart && globalCart.length > 0) {
 			setCartItemsState(globalCart);
+		} else if (initialCartItems.length > 0) {
+			// If we have initial cart items but no global cart, update global cart
+			setCart(storeId, initialCartItems);
 		}
-	}, [storeId]);
+	}, [storeId, initialCartItems]);
 
-	const total = cartItemsState.reduce(
+	const total = cartItemsState?.reduce(
 		(sum, item) =>
-			sum + parseFloat(item.price) * (parseInt(item.quantity, 10) || 0),
+			sum + parseFloat(item?.price || 0) * (parseInt(item?.quantity, 10) || 0),
 		0
-	);
+	) || 0;
 
 	// Calculates 10% discount if discount code is applied
 	const getDiscountedTotal = () => {
@@ -65,6 +71,36 @@ function EMartCartDetails({ navigation, route }) {
 		
 		// Update global state
 		removeFromCart(storeId, index);
+
+		// If cart becomes empty, show message
+		if (newCartItems.length === 0) {
+			Alert.alert('Cart Empty', 'Your cart is now empty. Continue shopping?', [
+				{
+					text: 'Yes',
+					onPress: () => navigation.goBack()
+				},
+				{
+					text: 'No',
+					style: 'cancel'
+				}
+			]);
+		}
+	};
+
+	const handleCheckout = () => {
+		if (!cartItemsState || cartItemsState.length === 0) {
+			Alert.alert('Empty Cart', 'Please add items to your cart before proceeding to checkout.');
+			return;
+		}
+
+		// Make sure the global cart is updated before proceeding
+		setCart(storeId, cartItemsState);
+
+		navigation.navigate('Confirmation', { 
+			cartItems: cartItemsState,
+			totalAmount: getDiscountedTotal(),
+			storeId
+		});
 	};
 
 	const renderCartItem = ({ item, index }) => (
@@ -91,7 +127,7 @@ function EMartCartDetails({ navigation, route }) {
 				<Text style={styles.cartItemTotal}>
 					₦
 					{(
-						parseFloat(item.price) * (parseInt(item.quantity, 10) || 0)
+						parseFloat(item?.price || 0) * (parseInt(item?.quantity, 10) || 0)
 					).toLocaleString()}
 				</Text>
 			</View>
@@ -160,20 +196,19 @@ function EMartCartDetails({ navigation, route }) {
 					})}
 				</Text>
 			</View>
-			<View>
-				<Pressable
-					style={styles.checkoutButton}
-					onPress={() => navigation.goBack()}
-				>
-					<Text style={styles.checkoutText}>Continue Shopping</Text>
-				</Pressable>
-				<Pressable
-					style={styles.checkoutButton2}
-					onPress={() => navigation.navigate('Confirmation', { cartItems: cartItemsState })}
-				>
-					<Text style={styles.checkoutText}>Proceed to Checkout</Text>
-				</Pressable>
-			</View>
+			
+			<Pressable
+				style={styles.checkoutButton}
+				onPress={() => navigation.goBack()}
+			>
+				<Text style={styles.checkoutText}>Continue Shopping</Text>
+			</Pressable>
+			<Pressable
+				style={styles.checkoutButton2}
+				onPress={handleCheckout}
+			>
+				<Text style={styles.checkoutText}>Proceed to Checkout</Text>
+			</Pressable>
 		</View>
 	);
 }

@@ -1,23 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	View,
 	Text,
 	StyleSheet,
 	Pressable,
-	Modal,
 	TextInput,
 	FlatList,
+	Modal,
+	Alert,
+	ActivityIndicator,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { getAuth } from 'firebase/auth';
-import { getDoc, updateDoc, doc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { getAuth } from 'firebase/auth';
 
 export default function ConfirmationScreen({ navigation, route }) {
 	const [addresses, setAddresses] = useState([]);
-	const [defaultAddress, setDefaultAddress] = useState(null);
 	const [showAddressesModal, setShowAddressesModal] = useState(false);
 	const [showAddAddressModal, setShowAddAddressModal] = useState(false);
+	const [defaultAddress, setDefaultAddress] = useState(null);
 	const [form, setForm] = useState({
 		street: '',
 		city: '',
@@ -28,117 +30,149 @@ export default function ConfirmationScreen({ navigation, route }) {
 		isDefault: false,
 	});
 	const [loading, setLoading] = useState(false);
-	const [selectedPayment, setSelectedPayment] = useState('');
-	const [isVerified, setIsVerified] = useState(false);
+	const [userData, setUserData] = useState(null);
+	const auth = getAuth();
 
-	const user = getAuth().currentUser;
+	// Get cart items and total from route params
+	const cartItems = route.params?.cartItems || [];
+	const totalAmount = route.params?.totalAmount || 0;
+	const storeId = route.params?.storeId;
 
-	const paymentOptions = [
-		{ key: 'bank', label: 'Bank Transfer' },
-		{ key: 'cash', label: 'Cash on Delivery (Verified Customers only)' },
-		{ key: 'card', label: 'Card' },
-	];
-
-	const fetchAddresses = async () => {
-		try {
-			const auth = getAuth();
-			const user = auth.currentUser;
-			if (!user) {
-				console.error('User is not authenticated');
-				return;
-			}
-			const userId = user.uid;
-			const userDoc = await getDoc(doc(db, 'users', userId));
-			if (userDoc.exists()) {
-				const userData = userDoc.data();
-				const addressesMap = userData.addresses || {};
-				// Convert map to array
-				const addressArray = Object.keys(addressesMap).map((key) => ({
-					...addressesMap[key],
-					id: key,
-				}));
-				setAddresses(addressArray);
-			} else {
-				setAddresses([]);
-			}
-		} catch (error) {
-			console.error('Error fetching addresses:', error);
-			setAddresses([]);
+	useEffect(() => {
+		// Check if we have cart items
+		if (!cartItems || cartItems.length === 0) {
+			Alert.alert(
+				'Empty Cart',
+				'Your cart is empty. Please add items before proceeding.',
+				[
+					{
+						text: 'OK',
+						onPress: () => navigation.navigate('EMartCartDetails')
+					}
+				]
+			);
+			return;
 		}
-	};
 
-	useEffect(() => {
-    const fetchVerification = async () => {
-        if (!user) return;
-        const userDocRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userDocRef);
-        if (userSnap.exists()) {
-            const userData = userSnap.data();
-            setIsVerified(!!userData.verified);
-        }
-    };
-    fetchVerification();
-}, [user]);
-
-	useEffect(() => {
-		const fetchDefaultAddress = async () => {
+		// Fetch user data and addresses
+		const fetchUserData = async () => {
 			try {
-				const auth = getAuth();
-				const user = auth.currentUser;
-
-				if (!user) {
-					console.error('User is not authenticated');
+				if (!auth.currentUser) {
+					navigation.navigate('Login');
 					return;
 				}
 
-				const userId = user.uid;
-				const userDoc = await getDoc(doc(db, 'users', userId));
-
+				const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
 				if (userDoc.exists()) {
-					const userData = userDoc.data();
-					const addresses = userData.addresses || {};
-
-					// Find the default address
-					const defaultAddressEntry = Object.entries(addresses).find(
-						([, address]) => address.isDefault
-					);
-
-					if (defaultAddressEntry) {
-						const [id, address] = defaultAddressEntry;
-						setDefaultAddress({ id, ...address });
+					const data = userDoc.data();
+					setUserData(data);
+					
+					// Convert addresses map to array and set default address
+					if (data.addresses) {
+						const addressArray = Object.keys(data.addresses).map(key => ({
+							...data.addresses[key],
+							id: key
+						}));
+						setAddresses(addressArray);
+						const defaultAddr = addressArray.find(addr => addr.isDefault);
+						if (defaultAddr) {
+							setDefaultAddress(defaultAddr);
+						} else if (addressArray.length > 0) {
+							setDefaultAddress(addressArray[0]);
+						}
 					}
-				} else {
-					console.error('User document does not exist');
 				}
 			} catch (error) {
-				console.error('Error fetching default address:', error);
+				console.error('Error fetching user data:', error);
+				Alert.alert('Error', 'Could not fetch your information. Please try again.');
+			} finally {
+				setLoading(false);
 			}
 		};
 
-		fetchDefaultAddress();
-	}, []);
+		fetchUserData();
+	}, [auth.currentUser, navigation]);
 
-	const Checkbox = ({ value, onValueChange, color }) => (
+	const fetchAddresses = async () => {
+		if (!auth.currentUser) return;
+		const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+		if (userDoc.exists() && userDoc.data().addresses) {
+			const addressesData = userDoc.data().addresses;
+			const addressArray = Object.keys(addressesData).map(key => ({
+				...addressesData[key],
+				id: key
+			}));
+			setAddresses(addressArray);
+		}
+	};
+
+	const Checkbox = ({ value, onValueChange, color, disabled }) => (
 		<Pressable
-			onPress={() => onValueChange(!value)}
-			style={{
-				width: 22,
-				height: 22,
-				borderWidth: 2,
-				borderColor: color || '#FF521B',
-				borderRadius: 4,
-				alignItems: 'center',
-				justifyContent: 'center',
-				backgroundColor: value ? color || '#FF521B' : '#fff',
-			}}
+			style={[
+				{
+					width: 20,
+					height: 20,
+					borderRadius: 4,
+					borderWidth: 2,
+					borderColor: disabled ? '#ccc' : color || '#FF521B',
+					alignItems: 'center',
+					justifyContent: 'center',
+				},
+			]}
+			onPress={() => !disabled && onValueChange(!value)}
+			disabled={disabled}
 		>
-			{value ? <MaterialIcons name="check" size={18} color="#fff" /> : null}
+			{value && (
+				<MaterialIcons
+					name="check"
+					size={16}
+					color={disabled ? '#ccc' : color || '#FF521B'}
+				/>
+			)}
 		</Pressable>
 	);
 
+	const handleProceedToPayment = () => {
+		if (!defaultAddress) {
+			Alert.alert('Missing Address', 'Please add a delivery address before proceeding.');
+			return;
+		}
+
+		if (!userData?.name || !userData?.phone) {
+			Alert.alert(
+				'Missing Information',
+				'Please complete your profile with name and phone number before proceeding.',
+				[
+					{
+						text: 'OK',
+						onPress: () => navigation.navigate('Profile')
+					}
+				]
+			);
+			return;
+		}
+
+		navigation.navigate('PaymentScreen', {
+			cartItems,
+			userData: {
+				...userData,
+				address: defaultAddress
+			},
+			totalAmount,
+			storeId
+		});
+	};
+
+	if (loading) {
+		return (
+			<View style={styles.loadingContainer}>
+				<ActivityIndicator size="large" color="#FF521B" />
+			</View>
+		);
+	}
+
 	return (
 		<View style={styles.container}>
-			{/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
@@ -146,34 +180,29 @@ export default function ConfirmationScreen({ navigation, route }) {
 				<Text style={styles.locationText}>Address and Billing</Text>
 				<View style={{ width: 24 }} />
 			</View>
+
 			<View style={{ backgroundColor: 'white', margin: 16, borderRadius: 4, padding: 16, elevation: 1 }}>
-  <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }}>Cart Items</Text>
-  {Array.isArray(route?.params?.cartItems) && route.params.cartItems.length > 0 ? (
-    <>
-      {route.params.cartItems.map((item, idx) => (
-        <View key={item.id || item.name + idx} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-          <Text style={{ fontSize: 15 }}>{item.name} x {item.quantity}</Text>
-          <Text style={{ fontSize: 15 }}>₦{(parseFloat(item.price) * (parseInt(item.quantity, 10) || 0)).toLocaleString()}</Text>
-        </View>
-      ))}
-      <View style={{ borderTopWidth: 1, borderTopColor: '#eee', marginTop: 8, paddingTop: 8, flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>Total:</Text>
-        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-          ₦
-          {route.params.cartItems
-            .reduce(
-              (sum, item) =>
-                sum + parseFloat(item.price) * (parseInt(item.quantity, 10) || 0),
-              0
-            )
-            .toLocaleString()}
-        </Text>
-      </View>
-    </>
-  ) : (
-    <Text style={{ color: '#aaa' }}>Your cart is empty.</Text>
-  )}
-</View>
+				<Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }}>Cart Items</Text>
+				{Array.isArray(cartItems) && cartItems.length > 0 ? (
+					<>
+						{cartItems.map((item, idx) => (
+							<View key={item.id || item.name + idx} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+								<Text style={{ fontSize: 15 }}>{item.name} x {item.quantity}</Text>
+								<Text style={{ fontSize: 15 }}>₦{(parseFloat(item.price) * (parseInt(item.quantity, 10) || 0)).toLocaleString()}</Text>
+							</View>
+						))}
+						<View style={{ borderTopWidth: 1, borderTopColor: '#eee', marginTop: 8, paddingTop: 8, flexDirection: 'row', justifyContent: 'space-between' }}>
+							<Text style={{ fontWeight: 'bold', fontSize: 16 }}>Total:</Text>
+							<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+								₦{totalAmount.toLocaleString()}
+							</Text>
+						</View>
+					</>
+				) : (
+					<Text style={{ color: '#aaa' }}>Your cart is empty.</Text>
+				)}
+			</View>
+
 			<View style={styles.deliveryAddress}>
 				<Text style={styles.addressHeader}>Delivery Address</Text>
 				{defaultAddress ? (
@@ -181,7 +210,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 						<Text style={styles.addressText}>{defaultAddress.street}</Text>
 						<Text style={styles.addressText}>
 							{defaultAddress.city}, {defaultAddress.state},{' '}
-							{defaultAddress.zipCode}
+							{defaultAddress.zip}
 						</Text>
 						<Text style={styles.addressText}>{defaultAddress.country}</Text>
 					</>
@@ -208,7 +237,6 @@ export default function ConfirmationScreen({ navigation, route }) {
 				<Modal visible={showAddressesModal} animationType="slide" transparent>
 					<View style={styles.modalOverlay}>
 						<View style={styles.modalContent}>
-							{/* X Close Icon at top right */}
 							<Pressable
 								onPress={() => setShowAddressesModal(false)}
 								style={{
@@ -329,7 +357,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 											!form.country
 										)
 											return;
-										const userDocRef = doc(db, 'users', user.uid);
+										const userDocRef = doc(db, 'users', auth.currentUser.uid);
 
 										// Generate a unique id for the address
 										const newId = Date.now().toString();
@@ -394,47 +422,14 @@ export default function ConfirmationScreen({ navigation, route }) {
 						</View>
 					</View>
 				</Modal>
-				{/* Logic to enter new shipping address */}
 			</View>
 
-			<View style={styles.paymentOptions}>
-  <Text>Payment Options</Text>
-  <View>
-    {paymentOptions.map(option => {
-      const isCash = option.key === 'cash';
-      const disabled = isCash && !isVerified;
-      return (
-        <Pressable
-          key={option.key}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginVertical: 6,
-            opacity: disabled ? 0.4 : 1,
-          }}
-          onPress={() => {
-            if (!disabled) setSelectedPayment(option.key);
-          }}
-          disabled={disabled}
-        >
-          <Checkbox
-            value={selectedPayment === option.key}
-            onValueChange={() => {
-              if (!disabled) setSelectedPayment(option.key);
-            }}
-            color="#FF521B"
-            disabled={disabled}
-          />
-          <Text style={[styles.addressText2, disabled && { color: '#aaa' }]}>
-            {option.label}
-          </Text>
-        </Pressable>
-      );
-    })}
-  </View>
-</View>
-			<Pressable onPress={() => navigation.navigate('PaymentOptions')}>
-				<Text style={{ color: '#FF521B', fontSize: 18, marginTop: 20, textAlign: 'center' }}>
+			<Pressable 
+				style={[styles.proceedButton, (!defaultAddress || !cartItems.length) && styles.disabledButton]}
+				onPress={handleProceedToPayment}
+				disabled={!defaultAddress || !cartItems.length}
+			>
+				<Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>
 					Proceed to Payment
 				</Text>
 			</Pressable>
@@ -447,14 +442,18 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: '#FFF9F7',
 	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#FFF9F7',
+	},
 	header: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		borderBottomWidth: 1,
-		borderBottomColor: '#F0F0F0',
 		marginTop: 40,
 	},
 	locationText: {
@@ -480,10 +479,6 @@ const styles = StyleSheet.create({
 	},
 	addressText: {
 		fontSize: 16
-	},
-		addressText2: {
-		fontSize: 16,
-		marginLeft: 8
 	},
 	modalOverlay: {
 		flex: 1,
@@ -513,16 +508,17 @@ const styles = StyleSheet.create({
 		borderRadius: 4,
 		marginHorizontal: 4,
 	},
-	paymentOptions: {
-		paddingVertical: 16,
-		paddingHorizontal: 16,
-		backgroundColor: 'white',
-		margin: 16,
-		borderRadius: 4,
-		elevation: 1,
-		shadowColor: '#000',
-		shadowOpacity: 0.04,
-		shadowRadius: 2,
-		gap: 10,
+	proceedButton: {
+		backgroundColor: '#FF521B',
+		padding: 16,
+		marginHorizontal: 16,
+		borderRadius: 8,
+		position: 'absolute',
+		bottom: 24,
+		left: 0,
+		right: 0,
+	},
+	disabledButton: {
+		backgroundColor: '#E0E0E0',
 	},
 });

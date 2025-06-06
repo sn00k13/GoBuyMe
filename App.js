@@ -40,6 +40,11 @@ import Permissions from './screens/Permissions';
 import EmartScreen from './screens/EmartScreen';
 import SelectProductScreen from './screens/SelectProductScreen';
 import EMartCartDetails from './screens/EMartCartDetails';
+import PaymentScreen from './screens/PaymentScreen';
+import CashOnDeliveryScreen from './screens/CashOnDeliveryScreen';
+import OrderConfirmation from './screens/OrderConfirmation';
+import OrdersScreen from './screens/OrdersScreen';
+import OrderDetailsScreen from './screens/OrderDetailsScreen';
 import { CartProvider } from './screens/CartContext';
 import { StoreCartProvider } from './screens/StoreCartContext';
 import { MaterialIcons, FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
@@ -85,6 +90,11 @@ function HomeStack() {
         <Stack.Screen name="EmartScreen" component={EmartScreen} />        
         <Stack.Screen name="SelectProductScreen" component={SelectProductScreen} />
         <Stack.Screen name="EMartCartDetails" component={EMartCartDetails}/>
+        <Stack.Screen name="PaymentScreen" component={PaymentScreen}/>
+        <Stack.Screen name="CashOnDelivery" component={CashOnDeliveryScreen}/>
+        <Stack.Screen name="OrderConfirmation" component={OrderConfirmation}/>
+        <Stack.Screen name="Orders" component={OrdersScreen}/>
+        <Stack.Screen name="OrderDetails" component={OrderDetailsScreen}/>
       </Stack.Navigator>
     </CartProvider>
     </StoreCartProvider>

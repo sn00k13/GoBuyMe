@@ -13,6 +13,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Alert } from 'react-native';
 import { useStoreCart } from './StoreCartContext';
+import { useFocusEffect } from '@react-navigation/native';
 
 function SelectProductScreen({ navigation, route }) {
 	const [categories, setCategories] = useState([]);
@@ -39,6 +40,19 @@ function SelectProductScreen({ navigation, route }) {
 			updateCartCount(initialQuantities);
 		}
 	}, [storeId]);
+
+	// Update quantities and cart count when screen comes into focus
+	useFocusEffect(
+		React.useCallback(() => {
+			const cartItems = getCart(storeId);
+			const newQuantities = {};
+			cartItems.forEach(item => {
+				newQuantities[item.name] = item.quantity;
+			});
+			setQuantities(newQuantities);
+			updateCartCount(newQuantities);
+		}, [storeId, getCart])
+	);
 
 	// Update cart count whenever quantities change
 	const updateCartCount = (newQuantities) => {

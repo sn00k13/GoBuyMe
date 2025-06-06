@@ -4,20 +4,15 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 export default function PaymentOptionsScreen({ navigation }) {
   return (
     <View style={styles.container}>
-            {/* Back Button */}
-                  <Pressable 
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                  >
-                    <Text style={styles.backButtonText}>← Back</Text>
-                  </Pressable>
-      <Text style={styles.title}>Payment Screen</Text>
-      <Text>This screen will show payment options</Text>
-      <Text>Card</Text>
-      <Text>Cash</Text>
-      <Text>Transfer</Text>
-      <Text>Wallet</Text>
-      <Text>Cash on Delivery</Text>
+            {/* Header */}
+			<View style={styles.header}>
+				<Pressable onPress={() => navigation.goBack()}>
+					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+				</Pressable>
+				<Text style={styles.locationText}>Address and Billing</Text>
+				<View style={{ width: 24 }} />
+			</View>
+      {/* Display Logged items here */}
       
       <Pressable onPress={() => navigation.navigate('Confirmation')}>
         <Text style={{ color: '#FF521B', fontSize: 18, marginTop: 20 }}>

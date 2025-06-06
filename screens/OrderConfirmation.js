@@ -1,0 +1,201 @@
+import React, { useEffect } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    Animated,
+    Easing,
+} from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+
+export default function OrderConfirmation({ navigation, route }) {
+    const { orderId = '', amount = 0 } = route.params || {};
+    const checkmarkScale = new Animated.Value(0);
+    const checkmarkOpacity = new Animated.Value(0);
+
+    useEffect(() => {
+        // Animate the checkmark
+        Animated.parallel([
+            Animated.timing(checkmarkScale, {
+                toValue: 1,
+                duration: 500,
+                easing: Easing.elastic(1),
+                useNativeDriver: true,
+            }),
+            Animated.timing(checkmarkOpacity, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, []);
+
+    const handleViewOrder = () => {
+        navigation.navigate('OrderDetails', { orderId });
+    };
+
+    const handleContinueShopping = () => {
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'EmartScreen' }],
+        });
+    };
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.content}>
+                <View style={styles.checkmarkContainer}>
+                    <Animated.View
+                        style={[
+                            styles.checkmarkCircle,
+                            {
+                                transform: [{ scale: checkmarkScale }],
+                                opacity: checkmarkOpacity,
+                            },
+                        ]}
+                    >
+                        <MaterialIcons name="check" size={48} color="white" />
+                    </Animated.View>
+                </View>
+
+                <Text style={styles.title}>Order Confirmed!</Text>
+                <Text style={styles.message}>
+                    Thank you for your purchase. Your order has been successfully placed.
+                </Text>
+
+                <View style={styles.orderInfo}>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>Order ID</Text>
+                        <Text style={styles.infoValue}>#{(orderId || '').slice(-6)}</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>Amount Paid</Text>
+                        <Text style={styles.infoValue}>₦{(amount || 0).toLocaleString()}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.divider} />
+
+                <Text style={styles.statusMessage}>
+                    You will receive an email confirmation shortly with your order details.
+                </Text>
+            </View>
+
+            <View style={styles.footer}>
+                <TouchableOpacity
+                    style={[styles.button, styles.primaryButton]}
+                    onPress={handleViewOrder}
+                >
+                    <Text style={styles.primaryButtonText}>View Order</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.button, styles.secondaryButton]}
+                    onPress={handleContinueShopping}
+                >
+                    <Text style={styles.secondaryButtonText}>Continue Shopping</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#FFF0EB',
+    },
+    content: {
+        flex: 1,
+        alignItems: 'center',
+        padding: 24,
+        paddingTop: 60,
+    },
+    checkmarkContainer: {
+        marginBottom: 24,
+    },
+    checkmarkCircle: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        backgroundColor: '#4CAF50',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#0B3948',
+        marginBottom: 16,
+    },
+    message: {
+        fontSize: 16,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 32,
+    },
+    orderInfo: {
+        backgroundColor: 'white',
+        borderRadius: 8,
+        padding: 16,
+        width: '100%',
+        marginBottom: 24,
+    },
+    infoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
+    infoLabel: {
+        fontSize: 14,
+        color: '#666',
+    },
+    infoValue: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#0B3948',
+    },
+    divider: {
+        height: 1,
+        backgroundColor: '#E0E0E0',
+        width: '100%',
+        marginBottom: 24,
+    },
+    statusMessage: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 32,
+    },
+    footer: {
+        padding: 16,
+        backgroundColor: 'white',
+        borderTopWidth: 1,
+        borderTopColor: '#E0E0E0',
+    },
+    button: {
+        padding: 16,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    primaryButton: {
+        backgroundColor: '#FF521B',
+    },
+    secondaryButton: {
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderColor: '#FF521B',
+    },
+    primaryButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    secondaryButtonText: {
+        color: '#FF521B',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+}); 

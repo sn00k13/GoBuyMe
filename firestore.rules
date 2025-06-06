@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // User profiles - private
+    match /users/{userId} {
+      allow read, update: if isUser(userId);
+      allow create: if request.auth != null;
+    }
+
+    // Restaurants - public read
+    match /restaurants/{restaurant} {
+      allow read: if true;
+      // allow write: if isAdmin(); // When ready
+    }
+    
+    // Allow public read access to meals
+    match /meals/{mealId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Allow public read access to stores
+    match /stores/{storeId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Transactions
+    match /transactions/{transaction} {
+      allow create: if request.auth != null;
+      allow read: if request.auth.uid == resource.data.userId;
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // Orders
+    match /orders/{orderId} {
+      allow create: if request.auth != null;
+      allow read, update: if request.auth != null && 
+                         request.auth.uid == resource.data.userId;
+    }
+    
+    // Allow public read access to notifications
+    match /notifications/{notificationId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // Helper functions
+    function isUser(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+  }
+} 
