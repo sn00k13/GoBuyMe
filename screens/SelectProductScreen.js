@@ -331,21 +331,20 @@ function SelectProductScreen({ navigation, route }) {
 					contentContainerStyle={styles.horizontalList}
 				/>
 			</View>
-			<View style={styles.productsGrid}>
-				<FlatList
-					data={products}
-					renderItem={renderProductCard}
-					keyExtractor={(item, idx) => item.name + idx}
-					numColumns={3}
-					showsVerticalScrollIndicator={false}
-					contentContainerStyle={{ paddingBottom: 24 }}
-					ListEmptyComponent={
-						<Text style={{ textAlign: 'center', color: '#aaa', marginTop: 24 }}>
-							No products found.
-						</Text>
-					}
-				/>
-			</View>
+			<FlatList
+				style={styles.productsGrid}
+				data={products}
+				renderItem={renderProductCard}
+				keyExtractor={(item, idx) => item.name + idx}
+				numColumns={3}
+				showsVerticalScrollIndicator={false}
+				contentContainerStyle={styles.productsContainer}
+				ListEmptyComponent={
+					<Text style={styles.emptyText}>
+						No products found.
+					</Text>
+				}
+			/>
 			<View style={styles.cartFab}>
 				<Pressable
 					style={styles.cartButtonFab}
@@ -492,9 +491,17 @@ const styles = StyleSheet.create({
 		textAlign: 'left',
 	},
 	productsGrid: {
+		flex: 1,
+		backgroundColor: '#FFF0EB',
+	},
+	productsContainer: {
 		paddingHorizontal: 8,
-		paddingBottom: 24,
-		marginTop: 10,
+		paddingBottom: 80, // Add extra padding for the FAB
+	},
+	emptyText: {
+		textAlign: 'center',
+		color: '#aaa',
+		marginTop: 24,
 	},
 	addToCartAlt: {
 		marginLeft: 12,
