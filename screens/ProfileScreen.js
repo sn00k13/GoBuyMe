@@ -8,6 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function ProfileScreen({ navigation }) {
   const [userData, setUserData] = useState(null);
@@ -110,9 +111,9 @@ export default function ProfileScreen({ navigation }) {
       {/* Back Button */}
       <Pressable 
         style={styles.backButton}
-        onPress={() => navigation.navigate('Home', { screen: 'HomeMain' })}
+        onPress={() => navigation.toggleDrawer()}
       >
-        <Text style={styles.backButtonText}>← Back</Text>
+        <MaterialIcons name="arrow-back" size={24} color="#FF521B" />
       </Pressable>
 
       <View style={styles.profileHeader}>

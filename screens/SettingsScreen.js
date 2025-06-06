@@ -12,7 +12,7 @@ const SettingsScreen = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<Pressable onPress={() => navigation.goBack()}>
+				<Pressable onPress={() => navigation.toggleDrawer()}>
 					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
 				</Pressable>
 				<Text style={styles.locationText}>Settings</Text>

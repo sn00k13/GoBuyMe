@@ -27,9 +27,11 @@ export default function OffersScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-        <MaterialIcons name="arrow-back" size={24} color="#0B3948" />
-        <Text style={styles.backButtonText}>Back</Text>
+      <Pressable 
+        style={styles.backButton}
+        onPress={() => navigation.toggleDrawer()}
+      >
+        <MaterialIcons name="arrow-back" size={24} color="#FF521B" />
       </Pressable>
       <Text style={styles.title}>Available Offers</Text>
       <FlatList

@@ -153,9 +153,12 @@ export default function MyAddressesScreen({ navigation }) {
     <View style={styles.container}>
       {/* Header */}
                   <View style={styles.header}>
-                    <Pressable onPress={() => navigation.goBack()}>
-                      <MaterialIcons name="arrow-back" size={24} color="#FF521B" />
-                    </Pressable>
+                  <Pressable 
+        style={styles.backButton}
+        onPress={() => navigation.toggleDrawer()}
+      >
+        <MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+      </Pressable>
                     <Text style={styles.locationText}>Choose a delivery location</Text>
                     <View style={{ width: 24 }} />
                   </View>

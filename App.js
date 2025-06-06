@@ -12,7 +12,6 @@ import ChatScreen from './screens/ChatScreen';
 import CartDetails from './screens/CartDetails';
 import FavoritesScreen from './screens/FavoritesScreen';
 import OrderHistoryScreen from './screens/OrderHistoryScreen';
-import Cards from './screens/Cards';
 import OffersScreen from './screens/OffersScreen';
 import MealCardScreen from './screens/MealCardScreen';
 import RestaurantScreen from './screens/RestaurantScreen';
@@ -146,13 +145,6 @@ function DrawerNavigator() {
         component={MyAddressesScreen}
         options={{
           drawerIcon: ({ color }) => <FontAwesome6 name="location-dot" size={20} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="My Payment Cards"
-        component={Cards}
-        options={{
-          drawerIcon: ({ color }) => <FontAwesome5 name="money-bill" size={20} color={color} />,
         }}
       />
       <Drawer.Screen
