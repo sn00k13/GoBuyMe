@@ -164,7 +164,7 @@ useEffect(() => {
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => navigation.goBack()}>
+                <Pressable onPress={() => navigation.navigate('VendorList')}>
                     <MaterialIcons name="arrow-back" size={24} color="#FF521B" />
                 </Pressable>
                 <Text style={styles.locationText}>eMart</Text>
