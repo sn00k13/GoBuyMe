@@ -3,12 +3,14 @@ import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-nativ
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleRegister = async () => {
     if (!name || !email || !password || !phone) {
@@ -54,13 +56,25 @@ export default function RegisterScreen({ navigation }) {
         style={styles.input}
       />
       
-      <TextInput
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        style={styles.input}
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          placeholder="Password"
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
+          style={[styles.input, styles.passwordInput]}
+        />
+        <Pressable
+          onPress={() => setShowPassword(!showPassword)}
+          style={styles.eyeIcon}
+        >
+          <MaterialIcons
+            name={showPassword ? 'visibility-off' : 'visibility'}
+            size={24}
+            color="#666"
+          />
+        </Pressable>
+      </View>
       
       <TextInput
         placeholder="Phone Number"
@@ -98,21 +112,34 @@ const styles = StyleSheet.create({
     height: 50,
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 8,
+    borderRadius: 4,
     padding: 10,
     marginBottom: 15,
     backgroundColor: '#f9f9f9',
   },
+  passwordContainer: {
+    position: 'relative',
+    marginBottom: 15,
+  },
+  passwordInput: {
+    marginBottom: 0,
+    paddingRight: 50, // Make room for the eye icon
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 12,
+    top: 12,
+    padding: 2,
+  },
   button: {
     backgroundColor: '#FF521B',
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 4,
     alignItems: 'center',
     marginTop: 10,
   },
   buttonText: {
     color: '#fff',
-    fontWeight: 'bold',
     fontSize: 16,
   },
   link: {

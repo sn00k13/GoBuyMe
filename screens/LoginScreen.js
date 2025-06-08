@@ -10,10 +10,12 @@ import {
 } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function LoginScreen({ navigation }) {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [showPassword, setShowPassword] = useState(false);
 
 	const handleLogin = async () => {
 		try {
@@ -41,13 +43,25 @@ export default function LoginScreen({ navigation }) {
 						style={styles.input}
 					/>
 
-					<TextInput
-						placeholder="Password"
-						secureTextEntry
-						value={password}
-						onChangeText={setPassword}
-						style={styles.input}
-					/>
+					<View style={styles.passwordContainer}>
+						<TextInput
+							placeholder="Password"
+							secureTextEntry={!showPassword}
+							value={password}
+							onChangeText={setPassword}
+							style={[styles.input, styles.passwordInput]}
+						/>
+						<Pressable
+							onPress={() => setShowPassword(!showPassword)}
+							style={styles.eyeIcon}
+						>
+							<MaterialIcons
+								name={showPassword ? 'visibility-off' : 'visibility'}
+								size={24}
+								color="#666"
+							/>
+						</Pressable>
+					</View>
 
 					<Pressable
 						onPress={handleLogin}
@@ -102,6 +116,20 @@ const styles = StyleSheet.create({
 		padding: 15,
 		marginBottom: 15,
 		backgroundColor: '#FFF', // White background for inputs
+	},
+	passwordContainer: {
+		position: 'relative',
+		marginBottom: 15,
+	},
+	passwordInput: {
+		marginBottom: 0,
+		paddingRight: 50, // Make room for the eye icon
+	},
+	eyeIcon: {
+		position: 'absolute',
+		right: 12,
+		top: 12,
+		padding: 2,
 	},
 	loginButton: {
 		backgroundColor: '#FF521B', // Your brand color
