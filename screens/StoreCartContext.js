@@ -9,9 +9,35 @@ export const StoreCartProvider = ({ children }) => {
   // Get cart for a store
   const getCart = (storeId) => storeCarts[storeId] || [];
 
-  // Set cart for a store
-  const setCart = (storeId, items) => {
-    setStoreCarts(prev => ({ ...prev, [storeId]: items }));
+  // Add or update items in cart
+  const updateCart = (storeId, newItems) => {
+    setStoreCarts(prev => {
+      const currentCart = prev[storeId] || [];
+      
+      // Create a map of existing items by name for quick lookup
+      const existingItemsMap = {};
+      currentCart.forEach(item => {
+        existingItemsMap[item.name] = item;
+      });
+
+      // Update quantities for existing items and add new items
+      newItems.forEach(newItem => {
+        if (existingItemsMap[newItem.name]) {
+          existingItemsMap[newItem.name].quantity = newItem.quantity;
+        } else {
+          existingItemsMap[newItem.name] = newItem;
+        }
+      });
+
+      // Convert back to array and filter out items with quantity 0
+      const updatedCart = Object.values(existingItemsMap)
+        .filter(item => parseInt(item.quantity, 10) > 0);
+
+      return {
+        ...prev,
+        [storeId]: updatedCart
+      };
+    });
   };
 
   // Remove item by index
@@ -33,7 +59,7 @@ export const StoreCartProvider = ({ children }) => {
   };
 
   return (
-    <StoreCartContext.Provider value={{ getCart, setCart, removeFromCart, clearCart }}>
+    <StoreCartContext.Provider value={{ getCart, updateCart, removeFromCart, clearCart }}>
       {children}
     </StoreCartContext.Provider>
   );

@@ -22,7 +22,7 @@ function SelectProductScreen({ navigation, route }) {
 	);
 	const [activeSubcategory, setActiveSubcategory] = useState(null);
 	const [quantities, setQuantities] = useState({});
-	const { getCart, setCart } = useStoreCart();
+	const { getCart, updateCart } = useStoreCart();
 	const [cartItemCount, setCartItemCount] = useState(0);
 
 	// Get storeId from navigation params or fallback to a default
@@ -71,50 +71,27 @@ function SelectProductScreen({ navigation, route }) {
 		setQuantities(newQuantities);
 		updateCartCount(newQuantities);
 		
-		// Update cart when quantity changes
-		const cartItems = products
-			.filter(item => parseInt(newQuantities[item.name], 10) > 0)
-			.map(item => ({
-				...item,
-				quantity: newQuantities[item.name],
-			}));
-		setCart(storeId, cartItems);
+		// Find the product in the current category
+		const product = products.find(item => item.name === key);
+		if (product) {
+			// Update cart with the changed item
+			updateCart(storeId, [{
+				...product,
+				quantity: newQuantities[key]
+			}]);
+		}
 	};
 
 	const increment = (key) => {
-		const newQuantities = {
-			...quantities,
-			[key]: String(parseInt(quantities[key] || '0', 10) + 1),
-		};
-		setQuantities(newQuantities);
-		updateCartCount(newQuantities);
-		
-		// Update cart when quantity changes
-		const cartItems = products
-			.filter(item => parseInt(newQuantities[item.name], 10) > 0)
-			.map(item => ({
-				...item,
-				quantity: newQuantities[item.name],
-			}));
-		setCart(storeId, cartItems);
+		const currentQty = parseInt(quantities[key] || '0', 10);
+		handleQuantityChange(key, String(currentQty + 1));
 	};
 
 	const decrement = (key) => {
-		const newQuantities = {
-			...quantities,
-			[key]: String(Math.max(0, parseInt(quantities[key] || '0', 10) - 1)),
-		};
-		setQuantities(newQuantities);
-		updateCartCount(newQuantities);
-		
-		// Update cart when quantity changes
-		const cartItems = products
-			.filter(item => parseInt(newQuantities[item.name], 10) > 0)
-			.map(item => ({
-				...item,
-				quantity: newQuantities[item.name],
-			}));
-		setCart(storeId, cartItems);
+		const currentQty = parseInt(quantities[key] || '0', 10);
+		if (currentQty > 0) {
+			handleQuantityChange(key, String(currentQty - 1));
+		}
 	};
 
 	useEffect(() => {
@@ -349,7 +326,7 @@ function SelectProductScreen({ navigation, route }) {
 				<Pressable
 					style={styles.cartButtonFab}
 					onPress={() => navigation.navigate('EMartCartDetails', { 
-						cartItems,
+						cartItems: getCart(storeId),
 						storeId 
 					})}
 				>

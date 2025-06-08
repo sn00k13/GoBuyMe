@@ -15,7 +15,7 @@ function EMartCartDetails({ navigation, route }) {
 	// Provide default storeId if not passed in route params
 	const storeId = route?.params?.storeId || 'J3GO05mnhnoccDG9Bchc';
 	const initialCartItems = route?.params?.cartItems || [];
-	const { getCart, setCart, removeFromCart } = useStoreCart();
+	const { getCart, updateCart, removeFromCart } = useStoreCart();
 	const [cartItemsState, setCartItemsState] = React.useState(initialCartItems);
 	const [discountCode, setDiscountCode] = React.useState('');
 	const [discountMessage, setDiscountMessage] = React.useState('');
@@ -29,7 +29,7 @@ function EMartCartDetails({ navigation, route }) {
 			setCartItemsState(globalCart);
 		} else if (initialCartItems.length > 0) {
 			// If we have initial cart items but no global cart, update global cart
-			setCart(storeId, initialCartItems);
+			updateCart(storeId, initialCartItems);
 		}
 	}, [storeId, initialCartItems]);
 
@@ -99,7 +99,7 @@ function EMartCartDetails({ navigation, route }) {
 		}
 
 		// Make sure the global cart is updated before proceeding
-		setCart(storeId, cartItemsState);
+		updateCart(storeId, cartItemsState);
 
 		navigation.navigate('Confirmation', {
 			cartItems: cartItemsState,
