@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, Platform } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { MaterialIcons } from '@expo/vector-icons';
+import Recaptcha from 'react-native-recaptcha-that-works';
+import { RECAPTCHA_CONFIG } from '../config';
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -11,6 +13,18 @@ export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const recaptchaRef = useRef();
+  
+  // Track form changes to determine if user is likely human
+  const [formInteractions, setFormInteractions] = useState(0);
+  const isLikelyHuman = formInteractions > 3; // Consider user likely human after 3 field interactions
+
+  const handleFieldChange = (value, setter) => {
+    setter(value);
+    setFormInteractions(prev => prev + 1);
+  };
 
   const handleRegister = async () => {
     if (!name || !email || !password || !phone) {
@@ -18,21 +32,50 @@ export default function RegisterScreen({ navigation }) {
       return;
     }
 
+    setIsLoading(true);
     try {
-      // 1. Create auth user
+      // Only show reCAPTCHA if user behavior seems suspicious
+      if (!isVerified && !isLikelyHuman) {
+        recaptchaRef.current.open();
+        setIsLoading(false);
+        return;
+      }
+
+      // Create auth user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
-      // 2. Save additional data to Firestore
+      // Save additional data to Firestore
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         name,
         email,
         phone,
         createdAt: new Date(),
       });
-      Alert.alert('Registration Successful. Login to quench that hunger!')
+      
+      Alert.alert('Registration Successful', 'Welcome to GoBuyMe! Attack that hunger');
       navigation.replace('Login');
     } catch (error) {
       Alert.alert('Registration Failed', error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onVerify = (token) => {
+    setIsVerified(true);
+    // Automatically proceed with registration after verification
+    handleRegister();
+  };
+
+  const onExpire = () => {
+    setIsVerified(false);
+  };
+
+  const onError = (err) => {
+    console.warn('reCAPTCHA Error:', err);
+    // If reCAPTCHA fails, allow registration if user seems human
+    if (isLikelyHuman) {
+      setIsVerified(true);
     }
   };
 
@@ -43,14 +86,14 @@ export default function RegisterScreen({ navigation }) {
       <TextInput
         placeholder="Full Name"
         value={name}
-        onChangeText={setName}
+        onChangeText={(value) => handleFieldChange(value, setName)}
         style={styles.input}
       />
       
       <TextInput
         placeholder="Email"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(value) => handleFieldChange(value, setEmail)}
         keyboardType="email-address"
         autoCapitalize="none"
         style={styles.input}
@@ -61,7 +104,7 @@ export default function RegisterScreen({ navigation }) {
           placeholder="Password"
           secureTextEntry={!showPassword}
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(value) => handleFieldChange(value, setPassword)}
           style={[styles.input, styles.passwordInput]}
         />
         <Pressable
@@ -79,13 +122,34 @@ export default function RegisterScreen({ navigation }) {
       <TextInput
         placeholder="Phone Number"
         value={phone}
-        onChangeText={setPhone}
+        onChangeText={(value) => handleFieldChange(value, setPhone)}
         keyboardType="phone-pad"
         style={styles.input}
       />
 
-      <Pressable onPress={handleRegister} style={styles.button}>
-        <Text style={styles.buttonText}>Register</Text>
+      <Recaptcha
+        ref={recaptchaRef}
+        siteKey={RECAPTCHA_CONFIG.siteKey}
+        baseUrl={RECAPTCHA_CONFIG.baseUrl}
+        onVerify={onVerify}
+        onExpire={onExpire}
+        onError={onError}
+        size="invisible"
+        enterprise
+        hideBadge
+      />
+
+      <Pressable 
+        onPress={handleRegister}
+        style={[
+          styles.button,
+          isLoading && styles.buttonDisabled
+        ]}
+        disabled={isLoading}
+      >
+        <Text style={styles.buttonText}>
+          {isLoading ? 'Registering...' : 'Register'}
+        </Text>
       </Pressable>
       
       <Pressable onPress={() => navigation.navigate('Login')}>
@@ -123,7 +187,7 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     marginBottom: 0,
-    paddingRight: 50, // Make room for the eye icon
+    paddingRight: 50,
   },
   eyeIcon: {
     position: 'absolute',
@@ -137,6 +201,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignItems: 'center',
     marginTop: 10,
+  },
+  buttonDisabled: {
+    backgroundColor: '#ccc',
   },
   buttonText: {
     color: '#fff',
