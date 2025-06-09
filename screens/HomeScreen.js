@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
 	},
 	buttonText: {
 		color: 'white',
-		fontWeight: 'bold',
+		// fontWeight: 'bold',
 	},
 	menuContainer: {
 		flexDirection: 'row',

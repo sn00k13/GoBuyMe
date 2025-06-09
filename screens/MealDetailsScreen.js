@@ -12,8 +12,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useCart } from './CartContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { RadioButton } from 'react-native-paper'; // Import RadioButton if using react-native-paper
-import { CheckBox } from 'react-native-elements'; // Import CheckBox
 
 export default function MealDetailsScreen({ route, navigation }) {
 	const {
@@ -31,8 +29,6 @@ export default function MealDetailsScreen({ route, navigation }) {
 	const [isFavorited, setIsFavorited] = useState(false);
 	const [cartTotal, setCartTotal] = useState(0);
 	const [cartItemCount, setCartItemCount] = useState(0);
-	const [selectedExtra, setSelectedExtra] = useState(null);
-	const [selectedProtein, setSelectedProtein] = useState(null);
 	const [selectedExtras, setSelectedExtras] = useState([]);
 	const [selectedProteins, setSelectedProteins] = useState([]);
 
@@ -50,7 +46,6 @@ export default function MealDetailsScreen({ route, navigation }) {
 
 				if (docSnap.exists()) {
 					const restaurantData = docSnap.data();
-					console.log('Fetched restaurant data:', restaurantData); // Debugging
 					setRestaurant(restaurantData);
 				} else {
 					console.log('No such document!');
@@ -64,7 +59,12 @@ export default function MealDetailsScreen({ route, navigation }) {
 	}, [restaurantId]);
 
 	const handleAddToCart = () => {
-		addToCart(restaurantId, mealPrice);
+		const meal = {
+			id: mealId,
+			name: mealName,
+			price: parseFloat(mealPrice),
+		};
+		addToCart(restaurantId, meal, selectedExtras, selectedProteins, extras, protein);
 		setCartTotal((prev) => prev + parseFloat(mealPrice));
 		setCartItemCount((prev) => prev + 1);
 	};
@@ -78,11 +78,9 @@ export default function MealDetailsScreen({ route, navigation }) {
 
 	const handleSelectExtra = (key, price) => {
 		if (selectedExtras.includes(key)) {
-			// Deselect the item
 			setSelectedExtras((prev) => prev.filter((item) => item !== key));
 			setCartTotal((prev) => prev - price);
 		} else {
-			// Select the item
 			setSelectedExtras((prev) => [...prev, key]);
 			setCartTotal((prev) => prev + price);
 		}
@@ -90,11 +88,9 @@ export default function MealDetailsScreen({ route, navigation }) {
 
 	const handleSelectProtein = (key, price) => {
 		if (selectedProteins.includes(key)) {
-			// Deselect the item
 			setSelectedProteins((prev) => prev.filter((item) => item !== key));
 			setCartTotal((prev) => prev - price);
 		} else {
-			// Select the item
 			setSelectedProteins((prev) => [...prev, key]);
 			setCartTotal((prev) => prev + price);
 		}
@@ -108,7 +104,7 @@ export default function MealDetailsScreen({ route, navigation }) {
 					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
 				</Pressable>
 				<Text style={styles.locationText}>
-					{restaurant?.location || 'Owerri'}
+					{restaurant?.name || 'Restaurant'}
 				</Text>
 				<Pressable onPress={() => setIsFavorited(!isFavorited)}>
 					<MaterialIcons
@@ -118,61 +114,82 @@ export default function MealDetailsScreen({ route, navigation }) {
 					/>
 				</Pressable>
 			</View>
-			<View style={styles.restaurantCard}>
-				<Image
-					source={
-						mealImageUrl
-							? { uri: mealImageUrl } // Use the imageUrl from the database
-							: require('../assets/placeholder.jpg') // Fallback image
-					}
-					style={styles.mealImage}
-					resizeMode="cover"
-				/>
-				<Text style={styles.title}>{mealName}</Text>
-				<Text style={styles.detail}>{mealDescription}</Text>
 
-				<Text style={styles.detail2}>Price: ₦{mealPrice}</Text>
-				<View style={styles.addToCartView}>
-					<Pressable onPress={handleAddToCart} style={styles.addToCartButton}>
-						<Text style={styles.addToCart}>Add to Cart</Text>
-					</Pressable>
-					<Pressable
-						onPress={handleRemoveFromCart}
-						style={styles.addToCartButton2}
-					>
-						<Text style={styles.addToCart}>Remove Item</Text>
-					</Pressable>
+			<ScrollView style={styles.content}>
+				{/* Meal Image and Basic Info Card */}
+				<View style={styles.mealCard}>
+					<Image
+						source={
+							mealImageUrl
+								? { uri: mealImageUrl }
+								: require('../assets/placeholder.jpg')
+						}
+						style={styles.mealImage}
+						resizeMode="cover"
+					/>
+					<View style={styles.mealInfo}>
+						<Text style={styles.mealName}>{mealName}</Text>
+						<Text style={styles.mealDescription}>{mealDescription}</Text>
+						<Text style={styles.mealPrice}>₦{mealPrice}</Text>
+					</View>
 				</View>
-			</View>
-			<ScrollView style={styles.menuScrollContainer}>
-				<View>
-					{/* Render Extras */}
+
+				{/* Extras Section */}
+				<View style={styles.section}>
 					<Text style={styles.sectionTitle}>Extras</Text>
 					{extras && Object.keys(extras).length > 0 ? (
 						Object.entries(extras).map(([key, extra]) => (
-							<CustomCheckbox
+							<Pressable
 								key={key}
-								isChecked={selectedExtras.includes(key)}
+								style={styles.optionCard}
 								onPress={() => handleSelectExtra(key, extra.price)}
-								label={extra.name}
-								price={extra.price}
-							/>
+							>
+								<View style={styles.optionInfo}>
+									<Text style={styles.optionName}>{extra.name}</Text>
+									<Text style={styles.optionPrice}>₦{extra.price}</Text>
+								</View>
+								<View
+									style={[
+										styles.checkbox,
+										selectedExtras.includes(key) && styles.checkboxChecked,
+									]}
+								>
+									{selectedExtras.includes(key) && (
+										<MaterialIcons name="check" size={16} color="white" />
+									)}
+								</View>
+							</Pressable>
 						))
 					) : (
 						<Text style={styles.noItemsText}>No extras available</Text>
 					)}
+				</View>
 
-					{/* Render Protein */}
+				{/* Protein Section */}
+				<View style={styles.section}>
 					<Text style={styles.sectionTitle}>Protein</Text>
 					{protein && Object.keys(protein).length > 0 ? (
 						Object.entries(protein).map(([key, item]) => (
-							<CustomCheckbox
+							<Pressable
 								key={key}
-								isChecked={selectedProteins.includes(key)}
+								style={styles.optionCard}
 								onPress={() => handleSelectProtein(key, item.price)}
-								label={item.name}
-								price={item.price}
-							/>
+							>
+								<View style={styles.optionInfo}>
+									<Text style={styles.optionName}>{item.name}</Text>
+									<Text style={styles.optionPrice}>₦{item.price}</Text>
+								</View>
+								<View
+									style={[
+										styles.checkbox,
+										selectedProteins.includes(key) && styles.checkboxChecked,
+									]}
+								>
+									{selectedProteins.includes(key) && (
+										<MaterialIcons name="check" size={16} color="white" />
+									)}
+								</View>
+							</Pressable>
 						))
 					) : (
 						<Text style={styles.noItemsText}>No protein options available</Text>
@@ -180,229 +197,194 @@ export default function MealDetailsScreen({ route, navigation }) {
 				</View>
 			</ScrollView>
 
-			<Pressable
-				style={styles.cartIcon}
-				onPress={() => navigation.navigate('Cart', { restaurantId, cartTotal })}
-			>
-				<FontAwesome name="shopping-basket" size={42} color="#2e1e0f" />
-				<Text style={styles.cartTotal}>₦ {cartTotal.toFixed(2)}</Text>
-				{cartItemCount > 0 && (
-					<View style={styles.cartItemCount}>
-						<Text style={styles.cartItemCountText}>{cartItemCount}</Text>
-					</View>
-				)}
-			</Pressable>
-			{console.log('Meal Image URL:', mealImageUrl)}
-			{console.log('Restaurant Data:', restaurant)}
-			{console.log('Breakfast Meals:', restaurant?.menuPreview?.breakfast)}
+			{/* Bottom Action Bar */}
+			<View style={styles.bottomBar}>
+				<View style={styles.cartActions}>
+					<Pressable
+						style={styles.cartButton}
+						onPress={handleRemoveFromCart}
+					>
+						<Text style={styles.cartButtonText}>-</Text>
+					</Pressable>
+					<Text style={styles.cartCount}>{cartItemCount}</Text>
+					<Pressable
+						style={styles.cartButton}
+						onPress={handleAddToCart}
+					>
+						<Text style={styles.cartButtonText}>+</Text>
+					</Pressable>
+				</View>
+				<Pressable
+					style={styles.viewCartButton}
+					onPress={() => navigation.navigate('Cart', { restaurantId })}
+				>
+					<Text style={styles.viewCartText}>View Cart</Text>
+					<Text style={styles.cartTotal}>₦{cartTotal.toFixed(2)}</Text>
+				</Pressable>
+			</View>
 		</View>
 	);
 }
 
-const CustomCheckbox = ({ isChecked, onPress, label, price }) => {
-	return (
-		<Pressable onPress={onPress} style={styles.checkboxRow}>
-			<View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-				{isChecked && <View style={styles.checkboxInner} />}
-			</View>
-			<Text style={styles.checkboxLabel}>
-				{label} - ₦{price}
-			</Text>
-		</Pressable>
-	);
-};
-
-// Keep your existing styles
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#FFF9F7',
-	},
-	menuScrollContainer: {
-		flex: 1,
-		padding: 16,
-		paddingBottom: 20,
-	},
-	title: {
-		fontSize: 24,
-		fontWeight: 'bold',
-		color: '#FF521B',
-		marginBottom: 16,
-	},
-	detail: {
-		fontSize: 18,
-		color: '#2A324B',
-		marginBottom: 8,
-		fontStyle: 'italic',
-	},
-	detail2: {
-		fontSize: 18,
-		color: '#2A324B',
-		marginBottom: 8,
-		fontWeight: 'bold',
-	},
-	cartIcon: {
-		position: 'absolute',
-		bottom: 20,
-		right: 20,
-		backgroundColor: '#A2A79E',
-		elevation: 5,
-		flexDirection: 'column',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		borderRadius: 10,
-		height: 90,
-		width: 110,
-		paddingTop: 10,
-	},
-	cartTotal: {
-		width: 110,
-		backgroundColor: '#FF521B',
-		fontSize: 18,
-		fontWeight: 'bold',
-		color: '#FFF',
-		marginTop: 5,
-		padding: 5,
-		textAlign: 'center',
-		borderRadiusLeft: 0,
-		borderRadiusRight: 0,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	},
-	cartItemCount: {
-		position: 'absolute',
-		top: 5,
-		right: 5,
-		backgroundColor: '#FF521B',
-		borderRadius: '50%',
-		height: 25,
-		width: 25,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	cartItemCountText: {
-		color: '#FFF',
-		fontSize: 13,
-		fontWeight: 'bold',
+		backgroundColor: '#FFF0EB',
 	},
 	header: {
 		flexDirection: 'row',
-		alignItems: 'center',
 		justifyContent: 'space-between',
-		marginTop: 40,
-		marginBottom: 5,
-		backgroundColor: '#FFF9F7',
+		alignItems: 'center',
 		padding: 16,
+		backgroundColor: 'white',
+		borderBottomWidth: 1,
+		borderBottomColor: '#F0F0F0',
+		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,
 		fontWeight: 'bold',
 		color: '#FF521B',
 	},
-	restaurantCard: {
-		backgroundColor: '#FFF',
-		shadowColor: '#2A324B',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.25,
-		shadowRadius: 3.84,
-		elevation: 5,
-		padding: 16,
+	content: {
+		flex: 1,
+	},
+	mealCard: {
+		backgroundColor: 'white',
+		margin: 16,
+		borderRadius: 8,
+		elevation: 2,
+		overflow: 'hidden',
 	},
 	mealImage: {
 		width: '100%',
 		height: 200,
-		aspectRatio: 16 / 9,
-		borderRadius: 8,
-		marginBottom: 16,
-		overflow: 'hidden',
+		backgroundColor: '#F0F0F0',
 	},
-	addToCartButton: {
-		backgroundColor: '#4D8B31',
-		padding: 10,
-		// margin: 'auto',
-		marginTop: 10,
-		width: '40%',
-		borderRadius: 8,
-		alignItems: 'center',
+	mealInfo: {
+		padding: 16,
 	},
-	addToCartButton2: {
-		backgroundColor: '#832232',
-		padding: 10,
-		// margin: 'auto',
-		marginTop: 10,
-		width: '40%',
-		borderRadius: 8,
-		alignItems: 'center',
-	},
-	addToCart: {
-		color: '#fff',
-		fontSize: 18,
+	mealName: {
+		fontSize: 24,
 		fontWeight: 'bold',
+		color: '#2A324B',
+		marginBottom: 8,
 	},
-	addToCartView: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
+	mealDescription: {
+		fontSize: 16,
+		color: '#666',
+		marginBottom: 8,
+		lineHeight: 22,
 	},
-	sectionTitle: {
+	mealPrice: {
 		fontSize: 20,
 		fontWeight: 'bold',
 		color: '#FF521B',
-		marginBottom: 8,
 	},
-	groupContainer: {
-		marginBottom: 12,
+	section: {
+		backgroundColor: 'white',
+		margin: 16,
+		marginTop: 0,
+		padding: 16,
+		borderRadius: 8,
+		elevation: 2,
 	},
-	itemText: {
+	sectionTitle: {
+		fontSize: 18,
+		fontWeight: 'bold',
+		color: '#2A324B',
+		marginBottom: 16,
+	},
+	optionCard: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		paddingVertical: 12,
+		borderBottomWidth: 1,
+		borderBottomColor: '#F0F0F0',
+	},
+	optionInfo: {
+		flex: 1,
+	},
+	optionName: {
 		fontSize: 16,
 		color: '#2A324B',
 		marginBottom: 4,
 	},
-	noItemsText: {
-		fontSize: 16,
-		fontStyle: 'italic',
-		color: '#777',
-	},
-	itemRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: 8,
-	},
-	checkboxContainer: {
-		backgroundColor: 'transparent',
-		borderWidth: 0,
-		padding: 0,
-		margin: 0,
-		marginBottom: 8,
-	},
-	checkboxText: {
-		fontSize: 16,
-		color: '#2A324B',
-	},
-	checkboxRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: 8,
+	optionPrice: {
+		fontSize: 14,
+		color: '#FF521B',
+		fontWeight: '500',
 	},
 	checkbox: {
 		width: 24,
 		height: 24,
-		borderWidth: 2,
-		borderColor: '#2A324B',
 		borderRadius: 4,
-		marginRight: 8,
-		justifyContent: 'center',
+		borderWidth: 2,
+		borderColor: '#FF521B',
 		alignItems: 'center',
+		justifyContent: 'center',
+		marginLeft: 12,
 	},
 	checkboxChecked: {
 		backgroundColor: '#FF521B',
 	},
-	checkboxInner: {
-		width: 12,
-		height: 12,
-		backgroundColor: '#FF521B',
+	noItemsText: {
+		fontSize: 16,
+		color: '#666',
+		fontStyle: 'italic',
+		textAlign: 'center',
+		paddingVertical: 16,
 	},
-	checkboxLabel: {
+	bottomBar: {
+		backgroundColor: 'white',
+		padding: 16,
+		flexDirection: 'row',
+		alignItems: 'center',
+		borderTopWidth: 1,
+		borderTopColor: '#F0F0F0',
+	},
+	cartActions: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginRight: 16,
+	},
+	cartButton: {
+		width: 36,
+		height: 36,
+		borderRadius: 18,
+		backgroundColor: '#FF521B',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	cartButtonText: {
+		color: 'white',
+		fontSize: 20,
+		fontWeight: 'bold',
+	},
+	cartCount: {
 		fontSize: 18,
+		fontWeight: 'bold',
 		color: '#2A324B',
+		marginHorizontal: 16,
+	},
+	viewCartButton: {
+		flex: 1,
+		backgroundColor: '#FF521B',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		padding: 12,
+		borderRadius: 8,
+	},
+	viewCartText: {
+		color: 'white',
+		fontSize: 16,
+		fontWeight: 'bold',
+	},
+	cartTotal: {
+		color: 'white',
+		fontSize: 16,
+		fontWeight: 'bold',
 	},
 });

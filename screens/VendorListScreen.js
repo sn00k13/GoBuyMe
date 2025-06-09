@@ -161,7 +161,7 @@ export default function VendorListScreen({ navigation }) {
   const renderRestaurantItem = ({ item }) => (
     <Pressable 
       style={styles.restaurantCard}
-      onPress={() => navigation.navigate('Restaurant', { restaurantId: item.id })}
+      onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item.id })}
     >
       <Image 
         source={item.imageUrl ? { uri: item.imageUrl } : require('../assets/placeholder.jpg')} 
@@ -169,7 +169,9 @@ export default function VendorListScreen({ navigation }) {
       />
       <View style={styles.restaurantInfo}>
         <Text style={styles.restaurantName}>{item.name}</Text>
-        <Text style={styles.restaurantCuisine}>{item.cuisine || 'Various cuisines'}</Text>
+        <Text style={styles.restaurantCuisine}>
+          {Array.isArray(item.cuisineType) ? item.cuisineType.join(' • ') : item.cuisine || 'Various cuisines'}
+        </Text>
         <View style={styles.restaurantMeta}>
           <View style={styles.ratingContainer}>
             <MaterialIcons name="star" size={16} color="#FFD700" />

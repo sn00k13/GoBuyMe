@@ -26,6 +26,7 @@
     "https": "^1.0.0",
     "react": "18.3.1",
     "react-native": "0.76.9",
+    "react-native-dotenv": "^3.4.11",
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-image-picker": "^8.2.1",

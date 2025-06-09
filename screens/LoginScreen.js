@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
 	},
 	loginButtonText: {
 		color: 'white',
-		fontWeight: 'bold',
+		// fontWeight: 'bold',
 		fontSize: 16,
 	},
 	link: {

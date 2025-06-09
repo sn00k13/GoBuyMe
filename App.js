@@ -44,6 +44,8 @@ import CashOnDeliveryScreen from './screens/CashOnDeliveryScreen';
 import OrderConfirmation from './screens/OrderConfirmation';
 import OrdersScreen from './screens/OrdersScreen';
 import OrderDetailsScreen from './screens/OrderDetailsScreen';
+import RestaurantDetailScreen from './screens/RestaurantDetailScreen';
+import RestaurantMenuItemScreen from './screens/RestaurantMenuItemScreen';
 import { CartProvider } from './screens/CartContext';
 import { StoreCartProvider } from './screens/StoreCartContext';
 import { MaterialIcons, FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
@@ -94,6 +96,8 @@ function HomeStack() {
         <Stack.Screen name="OrderConfirmation" component={OrderConfirmation}/>
         <Stack.Screen name="Orders" component={OrdersScreen}/>
         <Stack.Screen name="OrderDetails" component={OrderDetailsScreen}/>
+        <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen}/>
+        <Stack.Screen name="RestaurantMenuItem" component={RestaurantMenuItemScreen}/>
       </Stack.Navigator>
     </CartProvider>
     </StoreCartProvider>
