@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,22 +8,45 @@ import {
   Pressable,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useCart } from './StoreCartContext';
+import { useCart } from './CartContext';
 
 export default function RestaurantMenuItemScreen({ route, navigation }) {
   const { menuItem, restaurantId, restaurantName } = route.params;
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
+  const { addToCart, getCartTotal, getCartItemCount } = useCart();
+  const [cartTotal, setCartTotal] = useState(0);
+  const [cartItemCount, setCartItemCount] = useState(0);
+
+  // Update cart count when screen comes into focus
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setCartTotal(getCartTotal(restaurantId));
+      setCartItemCount(getCartItemCount(restaurantId));
+    });
+
+    return unsubscribe;
+  }, [navigation, restaurantId]);
+
+  // Initialize cart total and item count when component mounts
+  useEffect(() => {
+    setCartTotal(getCartTotal(restaurantId));
+    setCartItemCount(getCartItemCount(restaurantId));
+  }, [restaurantId]);
 
   const handleAddToCart = () => {
-    const itemToAdd = {
-      ...menuItem,
-      quantity,
-      restaurantId,
-      restaurantName,
+    const meal = {
+      id: menuItem.id,
+      name: menuItem.name,
+      price: parseFloat(menuItem.price),
+      quantity: quantity,
     };
-    addToCart(itemToAdd);
-    navigation.goBack();
+    addToCart(restaurantId, meal);
+    
+    // Update cart count immediately
+    const newCartTotal = getCartTotal(restaurantId);
+    const newCartCount = getCartItemCount(restaurantId);
+    setCartTotal(newCartTotal);
+    setCartItemCount(newCartCount);
   };
 
   return (
@@ -37,7 +60,7 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView>
+      <ScrollView style={styles.scrollView}>
         {/* Item Image */}
         <Image
           source={
@@ -76,6 +99,21 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
         </View>
       </ScrollView>
 
+      {/* Cart FAB */}
+      <Pressable
+        style={styles.cartButtonFab}
+        onPress={() => navigation.navigate('Cart', { restaurantId })}
+      >
+        <MaterialIcons name="shopping-cart" size={28} color="#fff" />
+        {cartItemCount > 0 && (
+          <View style={styles.cartCounter}>
+            <Text style={styles.cartCounterText}>
+              {cartItemCount}
+            </Text>
+          </View>
+        )}
+      </Pressable>
+
       {/* Bottom Action Bar */}
       <View style={styles.bottomBar}>
         <View style={styles.totalContainer}>
@@ -104,42 +142,46 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
     elevation: 2,
+    marginTop: 40
   },
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0B3948',
+    color: '#FF521B',
   },
   scrollView: {
     flex: 1,
   },
   itemImage: {
     width: '100%',
-    height: 250,
-    resizeMode: 'cover',
+    height: 200,
+    resizeMode: 'contain',
+    backgroundColor: '#FFF0EB'
   },
   detailsContainer: {
     padding: 16,
+    backgroundColor: 'white',
+    flex: 1,
   },
   itemName: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#0B3948',
     marginBottom: 8,
   },
   itemDescription: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#666',
     marginBottom: 16,
   },
   itemPrice: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#FF521B',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   quantityContainer: {
-    marginBottom: 24,
+    // marginBottom: 24,
   },
   quantityLabel: {
     fontSize: 16,
@@ -151,8 +193,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityButton: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     borderRadius: 20,
     backgroundColor: '#fff',
     alignItems: 'center',
@@ -182,7 +224,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   totalAmount: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#0B3948',
   },
@@ -190,12 +232,45 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF521B',
     paddingHorizontal: 32,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 4,
     marginLeft: 16,
   },
   addButtonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  cartButtonFab: {
+    position: 'absolute',
+    bottom: 100, // Positioned above the bottom bar
+    right: 24,
+    backgroundColor: '#FF521B',
+    borderRadius: 32,
+    width: 56,
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  cartCounter: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#FF521B',
+  },
+  cartCounterText: {
+    color: '#FF521B',
     fontWeight: 'bold',
+    fontSize: 13,
   },
 }); 

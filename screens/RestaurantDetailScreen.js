@@ -11,6 +11,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
+import { useCart } from './CartContext';
 
 export default function RestaurantDetailScreen({ route, navigation }) {
   const { restaurantId } = route.params;
@@ -18,6 +19,8 @@ export default function RestaurantDetailScreen({ route, navigation }) {
   const [menuItems, setMenuItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [cartItemCount, setCartItemCount] = useState(0);
+  const { getCartItemCount } = useCart();
 
   useEffect(() => {
     const fetchRestaurant = async () => {
@@ -61,6 +64,20 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 
     fetchRestaurant();
     fetchMenu();
+  }, [restaurantId]);
+
+  // Update cart count when screen comes into focus
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setCartItemCount(getCartItemCount(restaurantId));
+    });
+
+    return unsubscribe;
+  }, [navigation, restaurantId]);
+
+  // Initialize cart count
+  useEffect(() => {
+    setCartItemCount(getCartItemCount(restaurantId));
   }, [restaurantId]);
 
   const renderCategory = ({ item }) => (
@@ -299,6 +316,21 @@ export default function RestaurantDetailScreen({ route, navigation }) {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.menuList}
       />
+
+      {/* Cart FAB */}
+      <Pressable
+        style={styles.cartButtonFab}
+        onPress={() => navigation.navigate('Cart', { restaurantId })}
+      >
+        <MaterialIcons name="shopping-cart" size={28} color="#fff" />
+        {cartItemCount > 0 && (
+          <View style={styles.cartCounter}>
+            <Text style={styles.cartCounterText}>
+              {cartItemCount}
+            </Text>
+          </View>
+        )}
+      </Pressable>
     </View>
   );
 }
@@ -467,5 +499,39 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FF521B',
+  },
+  cartButtonFab: {
+    position: 'absolute',
+    bottom: 32,
+    right: 24,
+    backgroundColor: '#FF521B',
+    borderRadius: 32,
+    width: 56,
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  cartCounter: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#FF521B',
+  },
+  cartCounterText: {
+    color: '#FF521B',
+    fontWeight: 'bold',
+    fontSize: 13,
   },
 }); 
