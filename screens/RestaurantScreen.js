@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
 		color: '#2A324B',
 	},
 	sectionTitle: {
-		fontSize: 18,
+		fontSize: 16,
 		fontWeight: 'bold',
 		marginBottom: 8,
 		color: '#FF521B',
@@ -404,13 +404,13 @@ const styles = StyleSheet.create({
 	},
 	menuDisplay: {
 		backgroundColor: '#EDEDF4',
-		padding: 12,
+		padding: 10,
 		paddingLeft: 16,
 		borderTopLeftRadius: 8,
 		borderTopRightRadius: 8,
 	},
 	menuHeader: {
-		fontSize: 18,
+		fontSize: 16,
 		fontWeight: 'bold',
 		color: '#2A324B',
 	},
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 	},
 	restaurantName: {
-		fontSize: 22,
+		fontSize: 20,
 		fontWeight: 'bold',
 		color: '#FF521B',
 	},

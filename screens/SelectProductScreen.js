@@ -318,7 +318,7 @@ function SelectProductScreen({ navigation, route }) {
 				contentContainerStyle={styles.productsContainer}
 				ListEmptyComponent={
 					<Text style={styles.emptyText}>
-						No products found.
+						No available products found.
 					</Text>
 				}
 			/>
