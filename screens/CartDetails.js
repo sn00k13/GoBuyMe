@@ -1,13 +1,14 @@
 import React from 'react';
 import {
-	View,
-	Text,
-	StyleSheet,
-	Pressable,
-	FlatList,
-	Image,
-	TextInput,
-} from 'react-native';
+ 	View,
+ 	Text,
+ 	StyleSheet,
+ 	Pressable,
+ 	FlatList,
+ 	Image,
+ 	TextInput,
+	Alert
+ } from 'react-native';
 import { useCart } from './CartContext';
 import { MaterialIcons } from '@expo/vector-icons';
 

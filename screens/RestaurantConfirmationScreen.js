@@ -57,6 +57,7 @@ export default function RestaurantConfirmationScreen({ navigation, route }) {
 		// Fetch user data and addresses
 		const fetchUserData = async () => {
 			try {
+				setLoading(true); // <-- Set loading to true before async work
 				if (!auth.currentUser) {
 					navigation.navigate('Login');
 					return;
@@ -554,7 +555,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#FF521B',
 		padding: 16,
 		marginHorizontal: 16,
-		borderRadius: 8,
+		borderRadius: 4,
 		position: 'absolute',
 		bottom: 24,
 		left: 0,

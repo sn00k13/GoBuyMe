@@ -69,11 +69,9 @@ export function CartProvider({ children }) {
 	};
 
 	const clearCart = (restaurantId) => {
-		console.log('Clearing cart for:', restaurantId);
+		if (!restaurantId) return; // defensive guard
 		setCart((prevCarts) => {
-			const newCarts = { ...prevCarts };
-			delete newCarts[restaurantId];
-			console.log('Cart after clear:', newCarts);
+			const { [restaurantId]: _, ...newCarts } = prevCarts; // omit key immutably
 			return newCarts;
 		});
 	};

@@ -14,6 +14,7 @@ import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase';
 import { useCart } from './CartContext';
+import { PAYSTACK_PUBLIC_KEY } from '@env';
 
 export default function PaymentScreen({ navigation, route }) {
 	const {
@@ -203,7 +204,7 @@ export default function PaymentScreen({ navigation, route }) {
 				</View>
 
 				<Paystack
-					paystackKey="pk_test_1700cc30d4e1158c6da9ca80f549205b762b9eed"
+					paystackKey={PAYSTACK_PUBLIC_KEY}
 					amount={totalAmount}
 					billingEmail={userData.email}
 					activityIndicatorColor="#FF521B"

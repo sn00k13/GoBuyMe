@@ -85,8 +85,10 @@ export default function PaymentScreen({ navigation, route }) {
 			const orderRef = doc(db, 'orders', response.transactionRef.reference);
 			await setDoc(orderRef, orderData);
 
-			// Clear cart after initiating payment
-			clearCart(storeId);
+			// Clear cart only if we have a valid store identifier
+			if (storeId) {
+				clearCart(storeId);
+			}
 
 			// Navigate to success screen with appropriate message
 			navigation.replace('OrderConfirmation', {
