@@ -18,6 +18,7 @@ import VendorListScreen from './screens/VendorListScreen';
 import MealDetailsScreen from './screens/MealDetailsScreen';
 import PaymentOptionsScreen from './screens/PaymentOptionsScreen';
 import ConfirmationScreen from './screens/ConfirmationScreen';
+import RestaurantConfirmationScreen from './screens/ConfirmationScreen';
 import MyAddressesScreen from './screens/MyAddressesScreen';
 import NotificationsScreen from './screens/NotificationsScreen';
 import LandingScreen from './screens/LandingScreen';
@@ -39,6 +40,7 @@ import EmartScreen from './screens/EmartScreen';
 import SelectProductScreen from './screens/SelectProductScreen';
 import EMartCartDetails from './screens/EMartCartDetails';
 import PaymentScreen from './screens/PaymentScreen';
+import RestaurantPaymentScreen from './screens/RestaurantPaymentScreen';
 import CashOnDeliveryScreen from './screens/CashOnDeliveryScreen';
 import OrderConfirmation from './screens/OrderConfirmation';
 import OrdersScreen from './screens/OrdersScreen';
@@ -81,6 +83,7 @@ function HomeStack() {
         <Stack.Screen name="Cart" component={CartDetails} />
         <Stack.Screen name="PaymentOptions" component={PaymentOptionsScreen} />
         <Stack.Screen name="Confirmation" component={ConfirmationScreen} />
+        <Stack.Screen name="RestaurantConfirmation" component={RestaurantConfirmationScreen} />
         <Stack.Screen name="Favorites" component={FavoritesScreen} />
         <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
@@ -90,6 +93,7 @@ function HomeStack() {
         <Stack.Screen name="SelectProductScreen" component={SelectProductScreen} />
         <Stack.Screen name="EMartCartDetails" component={EMartCartDetails}/>
         <Stack.Screen name="PaymentScreen" component={PaymentScreen}/>
+        <Stack.Screen name="RestaurantPaymentScreen" component={RestaurantPaymentScreen}/>
         <Stack.Screen name="CashOnDelivery" component={CashOnDeliveryScreen}/>
         <Stack.Screen name="OrderConfirmation" component={OrderConfirmation}/>
         <Stack.Screen name="Orders" component={OrdersScreen}/>

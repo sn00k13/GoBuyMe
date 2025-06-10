@@ -38,7 +38,7 @@ export default function OrderConfirmation({ navigation, route }) {
     const handleContinueShopping = () => {
         navigation.reset({
             index: 0,
-            routes: [{ name: 'EmartScreen' }],
+            routes: [{ name: 'VendorList' }],
         });
     };
 

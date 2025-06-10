@@ -68,6 +68,16 @@ export function CartProvider({ children }) {
 		});
 	};
 
+	const clearCart = (restaurantId) => {
+		console.log('Clearing cart for:', restaurantId);
+		setCart((prevCarts) => {
+			const newCarts = { ...prevCarts };
+			delete newCarts[restaurantId];
+			console.log('Cart after clear:', newCarts);
+			return newCarts;
+		});
+	};
+
 	const getCartTotal = (restaurantId) => {
 		return cart[restaurantId]?.total || 0;
 	};
@@ -83,6 +93,7 @@ export function CartProvider({ children }) {
 				cart,
 				addToCart,
 				removeFromCart,
+				clearCart,
 				getCartItemCount,
 				getCartTotal,
 			}}

@@ -13,19 +13,19 @@ import { Paystack } from 'react-native-paystack-webview';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase';
-import { useStoreCart } from './StoreCartContext';
+import { useCart } from './CartContext';
 
 export default function PaymentScreen({ navigation, route }) {
 	const {
 		cartItems = [],
 		totalAmount = 0,
 		userData,
-		storeId,
+		restaurantId,
 	} = route.params || {};
 	const [processing, setProcessing] = useState(false);
 	const [selectedMethod, setSelectedMethod] = useState('card'); // 'card' or 'bank'
 	const auth = getAuth();
-	const { clearCart } = useStoreCart();
+	const { clearCart } = useCart();
 	const paystackWebViewRef = useRef();
 
 	// Redirect to cart if no items
@@ -59,7 +59,8 @@ export default function PaymentScreen({ navigation, route }) {
 		try {
 			setProcessing(true);
 
-			// Build order data, only include storeId if defined
+			// Create order document
+			const orderRef = doc(db, 'orders', response.transactionRef.reference);
 			const orderData = {
 				userId: auth.currentUser.uid,
 				items: cartItems,
@@ -67,26 +68,22 @@ export default function PaymentScreen({ navigation, route }) {
 				status: selectedMethod === 'bank' ? 'pending' : 'paid',
 				paymentStatus: selectedMethod === 'bank' ? 'pending' : 'paid',
 				paymentReference: response.transactionRef.reference,
-				paymentMethod: selectedMethod,
 				customerName: userData.name,
 				customerPhone: userData.phone,
 				customerEmail: userData.email,
 				customerAddress: userData.address,
 				createdAt: serverTimestamp(),
-				...(storeId ? { storeId } : {}),
+				restaurantId, // Always include this
+				// ...(storeId ? { storeId } : {}), // Only for eMart, not needed here
 			};
-
-			// Remove any undefined fields (extra safety)
+			console.log('ORDER DATA:', orderData);
 			Object.keys(orderData).forEach(
 				(key) => orderData[key] === undefined && delete orderData[key]
 			);
-
-			// Create order document
-			const orderRef = doc(db, 'orders', response.transactionRef.reference);
 			await setDoc(orderRef, orderData);
 
 			// Clear cart after initiating payment
-			clearCart(storeId);
+			clearCart(restaurantId);
 
 			// Navigate to success screen with appropriate message
 			navigation.replace('OrderConfirmation', {

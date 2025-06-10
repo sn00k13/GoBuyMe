@@ -6,6 +6,7 @@ import {
 	Pressable,
 	FlatList,
 	Image,
+	TextInput,
 } from 'react-native';
 import { useCart } from './CartContext';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -14,6 +15,23 @@ export default function CartDetails({ route, navigation }) {
 	const { cart, getCartTotal, getCartItemCount, removeFromCart } = useCart();
 	const { restaurantId, restaurantName } = route.params;
 	const cartItems = cart[restaurantId]?.items || [];
+
+	const [discountCode, setDiscountCode] = React.useState('');
+	const [discountApplied, setDiscountApplied] = React.useState(false);
+	const [discountError, setDiscountError] = React.useState('');
+
+	const total = getCartTotal(restaurantId);
+	const discountedTotal = discountApplied ? total * 0.9 : total; // 10% off for demo
+
+	const handleApplyDiscount = () => {
+		if (discountCode.trim().toUpperCase() === 'SAVE10') {
+			setDiscountApplied(true);
+			setDiscountError('');
+		} else {
+			setDiscountApplied(false);
+			setDiscountError('Invalid or expired discount code.');
+		}
+	};
 
 	const renderCartItem = ({ item }) => (
 		<View
@@ -35,14 +53,16 @@ export default function CartDetails({ route, navigation }) {
 				style={{ width: 60, height: 60, borderRadius: 8, marginRight: 12 }}
 			/>
 			<View style={{ flex: 1 }}>
-				<Text style={{ fontWeight: 'bold', fontSize: 16 }}>{item.name}</Text>
+				<Text style={{ fontWeight: 'bold', fontSize: 16, color: '#0B3948' }}>
+					{item.name}
+				</Text>
 				<Text style={{ color: '#666' }}>
 					₦{item.price} x {item.quantity}
 				</Text>
 			</View>
 			<View style={{ alignItems: 'flex-end', gap: 8 }}>
 				<Pressable onPress={() => removeFromCart(restaurantId, item.id)}>
-					<Text style={{ color: '#E14E1F', marginTop: 6 }}>
+					<Text style={{ color: '#0B3948', marginTop: 6 }}>
 						Remove from cart
 					</Text>
 				</Pressable>
@@ -52,6 +72,22 @@ export default function CartDetails({ route, navigation }) {
 			</View>
 		</View>
 	);
+
+	const handleCheckout = () => {
+		if (!cartItems || cartItems.length === 0) {
+			Alert.alert(
+				'Empty Cart',
+				'Please add items to your cart before proceeding to checkout.'
+			);
+			return;
+		}
+
+		navigation.navigate('RestaurantConfirmation', {
+			cartItems: cartItems,
+			totalAmount: discountedTotal,
+			restaurantId: restaurantId,
+		});
+	};
 
 	return (
 		<View style={styles.container}>
@@ -75,6 +111,51 @@ export default function CartDetails({ route, navigation }) {
 					</Text>
 				}
 			/>
+			{/* Discount code section */}
+			<View style={{ padding: 16 }}>
+				<Text style={{ fontSize: 15, marginBottom: 6 }}>Discount Code</Text>
+				<View style={styles.discountSection}>
+					<View>
+						<TextInput
+							style={styles.discountText}
+							placeholder="Enter discount code"
+							value={discountCode}
+							onChangeText={setDiscountCode}
+							autoCapitalize="characters"
+						/>
+					</View>
+					{discountApplied && (
+						<Text style={{ color: '#21A179', marginTop: 6 }}>
+							Discount applied! 10% off.
+						</Text>
+					)}
+					{discountError ? (
+						<Text style={{ color: '#E14E1F', marginTop: 6 }}>
+							{discountError}
+						</Text>
+					) : null}
+					<Pressable style={styles.applyDiscount} onPress={handleApplyDiscount}>
+						<Text style={{ color: '#fff' }}>Apply</Text>
+					</Pressable>
+				</View>
+			</View>
+			{/* Total */}
+			<View style={styles.orderTotal}>
+				<Text style={styles.orderTotalText1}>Total:</Text>
+				<Text style={styles.orderTotalText}>
+					₦{discountedTotal.toLocaleString()}
+				</Text>
+			</View>
+			<View style={styles.proceedCheckout}>
+				<Pressable onPress={() => navigation.navigate('RestaurantMenuItem')}>
+					<Text style={{ color: 'white' }}>Continue Shopping</Text>
+				</Pressable>
+			</View>
+			<View style={styles.proceedCheckout2}>
+				<Pressable onPress={handleCheckout}>
+					<Text style={{ color: 'white' }}>Proceed to Checkout</Text>
+				</Pressable>
+			</View>
 		</View>
 	);
 }
@@ -83,6 +164,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: '#FFF0EB',
+		paddingBottom: 16,
 	},
 	header: {
 		flexDirection: 'row',
@@ -98,5 +180,57 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: 'bold',
 		color: '#FF521B',
+	},
+	orderTotal: {
+		padding: 16,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+	},
+	proceedCheckout: {
+		backgroundColor: '#00b2ca',
+		borderRadius: 4,
+		paddingVertical: 14,
+		paddingHorizontal: 16,
+		alignItems: 'center',
+		margin: 16,
+	},
+	proceedCheckout2: {
+		backgroundColor: '#21A179',
+		borderRadius: 4,
+		paddingVertical: 14,
+		paddingHorizontal: 16,
+		alignItems: 'center',
+		marginHorizontal: 16,
+	},
+	orderTotalText: {
+		fontSize: 18,
+		fontWeight: 'bold',
+		color: '#FF521B',
+	},
+	orderTotalText1: {
+		fontSize: 18,
+		fontWeight: 'bold',
+		color: '#000',
+	},
+	discountText: {
+		borderWidth: 1,
+		borderColor: '#FF521B',
+		borderRadius: 4,
+		padding: 8,
+		backgroundColor: '#fff',
+		fontSize: 15,
+	},
+	discountSection: {
+		flexDirection: 'column',
+		gap: 4,
+	},
+	applyDiscount: {
+		backgroundColor: '#FF521B',
+		padding: 16,
+		alignItems: 'center',
+		borderRadius: 4,
+		paddingVertical: 14,
+		marginTop: 8,
 	},
 });

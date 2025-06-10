@@ -91,7 +91,7 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
 			<Pressable
 				style={styles.cartButtonFab}
 				onPress={() =>
-					navigation.navigate('Cart', { restaurantId, restaurantName })
+					navigation.navigate('Cart', { restaurantId })
 				}
 			>
 				<MaterialIcons name="shopping-cart" size={28} color="#fff" />
