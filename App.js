@@ -14,7 +14,6 @@ import FavoritesScreen from './screens/FavoritesScreen';
 import OrderHistoryScreen from './screens/OrderHistoryScreen';
 import OffersScreen from './screens/OffersScreen';
 import MealCardScreen from './screens/MealCardScreen';
-import RestaurantScreen from './screens/RestaurantScreen';
 import VendorListScreen from './screens/VendorListScreen'; 
 import MealDetailsScreen from './screens/MealDetailsScreen';
 import PaymentOptionsScreen from './screens/PaymentOptionsScreen';
@@ -70,7 +69,6 @@ function HomeStack() {
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="ResetPasswordSuccess" component={ResetPasswordSuccessScreen} />
         <Stack.Screen name="HomeMain" component={HomeScreen} />
-        <Stack.Screen name="Restaurant" component={RestaurantScreen} />
         <Stack.Screen name="VendorList" component={VendorListScreen} />
         <Stack.Screen name="MealCard" component={MealCardScreen} />
         <Stack.Screen name="MealDetails" component={MealDetailsScreen} />
