@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
 	View,
 	Text,
@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useCart } from './CartContext';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function RestaurantMenuItemScreen({ route, navigation }) {
 	const { menuItem, restaurantId, restaurantName } = route.params;
@@ -17,27 +18,12 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
 	const [cartTotal, setCartTotal] = useState(0);
 	const [cartItemCount, setCartItemCount] = useState(0);
 
-	// Update cart count when screen comes into focus
-	useEffect(() => {
-		const unsubscribe = navigation.addListener('focus', () => {
+	useFocusEffect(
+		React.useCallback(() => {
 			setCartTotal(getCartTotal(restaurantId));
 			setCartItemCount(getCartItemCount(restaurantId));
-		});
-
-		return unsubscribe;
-	}, [navigation, restaurantId]);
-
-	// Initialize cart total and item count when component mounts
-	useEffect(() => {
-		setCartTotal(getCartTotal(restaurantId));
-		setCartItemCount(getCartItemCount(restaurantId));
-	}, [restaurantId]);
-
-	// Update cart total and count reactively when cart changes
-	useEffect(() => {
-		setCartTotal(getCartTotal(restaurantId));
-		setCartItemCount(getCartItemCount(restaurantId));
-	}, [cart, restaurantId]);
+		}, [cart, restaurantId])
+	);
 
 	const handleAddToCart = () => {
 		const meal = {
@@ -103,7 +89,9 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
 			{/* Cart FAB */}
 			<Pressable
 				style={styles.cartButtonFab}
-				onPress={() => navigation.navigate('Cart', { restaurantId })}
+				onPress={() =>
+					navigation.navigate('Cart', { restaurantId, restaurantName })
+				}
 			>
 				<MaterialIcons name="shopping-cart" size={28} color="#fff" />
 				{cartItemCount > 0 && (

@@ -12,15 +12,16 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCart } from './CartContext';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function RestaurantDetailScreen({ route, navigation }) {
 	const { restaurantId } = route.params;
+	const { cart, getCartItemCount } = useCart();
+	const [cartItemCount, setCartItemCount] = useState(0);
 	const [restaurant, setRestaurant] = useState(null);
 	const [menuItems, setMenuItems] = useState([]);
 	const [selectedCategory, setSelectedCategory] = useState(null);
 	const [categories, setCategories] = useState([]);
-	const [cartItemCount, setCartItemCount] = useState(0);
-	const { cart, getCartItemCount } = useCart();
 
 	useEffect(() => {
 		const fetchRestaurant = async () => {
@@ -66,10 +67,11 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 		fetchMenu();
 	}, [restaurantId]);
 
-	// Update cart count reactively when cart changes
-	useEffect(() => {
-		setCartItemCount(getCartItemCount(restaurantId));
-	}, [cart, restaurantId]);
+	useFocusEffect(
+		React.useCallback(() => {
+			setCartItemCount(getCartItemCount(restaurantId));
+		}, [cart, restaurantId])
+	);
 
 	const renderCategory = ({ item }) => (
 		<Pressable

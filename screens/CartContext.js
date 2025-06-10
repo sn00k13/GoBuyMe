@@ -6,14 +6,7 @@ const CartContext = createContext();
 export function CartProvider({ children }) {
 	const [cart, setCart] = useState({});
 
-	const addToCart = (
-		restaurantId,
-		meal,
-		selectedExtras = [],
-		selectedProteins = [],
-		extrasData = {},
-		proteinData = {}
-	) => {
+	const addToCart = (restaurantId, meal) => {
 		if (!restaurantId || !meal) return;
 
 		setCart((prevCarts) => {
@@ -24,35 +17,50 @@ export function CartProvider({ children }) {
 				id: meal.id,
 				name: meal.name,
 				price: meal.price,
-				extras: Array.isArray(selectedExtras)
-					? selectedExtras.map((key) => ({
-							id: key,
-							name: extrasData[key]?.name || key,
-							price: extrasData[key]?.price || 0,
-					  }))
-					: [],
-				proteins: Array.isArray(selectedProteins)
-					? selectedProteins.map((key) => ({
-							id: key,
-							name: proteinData[key]?.name || key,
-							price: proteinData[key]?.price || 0,
-					  }))
-					: [],
+				imageUrl: meal.imageUrl || null,
+				quantity: meal.quantity || 1,
 			};
 
-			// Calculate the total price for the new item
-			const itemTotal =
-				(newItem.price || 0) +
-				newItem.extras.reduce((total, extra) => total + (extra.price || 0), 0) +
-				newItem.proteins.reduce(
-					(total, protein) => total + (protein.price || 0),
-					0
+			// Check if item already exists (by id)
+			const existingIndex = cart.items.findIndex(
+				(item) => item.id === newItem.id
+			);
+
+			let updatedItems;
+			if (existingIndex > -1) {
+				// If exists, increase quantity
+				updatedItems = cart.items.map((item, idx) =>
+					idx === existingIndex
+						? { ...item, quantity: item.quantity + newItem.quantity }
+						: item
 				);
+			} else {
+				// Else, add new item
+				updatedItems = [...cart.items, newItem];
+			}
 
-			// Add the new item to the cart
-			const updatedItems = [...cart.items, newItem];
-			const updatedTotal = cart.total + itemTotal;
+			// Recalculate total
+			const updatedTotal = updatedItems.reduce(
+				(sum, item) => sum + (item.price || 0) * (item.quantity || 1),
+				0
+			);
 
+			return {
+				...prevCarts,
+				[restaurantId]: { total: updatedTotal, items: updatedItems },
+			};
+		});
+	};
+
+	const removeFromCart = (restaurantId, itemId) => {
+		setCart((prevCarts) => {
+			const cart = prevCarts[restaurantId];
+			if (!cart) return prevCarts;
+			const updatedItems = cart.items.filter((item) => item.id !== itemId);
+			const updatedTotal = updatedItems.reduce(
+				(sum, item) => sum + (item.price || 0) * (item.quantity || 1),
+				0
+			);
 			return {
 				...prevCarts,
 				[restaurantId]: { total: updatedTotal, items: updatedItems },
@@ -66,7 +74,7 @@ export function CartProvider({ children }) {
 
 	const getCartItemCount = (restaurantId) => {
 		const restaurantCart = cart[restaurantId]?.items || [];
-		return restaurantCart.length;
+		return restaurantCart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 	};
 
 	return (
@@ -74,6 +82,7 @@ export function CartProvider({ children }) {
 			value={{
 				cart,
 				addToCart,
+				removeFromCart,
 				getCartItemCount,
 				getCartTotal,
 			}}
