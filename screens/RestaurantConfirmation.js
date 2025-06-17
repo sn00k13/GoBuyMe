@@ -15,7 +15,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
 
-export default function RestaurantConfirmationScreen({ navigation, route }) {
+export default function RestaurantConfirmation({ navigation, route }) {
 	const [addresses, setAddresses] = useState([]);
 	const [showAddressesModal, setShowAddressesModal] = useState(false);
 	const [showAddAddressModal, setShowAddAddressModal] = useState(false);
@@ -36,7 +36,9 @@ export default function RestaurantConfirmationScreen({ navigation, route }) {
 	// Get cart items and total from route params
 	const cartItems = route.params?.cartItems || [];
 	const totalAmount = route.params?.totalAmount || 0;
-	const restaurantId = route.params?.restaurantId;
+	const { restaurantId, restaurantName } = route.params;
+	const discountApplied = route.params?.discountApplied;
+	const discountAmount = route.params?.discountAmount || 0;
 
 	useEffect(() => {
 		// Check if we have cart items
@@ -167,6 +169,9 @@ export default function RestaurantConfirmationScreen({ navigation, route }) {
 			},
 			totalAmount,
 			restaurantId,
+			restaurantName,
+			discountApplied, // pass this if you want to show a message
+			discountAmount,
 		});
 	};
 
@@ -197,9 +202,12 @@ export default function RestaurantConfirmationScreen({ navigation, route }) {
 					elevation: 1,
 				}}
 			>
-				<Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }}>
-					Cart Items
-				</Text>
+				<View style={styles.cartName}>
+					<Text style={styles.cartNameText}>Cart Items</Text>
+					<Text style={styles.cartNameText2}>
+						{restaurantName || 'No Name'}
+					</Text>
+				</View>
 				{Array.isArray(cartItems) && cartItems.length > 0 ? (
 					<>
 						{cartItems.map((item, idx) => (
@@ -222,16 +230,15 @@ export default function RestaurantConfirmationScreen({ navigation, route }) {
 								</Text>
 							</View>
 						))}
-						<View
-							style={{
-								borderTopWidth: 1,
-								borderTopColor: '#eee',
-								marginTop: 8,
-								paddingTop: 8,
-								flexDirection: 'row',
-								justifyContent: 'space-between',
-							}}
-						>
+						{discountApplied && (
+							<View style={styles.discountText}>
+								<Text style={styles.discountText2}>Discount Applied:</Text>
+								<Text style={styles.discountText2}>
+									- ₦{discountAmount.toLocaleString()}
+								</Text>
+							</View>
+						)}
+						<View style={styles.totalText}>
 							<Text style={{ fontWeight: 'bold', fontSize: 16 }}>Total:</Text>
 							<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
 								₦{totalAmount.toLocaleString()}
@@ -472,7 +479,7 @@ export default function RestaurantConfirmationScreen({ navigation, route }) {
 				onPress={handleProceedToPayment}
 				disabled={!defaultAddress || !cartItems.length}
 			>
-				<Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>
+				<Text style={styles.proceedButtonText}>
 					Proceed to Payment
 				</Text>
 			</Pressable>
@@ -503,6 +510,17 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: 'bold',
 		color: '#FF521B',
+	},
+	discountText: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		paddingVertical: 8,
+		marginTop: 8,
+	},
+	discountText2: {
+		fontStyle: 'italic',
+		color: '#21A179',
+		fontSize: 16,
 	},
 	deliveryAddress: {
 		paddingVertical: 16,
@@ -554,6 +572,8 @@ const styles = StyleSheet.create({
 	proceedButton: {
 		backgroundColor: '#FF521B',
 		padding: 16,
+		paddingVertical: 14,
+		alignItems: 'center',
 		marginHorizontal: 16,
 		borderRadius: 4,
 		position: 'absolute',
@@ -561,7 +581,34 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 	},
+	proceedButtonText: {
+		color: '#fff',
+		fontSize: 16,
+		textAlign: 'center',
+	},
 	disabledButton: {
 		backgroundColor: '#E0E0E0',
+	},
+	cartName: {
+		marginBottom: 12,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+	},
+	cartNameText: {
+		fontSize: 18,
+		fontWeight: 'bold',
+	},
+	cartNameText2: {
+		fontSize: 16,
+		fontStyle: 'italic',
+	},
+	totalText: {
+		borderTopWidth: 1,
+		borderTopColor: '#eee',
+		marginTop: 8,
+		paddingTop: 8,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
 	},
 });

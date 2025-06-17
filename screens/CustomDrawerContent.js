@@ -12,8 +12,7 @@ const CustomDrawerContent = (props) => {
 		<View style={styles.container}>
 			{/* Custom Header */}
 			<View style={styles.header}>
-				<Image source={require('../assets/logo.png')} style={styles.logo} />
-				<Text style={styles.appName}>GoBuyMe</Text>
+				<Image source={require('../assets/logo.png')} style={styles.logo} />				
 			</View>
 
 			{/* Scrollable Content */}
@@ -58,10 +57,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	logo: {
-		width: 80,
-		height: 80,
-		borderRadius: 40,
+		width: 100,
+		height: 150,
+		// borderRadius: 40,
 		marginBottom: 10,
+		marginTop: 40,
 	},
 	appName: {
 		fontSize: 20,

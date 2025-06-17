@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   mealImage: {
     width: itemSize - 10,
     height: itemSize - 10,
-    borderRadius: 8,
+    borderRadius: 4,
     backgroundColor: '#eee', // Fallback if image missing
   },
   mealName: {

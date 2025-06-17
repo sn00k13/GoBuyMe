@@ -553,6 +553,8 @@ const styles = StyleSheet.create({
 	proceedButton: {
 		backgroundColor: '#FF521B',
 		padding: 16,
+		paddingVertical: 14,
+		alignItems: 'center',
 		marginHorizontal: 16,
 		borderRadius: 4,
 		position: 'absolute',

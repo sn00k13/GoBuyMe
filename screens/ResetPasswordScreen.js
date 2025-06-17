@@ -35,7 +35,7 @@ export default function ResetPasswordScreen({ navigation }) {
 
       <Pressable 
       onPress={() => navigation.goBack()}>
-        <Text style={styles.link}>Back to Login</Text>
+        <Text style={styles.link}>Back</Text>
       </Pressable>
     </View>
   );

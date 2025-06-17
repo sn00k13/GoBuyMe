@@ -1,14 +1,14 @@
 import React from 'react';
 import {
- 	View,
- 	Text,
- 	StyleSheet,
- 	Pressable,
- 	FlatList,
- 	Image,
- 	TextInput,
-	Alert
- } from 'react-native';
+	View,
+	Text,
+	StyleSheet,
+	Pressable,
+	FlatList,
+	Image,
+	TextInput,
+	Alert,
+} from 'react-native';
 import { useCart } from './CartContext';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -84,10 +84,14 @@ export default function CartDetails({ route, navigation }) {
 		}
 
 		navigation.navigate('RestaurantConfirmation', {
-			cartItems: cartItems,
-			totalAmount: discountedTotal,
-			restaurantId: restaurantId,
+			cartItems,
+			totalAmount: discountedTotal, // pass the discounted total
+			restaurantId,
+			restaurantName,
+			discountApplied, // pass this if you want to show a message
+			discountAmount: total - discountedTotal, // pass the discount value if needed
 		});
+		console.log('RestaurantConfirmationScreen params:', route.params);
 	};
 
 	return (
@@ -97,7 +101,7 @@ export default function CartDetails({ route, navigation }) {
 				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
 				</Pressable>
-				<Text style={styles.headerText}>My Cart</Text>
+				<Text style={styles.headerText}>My Cart - {restaurantName}</Text>
 				<View style={{ width: 24 }} />
 			</View>
 			{/* Render FlatList here */}
@@ -136,7 +140,7 @@ export default function CartDetails({ route, navigation }) {
 						</Text>
 					) : null}
 					<Pressable style={styles.applyDiscount} onPress={handleApplyDiscount}>
-						<Text style={{ color: '#fff' }}>Apply</Text>
+						<Text style={styles.proceedCheckoutText}>Apply</Text>
 					</Pressable>
 				</View>
 			</View>
@@ -149,12 +153,12 @@ export default function CartDetails({ route, navigation }) {
 			</View>
 			<View style={styles.proceedCheckout}>
 				<Pressable onPress={() => navigation.navigate('RestaurantMenuItem')}>
-					<Text style={{ color: 'white' }}>Continue Shopping</Text>
+					<Text style={styles.proceedCheckoutText}>Continue Shopping</Text>
 				</Pressable>
 			</View>
 			<View style={styles.proceedCheckout2}>
 				<Pressable onPress={handleCheckout}>
-					<Text style={{ color: 'white' }}>Proceed to Checkout</Text>
+					<Text style={styles.proceedCheckoutText}>Proceed to Checkout</Text>
 				</Pressable>
 			</View>
 		</View>
@@ -195,6 +199,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		alignItems: 'center',
 		margin: 16,
+		fontSize: 16,
 	},
 	proceedCheckout2: {
 		backgroundColor: '#21A179',
@@ -203,6 +208,11 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		alignItems: 'center',
 		marginHorizontal: 16,
+		fontSize: 16,
+	},
+	proceedCheckoutText: {
+		color: '#fff',
+		fontSize: 16,
 	},
 	orderTotalText: {
 		fontSize: 18,

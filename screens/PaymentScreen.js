@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
 	},
 	section: {
 		backgroundColor: 'white',
-		borderRadius: 8,
+		borderRadius: 4,
 		padding: 16,
 		marginBottom: 16,
 		shadowColor: '#000',
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
 		elevation: 3,
 	},
 	sectionTitle: {
-		fontSize: 18,
+		fontSize: 16,
 		fontWeight: 'semi-bold',
 		color: '#FF521B',
 		marginBottom: 16,
@@ -313,8 +313,8 @@ const styles = StyleSheet.create({
 		borderTopColor: '#F0F0F0',
 	},
 	totalLabel: {
-		fontSize: 18,
-		// fontWeight: 'bold',
+		fontSize: 16,
+		fontWeight: 'bold',
 		color: '#2A324B',
 	},
 	totalAmount: {
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
 		padding: 16,
 		borderWidth: 1,
 		borderColor: '#E0E0E0',
-		borderRadius: 8,
+		borderRadius: 4,
 		marginBottom: 12,
 	},
 	methodOptionSelected: {
@@ -353,15 +353,17 @@ const styles = StyleSheet.create({
 	},
 	payButton: {
 		backgroundColor: '#FF521B',
-		borderRadius: 8,
+		borderRadius: 4,
 		padding: 16,
+        paddingVertical: 14,
+		alignItems: 'center',
 		alignItems: 'center',
 		marginTop: 24,
 		marginBottom: 24,
 	},
 	payButtonText: {
 		color: 'white',
-		fontSize: 18,
+		fontSize: 16,
 		// fontWeight: 'bold',
 	},
 });

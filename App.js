@@ -15,10 +15,9 @@ import OrderHistoryScreen from './screens/OrderHistoryScreen';
 import OffersScreen from './screens/OffersScreen';
 import MealCardScreen from './screens/MealCardScreen';
 import VendorListScreen from './screens/VendorListScreen'; 
-import MealDetailsScreen from './screens/MealDetailsScreen';
 import PaymentOptionsScreen from './screens/PaymentOptionsScreen';
 import ConfirmationScreen from './screens/ConfirmationScreen';
-import RestaurantConfirmationScreen from './screens/ConfirmationScreen';
+import RestaurantConfirmation from './screens/RestaurantConfirmation';
 import MyAddressesScreen from './screens/MyAddressesScreen';
 import NotificationsScreen from './screens/NotificationsScreen';
 import LandingScreen from './screens/LandingScreen';
@@ -73,7 +72,6 @@ function HomeStack() {
         <Stack.Screen name="HomeMain" component={HomeScreen} />
         <Stack.Screen name="VendorList" component={VendorListScreen} />
         <Stack.Screen name="MealCard" component={MealCardScreen} />
-        <Stack.Screen name="MealDetails" component={MealDetailsScreen} />
         <Stack.Screen name="Address" component={AddressScreen} />
         <Stack.Screen name="MyAddresses" component={MyAddressesScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
@@ -83,7 +81,7 @@ function HomeStack() {
         <Stack.Screen name="Cart" component={CartDetails} />
         <Stack.Screen name="PaymentOptions" component={PaymentOptionsScreen} />
         <Stack.Screen name="Confirmation" component={ConfirmationScreen} />
-        <Stack.Screen name="RestaurantConfirmation" component={RestaurantConfirmationScreen} />
+        <Stack.Screen name="RestaurantConfirmation" component={RestaurantConfirmation} />
         <Stack.Screen name="Favorites" component={FavoritesScreen} />
         <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />

@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 16,
-		backgroundColor: '#FFF9F7',
+		backgroundColor: '#FFF0EB',
 		paddingTop: 40,
 	},
 	backButton: {
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
 	},
 	offerCard: {
 		backgroundColor: '#FFF',
-		borderRadius: 10,
+		borderRadius: 4,
 		padding: 18,
 		marginBottom: 18,
 		shadowColor: '#000',
