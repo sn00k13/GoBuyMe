@@ -33,7 +33,7 @@ yarn-error.*
 .env*.local
 .env
 server/routes/.env.local
-server/routes/.env
+/server/routes/.env
 
 # typescript
 *.tsbuildinfo
