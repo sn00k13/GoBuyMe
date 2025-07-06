@@ -10,11 +10,13 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { useCart } from './CartContext';
 
 export default function OrderDetailsScreen({ navigation, route }) {
 	const { orderId } = route.params;
 	const [order, setOrder] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const { addToCart } = useCart();
 
 	useEffect(() => {
 		const fetchOrder = async () => {
@@ -197,11 +199,25 @@ export default function OrderDetailsScreen({ navigation, route }) {
 				{order.status === 'pending' && (
 					<Pressable
 						style={styles.cancelButton}
-						onPress={() => {
-							// Handle order cancellation
+						onPress={async () => {
+							// Repeat Order: Add all items back to cart
+							if (!order || !order.items || !order.restaurantId) return;
+							for (const item of order.items) {
+								await addToCart(order.restaurantId, {
+									id: item.id,
+									name: item.name,
+									price: item.price,
+									quantity: item.quantity,
+									imageUrl: item.imageUrl || null,
+								});
+							}
+							navigation.navigate('CartDetails', {
+								restaurantId: order.restaurantId,
+								restaurantName: order.restaurantName || '',
+							});
 						}}
 					>
-						<Text style={styles.cancelButtonText}>Cancel Order</Text>
+						<Text style={styles.cancelButtonText}>Repeat Order</Text>
 					</Pressable>
 				)}
 			</ScrollView>
@@ -233,7 +249,7 @@ const styles = StyleSheet.create({
 	},
 	section: {
 		backgroundColor: 'white',
-		borderRadius: 8,
+		borderRadius: 4,
 		padding: 16,
 		marginBottom: 16,
 	},
@@ -329,7 +345,7 @@ const styles = StyleSheet.create({
 	},
 	cancelButton: {
 		backgroundColor: '#F44336',
-		borderRadius: 8,
+		borderRadius: 4,
 		padding: 16,
 		alignItems: 'center',
 		marginBottom: 24,

@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     },
     orderCard: {
         backgroundColor: 'white',
-        borderRadius: 8,
+        borderRadius: 4,
         padding: 16,
         marginBottom: 12,
         elevation: 2,
