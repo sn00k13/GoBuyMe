@@ -12,6 +12,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase';
 import { MaterialIcons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 
 export default function AddressesScreen({ navigation }) {
 	const [addresses, setAddresses] = useState({});
@@ -27,6 +28,24 @@ export default function AddressesScreen({ navigation }) {
 		isDefault: false,
 	});
 	const [editingAddressId, setEditingAddressId] = useState(null);
+
+	const districts = [
+		'Akwakuma',
+		'Aladinma',
+		'Amakaohia',
+		'Douglas',
+		'Ikenegbu',
+		'Irete',
+		'MCC',
+		'Nekede Old Road',
+		'New Owerri',
+		'Okigwe Road',
+		'Orji',
+		'Tetlow',
+		'Wetheral',
+		'West-End',
+		'World Bank',
+	];
 
 	useEffect(() => {
 		const fetchAddresses = async () => {
@@ -92,7 +111,8 @@ export default function AddressesScreen({ navigation }) {
 			!newAddress.city ||
 			!newAddress.zipCode ||
 			!newAddress.state ||
-			!newAddress.country
+			!newAddress.country ||
+			!newAddress.district
 		) {
 			Alert.alert('Error', 'Please fill in all required fields.');
 			return;
@@ -135,6 +155,7 @@ export default function AddressesScreen({ navigation }) {
 					country: '',
 					landmark: '',
 					isDefault: false,
+					district: '',
 				});
 				setIsAddingNew(false);
 				setEditingAddressId(null); // Reset editing state
@@ -221,6 +242,9 @@ export default function AddressesScreen({ navigation }) {
 							{address.landmark && (
 								<Text style={styles.addressText}>{address.landmark}</Text>
 							)}
+							{address.district && (
+								<Text style={styles.addressText}>{address.district}</Text>
+							)}
 						</View>
 						{/* Edit Button */}
 						<Pressable
@@ -290,6 +314,22 @@ export default function AddressesScreen({ navigation }) {
 							setNewAddress({ ...newAddress, landmark: text })
 						}
 					/>
+					<View style={styles.pickerContainer}>
+						<Text style={styles.pickerLabel}>District *</Text>
+						<Picker
+							selectedValue={newAddress.district}
+							onValueChange={(itemValue) =>
+								setNewAddress({ ...newAddress, district: itemValue })
+							}
+							style={styles.picker}
+							mode="dropdown"
+						>
+							<Picker.Item label="Select district" value="" />
+							{districts.map((district) => (
+								<Picker.Item key={district} label={district} value={district} />
+							))}
+						</Picker>
+					</View>
 					<Pressable
 						style={styles.checkboxContainer}
 						onPress={() =>
@@ -391,6 +431,21 @@ const styles = StyleSheet.create({
 		padding: 8,
 		marginVertical: 8,
 		marginHorizontal: 16,
+	},
+	pickerContainer: {
+		marginHorizontal: 16,
+		marginVertical: 8,
+	},
+	pickerLabel: {
+		fontSize: 14,
+		color: '#0B3948',
+		marginBottom: 4,
+	},
+	picker: {
+		borderWidth: 1,
+		borderColor: '#FF521B',
+		borderRadius: 4,
+		padding: 8,
 	},
 	checkboxContainer: {
 		flexDirection: 'row',

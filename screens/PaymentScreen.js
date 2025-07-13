@@ -71,7 +71,7 @@ export default function PaymentScreen({ navigation, route }) {
 				customerName: userData.name,
 				customerPhone: userData.phone,
 				customerEmail: userData.email,
-				customerAddress: userData.address,
+				deliveryAddress: userData.address,
 				createdAt: serverTimestamp(),
 				...(storeId ? { storeId } : {}),
 			};

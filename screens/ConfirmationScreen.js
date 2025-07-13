@@ -10,6 +10,7 @@ import {
 	Alert,
 	ActivityIndicator,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -20,13 +21,30 @@ export default function ConfirmationScreen({ navigation, route }) {
 	const [showAddressesModal, setShowAddressesModal] = useState(false);
 	const [showAddAddressModal, setShowAddAddressModal] = useState(false);
 	const [defaultAddress, setDefaultAddress] = useState(null);
+	const districts = [
+		'Akwakuma',
+		'Aladinma',
+		'Amakaohia',
+		'Douglas',
+		'Ikenegbu',
+		'Irete',
+		'MCC',
+		'Nekede Old Road',
+		'New Owerri',
+		'Okigwe Road',
+		'Orji',
+		'Tetlow',
+		'Wetheral',
+		'West-End',
+		'World Bank',
+	];
 	const [form, setForm] = useState({
 		street: '',
 		city: '',
 		state: '',
-		zip: '',
 		country: '',
 		landmark: '',
+		district: '',
 		isDefault: false,
 	});
 	const [loading, setLoading] = useState(false);
@@ -249,9 +267,10 @@ export default function ConfirmationScreen({ navigation, route }) {
 						<Text style={styles.addressText}>{defaultAddress.street}</Text>
 						<Text style={styles.addressText}>
 							{defaultAddress.city}, {defaultAddress.state},{' '}
-							{defaultAddress.zip}
+							{defaultAddress.country}
 						</Text>
-						<Text style={styles.addressText}>{defaultAddress.country}</Text>
+						<Text style={styles.addressText}>{defaultAddress.landmark}</Text>
+						<Text style={styles.addressText}>{defaultAddress.district}</Text>
 					</>
 				) : (
 					<Text style={styles.addressText}>No default address set</Text>
@@ -350,7 +369,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 							>
 								Add New Address
 							</Text>
-							{['street', 'city', 'state', 'zip', 'country', 'landmark'].map(
+							{['street', 'city', 'state', 'country', 'landmark'].map(
 								(field) => (
 									<TextInput
 										key={field}
@@ -363,6 +382,20 @@ export default function ConfirmationScreen({ navigation, route }) {
 									/>
 								)
 							)}
+							<View style={styles.pickerContainer}>
+								<Text style={styles.pickerLabel}>District *</Text>
+								<Picker
+									selectedValue={form.district}
+									onValueChange={(itemValue) => setForm((f) => ({ ...f, district: itemValue }))}
+									style={styles.picker}
+									mode="dropdown"
+								>
+									<Picker.Item label="Select district" value="" />
+									{districts.map((district) => (
+										<Picker.Item key={district} label={district} value={district} />
+									))}
+								</Picker>
+							</View>
 							<View
 								style={{
 									flexDirection: 'row',
@@ -392,10 +425,12 @@ export default function ConfirmationScreen({ navigation, route }) {
 											!form.street ||
 											!form.city ||
 											!form.state ||
-											!form.zip ||
-											!form.country
-										)
+											!form.country ||
+											!form.district
+										) {
+											Alert.alert('Missing Fields', 'Please fill in all required fields.');
 											return;
+										}
 										const userDocRef = doc(db, 'users', auth.currentUser.uid);
 
 										// Generate a unique id for the address
@@ -442,9 +477,9 @@ export default function ConfirmationScreen({ navigation, route }) {
 											street: '',
 											city: '',
 											state: '',
-											zip: '',
 											country: '',
 											landmark: '',
+											district: '',
 											isDefault: false,
 										});
 									}}
@@ -564,5 +599,21 @@ const styles = StyleSheet.create({
 	},
 	disabledButton: {
 		backgroundColor: '#E0E0E0',
+	},
+	pickerContainer: {
+		marginTop: 8,
+		marginBottom: 12,
+	},
+	pickerLabel: {
+		fontSize: 14,
+		color: '#555',
+		marginBottom: 4,
+	},
+	picker: {
+		borderWidth: 1,
+		borderColor: '#FF521B',
+		borderRadius: 4,
+		padding: 8,
+		backgroundColor: '#fff',
 	},
 });
