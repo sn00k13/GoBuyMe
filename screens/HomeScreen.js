@@ -92,15 +92,11 @@ export default function HomeScreen({ navigation }) {
 							{defaultAddress ? (
 								<>
 									<Text style={styles.addressText}>
-										{defaultAddress.street}
+										{defaultAddress.street.length > 30
+											? defaultAddress.street.slice(0, 30) + '...'
+											: defaultAddress.street}
 									</Text>
-									<Text style={styles.addressText}>
-										{defaultAddress.city}, {defaultAddress.state},{' '}
-										{defaultAddress.zipCode}
-									</Text>
-									<Text style={styles.addressText}>
-										{defaultAddress.country}
-									</Text>
+									
 								</>
 							) : (
 								<Text style={styles.addressText}>No default address set</Text>
