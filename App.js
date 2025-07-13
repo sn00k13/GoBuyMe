@@ -76,7 +76,6 @@ function HomeStack() {
         <Stack.Screen name="MyAddresses" component={MyAddressesScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
-        <Stack.Screen name="Notifications" component={NotificationsScreen} />
         <Stack.Screen name="Dummy" component={DummyScreen} />
         <Stack.Screen name="Cart" component={CartDetails} />
         <Stack.Screen name="PaymentOptions" component={PaymentOptionsScreen} />
@@ -152,6 +151,13 @@ function DrawerNavigator() {
         }}
       />
       <Drawer.Screen
+        name="My Notification"
+        component={NotificationsScreen}
+        options={{
+          drawerIcon: ({ color }) => <FontAwesome6 name="location-dot" size={20} color={color} />,
+        }}
+      />
+      <Drawer.Screen
         name="Awoof Packages"
         component={OffersScreen}
         options={{
@@ -189,7 +195,8 @@ export default function App() {
         <Stack.Screen name="AccountsPasswordsSettings" component={AccountsPasswordsSettings} />                
         <Stack.Screen name="OffersScreen" component={OffersScreen} />                
         <Stack.Screen name="Permissions" component={Permissions} />                
-        <Stack.Screen name="TermsService" component={TermsService} />                
+        <Stack.Screen name="TermsService" component={TermsService} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />              
       </Stack.Navigator>
     </NavigationContainer>
   );

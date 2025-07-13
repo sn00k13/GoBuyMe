@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Paystack } from 'react-native-paystack-webview';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, addDoc, collection } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase';
 import { useCart } from './CartContext';
@@ -74,7 +74,7 @@ export default function PaymentScreen({ navigation, route }) {
 				customerName: userData.name,
 				customerPhone: userData.phone,
 				customerEmail: userData.email,
-				customerAddress: userData.address,
+				deliveryAddress: userData.address,
 				createdAt: serverTimestamp(),
 				restaurantId,
 				discountApplied, // boolean
@@ -85,6 +85,14 @@ export default function PaymentScreen({ navigation, route }) {
 				(key) => orderData[key] === undefined && delete orderData[key]
 			);
 			await setDoc(orderRef, orderData);
+
+			// Create notification for the user
+			await addDoc(collection(db, 'notifications'), {
+				userId: auth.currentUser.uid,
+				title: 'Order Processing',
+				body: 'Order successfully placed. Kindly wait while we process your orders.',
+				timestamp: serverTimestamp(),
+			});
 
 			// Clear cart after initiating payment
 			clearCart(restaurantId);

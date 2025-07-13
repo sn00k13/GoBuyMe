@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Paystack } from 'react-native-paystack-webview';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, addDoc, collection } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase';
 import { useStoreCart } from './StoreCartContext';
@@ -84,6 +84,14 @@ export default function PaymentScreen({ navigation, route }) {
 			// Create order document
 			const orderRef = doc(db, 'orders', response.transactionRef.reference);
 			await setDoc(orderRef, orderData);
+
+			// Create notification for the user
+			await addDoc(collection(db, 'notifications'), {
+				userId: auth.currentUser.uid,
+				title: 'Order Processing',
+				body: 'Order successfully placed. Kindly wait while we process your orders.',
+				timestamp: serverTimestamp(),
+			});
 
 			// Clear cart only if we have a valid store identifier
 			if (storeId) {
