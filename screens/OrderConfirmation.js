@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     },
     orderInfo: {
         backgroundColor: 'white',
-        borderRadius: 8,
+        borderRadius: 4,
         padding: 16,
         width: '100%',
         marginBottom: 24,
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     },
     button: {
         padding: 16,
-        borderRadius: 8,
+        borderRadius: 4,
         alignItems: 'center',
         marginBottom: 12,
     },
