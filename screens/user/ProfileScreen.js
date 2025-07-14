@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput, Image, Alert } from 'react-native';
-import { auth } from '../firebase';
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db } from '../firebase';
+import { db, auth } from '../../firebase';
 import * as ImagePicker from 'expo-image-picker';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -157,7 +156,7 @@ export default function ProfileScreen({ navigation }) {
                     source={
                       userData?.profileImage
                         ? { uri: userData.profileImage } // Use profileImage from Firestore
-                        : require('../assets/default-profile.png') // Fallback image
+                        : require('../../assets/default-profile.png') // Fallback image
                     }
                     style={styles.profileImage}
                   />

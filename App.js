@@ -2,52 +2,50 @@ import 'react-native-gesture-handler';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-import HomeScreen from './screens/HomeScreen';
-import ProfileScreen from './screens/ProfileScreen';
-import SettingsScreen from './screens/SettingsScreen';
-import DummyScreen from './screens/DummyScreen';
-import CustomDrawerContent from './screens/CustomDrawerContent';
-import AddressScreen from './screens/AddressScreen';
-import ChatScreen from './screens/ChatScreen';
-import CartDetails from './screens/CartDetails';
-import FavoritesScreen from './screens/FavoritesScreen';
-import OrderHistoryScreen from './screens/OrderHistoryScreen';
-import OffersScreen from './screens/OffersScreen';
+import HomeScreen from './screens/app/HomeScreen';
+import ProfileScreen from './screens/user/ProfileScreen';
+import SettingsScreen from './screens/user/SettingsScreen';
+import CustomDrawerContent from './screens/app/CustomDrawerContent';
+import AddressScreen from './screens/user/AddressScreen';
+import ChatScreen from './screens/user/ChatScreen';
+import CartDetails from './screens/app/CartDetails';
+import FavoritesScreen from './screens/user/FavoritesScreen';
+import OrderHistoryScreen from './screens/user/OrderHistoryScreen';
+import OffersScreen from './screens/user/OffersScreen';
 import MealCardScreen from './screens/MealCardScreen';
-import VendorListScreen from './screens/VendorListScreen'; 
-import PaymentOptionsScreen from './screens/PaymentOptionsScreen';
-import ConfirmationScreen from './screens/ConfirmationScreen';
-import RestaurantConfirmation from './screens/RestaurantConfirmation';
-import MyAddressesScreen from './screens/MyAddressesScreen';
-import NotificationsScreen from './screens/NotificationsScreen';
-import LandingScreen from './screens/LandingScreen';
-import SplashScreen from './screens/SplashScreen';
-import LoginScreen from './screens/LoginScreen';
-import RegisterScreen from './screens/RegisterScreen';
-import ResetPasswordScreen from './screens/ResetPasswordScreen';
-import ResetPasswordSuccessScreen from './screens/ResetPasswordSuccessScreen';
-import AppearancePersonalization from './screens/AppearancePersonalization';
-import LanguageInput from './screens/LanguageInput';
-import DataStorage from './screens/DataStorage';
-import NotificationsOptions from './screens/NotificationsOptions';
-import PushNotifications from './screens/PushNotifications';
-import TermsService from './screens/TermsService';
-import AboutScreen from './screens/AboutScreen';
-import AccountsPasswordsSettings from './screens/AccountsPasswordsSettings';
-import Permissions from './screens/Permissions';
-import EmartScreen from './screens/EmartScreen';
-import SelectProductScreen from './screens/SelectProductScreen';
-import EMartCartDetails from './screens/EMartCartDetails';
-import PaymentScreen from './screens/PaymentScreen';
-import RestaurantPaymentScreen from './screens/RestaurantPaymentScreen';
+import VendorListScreen from './screens/app/VendorListScreen'; 
+import PaymentOptionsScreen from './screens/app/PaymentOptionsScreen';
+import ConfirmationScreen from './screens/store/ConfirmationScreen';
+import RestaurantConfirmation from './screens/restaurant/RestaurantConfirmation';
+import MyAddressesScreen from './screens/user/MyAddressesScreen';
+import NotificationsScreen from './screens/user/NotificationsScreen';
+import LandingScreen from './screens/app/LandingScreen';
+import SplashScreen from './screens/app/SplashScreen';
+import LoginScreen from './screens/auth/LoginScreen';
+import RegisterScreen from './screens/auth/RegisterScreen';
+import ResetPasswordScreen from './screens/auth/ResetPasswordScreen';
+import ResetPasswordSuccessScreen from './screens/auth/ResetPasswordSuccessScreen';
+import AppearancePersonalization from './screens/user/AppearancePersonalization';
+import LanguageInput from './screens/app/LanguageInput';
+import DataStorage from './screens/app/DataStorage';
+import NotificationsOptions from './screens/app/NotificationsOptions';
+import PushNotifications from './screens/app/PushNotifications';
+import TermsService from './screens/app/TermsService';
+import AboutScreen from './screens/app/AboutScreen';
+import Permissions from './screens/user/Permissions';
+import EmartScreen from './screens/store/EmartScreen';
+import SelectProductScreen from './screens/store/SelectProductScreen';
+import EMartCartDetails from './screens/store/EMartCartDetails';
+import PaymentScreen from './screens/store/PaymentScreen';
+import RestaurantPaymentScreen from './screens/restaurant/RestaurantPaymentScreen';
 import CashOnDeliveryScreen from './screens/CashOnDeliveryScreen';
-import OrderConfirmation from './screens/OrderConfirmation';
-import OrdersScreen from './screens/OrdersScreen';
-import OrderDetailsScreen from './screens/OrderDetailsScreen';
-import RestaurantDetailScreen from './screens/RestaurantDetailScreen';
-import RestaurantMenuItemScreen from './screens/RestaurantMenuItemScreen';
-import { CartProvider } from './screens/CartContext';
-import { StoreCartProvider } from './screens/StoreCartContext';
+import OrderConfirmation from './screens/store/OrderConfirmation';
+import OrdersScreen from './screens/user/OrdersScreen';
+import OrderDetailsScreen from './screens/app/OrderDetailsScreen';
+import RestaurantDetailScreen from './screens/restaurant/RestaurantDetailScreen';
+import RestaurantMenuItemScreen from './screens/restaurant/RestaurantMenuItemScreen';
+import { CartProvider } from './screens/app/CartContext';
+import { StoreCartProvider } from './screens/app/StoreCartContext';
 import { MaterialIcons, FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 
 const Drawer = createDrawerNavigator();
@@ -76,7 +74,6 @@ function HomeStack() {
         <Stack.Screen name="MyAddresses" component={MyAddressesScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
-        <Stack.Screen name="Dummy" component={DummyScreen} />
         <Stack.Screen name="Cart" component={CartDetails} />
         <Stack.Screen name="PaymentOptions" component={PaymentOptionsScreen} />
         <Stack.Screen name="Confirmation" component={ConfirmationScreen} />
@@ -184,15 +181,13 @@ export default function App() {
         }}
       >
         <Stack.Screen name="Drawer" component={DrawerNavigator} />
-        <Stack.Screen name="Dummy" component={DummyScreen} />
         <Stack.Screen name="Appearance" component={AppearancePersonalization} />
         <Stack.Screen name="Language" component={LanguageInput} />
         <Stack.Screen name="DataStorage" component={DataStorage} />
         <Stack.Screen name="NotificationsOptions" component={NotificationsOptions} />
         <Stack.Screen name="Chat" component={ChatScreen} />
         <Stack.Screen name="PushNotifications" component={PushNotifications} />        
-        <Stack.Screen name="AboutScreen" component={AboutScreen} />                
-        <Stack.Screen name="AccountsPasswordsSettings" component={AccountsPasswordsSettings} />                
+        <Stack.Screen name="AboutScreen" component={AboutScreen} />
         <Stack.Screen name="OffersScreen" component={OffersScreen} />                
         <Stack.Screen name="Permissions" component={Permissions} />                
         <Stack.Screen name="TermsService" component={TermsService} />

@@ -14,7 +14,7 @@ import Feather from '@expo/vector-icons/Feather';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { db } from '../firebase';
+import { db } from '../../firebase';
 
 export default function HomeScreen({ navigation }) {
 	const [defaultAddress, setDefaultAddress] = useState(null);
@@ -75,7 +75,7 @@ export default function HomeScreen({ navigation }) {
 				{/* Image Content */}
 				<View style={styles.imageContainer}>
 					<Image
-						source={require('../assets/burger-deal.jpg')}
+						source={require('../../assets/burger-deal.jpg')}
 						style={styles.image}
 						resizeMode="cover"
 					/>

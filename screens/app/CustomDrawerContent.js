@@ -12,7 +12,7 @@ const CustomDrawerContent = (props) => {
 		<View style={styles.container}>
 			{/* Custom Header */}
 			<View style={styles.header}>
-				<Image source={require('../assets/logo.png')} style={styles.logo} />				
+				<Image source={require('../../assets/logo.png')} style={styles.logo} />				
 			</View>
 
 			{/* Scrollable Content */}

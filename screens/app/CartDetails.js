@@ -9,7 +9,7 @@ import {
 	TextInput,
 	Alert,
 } from 'react-native';
-import { useCart } from './CartContext';
+import { useCart } from '../app/CartContext';
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function CartDetails({ route, navigation }) {
@@ -49,7 +49,7 @@ export default function CartDetails({ route, navigation }) {
 				source={
 					item.imageUrl
 						? { uri: item.imageUrl }
-						: require('../assets/placeholder.jpg')
+						: require('../../assets/placeholder.jpg')
 				}
 				style={{ width: 60, height: 60, borderRadius: 8, marginRight: 12 }}
 			/>

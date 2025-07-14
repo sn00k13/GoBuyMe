@@ -14,7 +14,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase'; // Make sure you have this configured
+import { db } from '../../firebase'; // Make sure you have this configured
 
 // Calculate grid item width based on screen width
 const { width } = Dimensions.get('window');
@@ -22,21 +22,21 @@ const itemSize = (width - 32 - 16) / 3; // 32=padding, 16=gap
 
 // Dummy meal data - replace with Firestore data later
 const dummyMeals = [
-  { id: '1', name: 'Jollof Rice', image: require('../assets/meal1.jpg') },
-  { id: '2', name: 'Pounded Yam', image: require('../assets/meal2.jpg') },
-  { id: '3', name: 'Fried Rice', image: require('../assets/meal3.jpg') },
-  { id: '4', name: 'Egusi Soup', image: require('../assets/meal4.jpg') },
-  { id: '5', name: 'Pepper Soup', image: require('../assets/meal5.jpg') },
-  { id: '6', name: 'Suya', image: require('../assets/meal6.jpg') },
-  { id: '7', name: 'Moi Moi', image: require('../assets/meal7.jpg') },
-  { id: '8', name: 'Akara', image: require('../assets/meal8.jpg') },
-  { id: '9', name: 'Amala', image: require('../assets/meal9.jpg') },
-  { id: '10', name: 'Moi Moi', image: require('../assets/meal7.jpg') },
-  { id: '11', name: 'Akara', image: require('../assets/meal8.jpg') },
-  { id: '12', name: 'Amala', image: require('../assets/meal9.jpg') },
-  { id: '13', name: 'Moi Moi', image: require('../assets/meal7.jpg') },
-  { id: '14', name: 'Akara', image: require('../assets/meal8.jpg') },
-  { id: '15', name: 'Amala', image: require('../assets/meal9.jpg') },
+  { id: '1', name: 'Jollof Rice', image: require('../../assets/meal1.jpg') },
+  { id: '2', name: 'Pounded Yam', image: require('../../assets/meal2.jpg') },
+  { id: '3', name: 'Fried Rice', image: require('../../assets/meal3.jpg') },
+  { id: '4', name: 'Egusi Soup', image: require('../../assets/meal4.jpg') },
+  { id: '5', name: 'Pepper Soup', image: require('../../assets/meal5.jpg') },
+  { id: '6', name: 'Suya', image: require('../../assets/meal6.jpg') },
+  { id: '7', name: 'Moi Moi', image: require('../../assets/meal7.jpg') },
+  { id: '8', name: 'Akara', image: require('../../assets/meal8.jpg') },
+  { id: '9', name: 'Amala', image: require('../../assets/meal9.jpg') },
+  { id: '10', name: 'Moi Moi', image: require('../../assets/meal7.jpg') },
+  { id: '11', name: 'Akara', image: require('../../assets/meal8.jpg') },
+  { id: '12', name: 'Amala', image: require('../../assets/meal9.jpg') },
+  { id: '13', name: 'Moi Moi', image: require('../../assets/meal7.jpg') },
+  { id: '14', name: 'Akara', image: require('../../assets/meal8.jpg') },
+  { id: '15', name: 'Amala', image: require('../../assets/meal9.jpg') },
 ];
 
 export default function VendorListScreen({ navigation }) {
@@ -109,7 +109,7 @@ export default function VendorListScreen({ navigation }) {
       onPress={() => navigation.navigate('EmartScreen')}
     >
       <Image
-        source={item.imageUrl ? { uri: item.imageUrl } : require('../assets/logo.png')}
+        source={item.imageUrl ? { uri: item.imageUrl } : require('../../assets/logo.png')}
         style={styles.restaurantImage2}
       />
       <View style={styles.restaurantInfo}>
@@ -138,7 +138,7 @@ export default function VendorListScreen({ navigation }) {
       onPress={() => navigation.navigate('MealCard', { mealId: item.id })}
     >
       <Image 
-        source={item.imageUrl ? { uri: item.imageUrl } : require('../assets/placeholder.jpg')} 
+        source={item.imageUrl ? { uri: item.imageUrl } : require('../../assets/placeholder.jpg')} 
         style={styles.mealImage} 
       />
       <Text style={styles.mealName} numberOfLines={1}>{item.name}</Text>
@@ -164,7 +164,7 @@ export default function VendorListScreen({ navigation }) {
       onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item.id })}
     >
       <Image 
-        source={item.imageUrl ? { uri: item.imageUrl } : require('../assets/placeholder.jpg')} 
+        source={item.imageUrl ? { uri: item.imageUrl } : require('../../assets/placeholder.jpg')} 
         style={styles.restaurantImage} 
       />
       <View style={styles.restaurantInfo}>

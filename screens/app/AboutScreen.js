@@ -28,7 +28,7 @@ export default function AboutScreen({ navigation }) {
 			{/* App Logo */}
 			<View style={styles.logoContainer}>
 				<Image
-					source={require('../assets/logo.png')}
+					source={require('../../assets/logo.png')}
 					style={styles.logo}
 					resizeMode="contain"
 				/>
@@ -49,11 +49,11 @@ export default function AboutScreen({ navigation }) {
 			<View style={styles.section}>
 				<Text style={styles.sectionTitle}>Contact & Support</Text>
 				<Pressable
-					onPress={() => Linking.openURL('mailto:support@gobuyme.com')}
+					onPress={() => Linking.openURL('mailto:support@gobuyme.shop')}
 				>
-					<Text style={styles.link}>support@gobuyme.com</Text>
+					<Text style={styles.link}>support@gobuyme.shop</Text>
 				</Pressable>
-				<Pressable onPress={() => Linking.openURL('https://gobuyme.com')}>
+				<Pressable onPress={() => Linking.openURL('https://gobuyme.shop')}>
 					<Text style={styles.link}>Visit our website</Text>
 				</Pressable>
 			</View>
@@ -62,11 +62,11 @@ export default function AboutScreen({ navigation }) {
 			<View style={styles.section}>
 				<Text style={styles.sectionTitle}>Legal</Text>
 				<Pressable
-					onPress={() => Linking.openURL('https://gobuyme.com/privacy')}
+					onPress={() => Linking.openURL('https://gobuyme.shop/privacy')}
 				>
 					<Text style={styles.link}>Privacy Policy</Text>
 				</Pressable>
-				<Pressable onPress={() => Linking.openURL('https://gobuyme.com/terms')}>
+				<Pressable onPress={() => Linking.openURL('https://gobuyme.shop/terms')}>
 					<Text style={styles.link}>Terms of Service</Text>
 				</Pressable>
 			</View>

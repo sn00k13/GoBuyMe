@@ -2,10 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert, Platform } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { auth, db } from '../../firebase';
 import { MaterialIcons } from '@expo/vector-icons';
 import Recaptcha from 'react-native-recaptcha-that-works';
-import { RECAPTCHA_CONFIG } from '../config';
+import { RECAPTCHA_CONFIG } from '../../config';
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState('');

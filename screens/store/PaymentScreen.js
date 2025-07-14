@@ -12,23 +12,20 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Paystack } from 'react-native-paystack-webview';
 import { doc, setDoc, serverTimestamp, addDoc, collection } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { db } from '../firebase';
-import { useCart } from './CartContext';
-import { PAYSTACK_PUBLIC_KEY } from '@env';
+import { db } from '../../firebase';
+import { useStoreCart } from '../app/StoreCartContext';
 
 export default function PaymentScreen({ navigation, route }) {
 	const {
 		cartItems = [],
 		totalAmount = 0,
 		userData,
-		restaurantId,
-		discountApplied,
-		discountAmount = 0,
+		storeId,
 	} = route.params || {};
 	const [processing, setProcessing] = useState(false);
 	const [selectedMethod, setSelectedMethod] = useState('card'); // 'card' or 'bank'
 	const auth = getAuth();
-	const { clearCart } = useCart();
+	const { clearCart } = useStoreCart();
 	const paystackWebViewRef = useRef();
 
 	// Redirect to cart if no items
@@ -62,8 +59,7 @@ export default function PaymentScreen({ navigation, route }) {
 		try {
 			setProcessing(true);
 
-			// Create order document
-			const orderRef = doc(db, 'orders', response.transactionRef.reference);
+			// Build order data, only include storeId if defined
 			const orderData = {
 				userId: auth.currentUser.uid,
 				items: cartItems,
@@ -71,19 +67,22 @@ export default function PaymentScreen({ navigation, route }) {
 				status: 'pending',
 				paymentStatus: selectedMethod === 'bank' ? 'pending' : 'paid',
 				paymentReference: response.transactionRef.reference,
+				paymentMethod: selectedMethod,
 				customerName: userData.name,
 				customerPhone: userData.phone,
 				customerEmail: userData.email,
 				deliveryAddress: userData.address,
 				createdAt: serverTimestamp(),
-				restaurantId,
-				discountApplied, // boolean
-				discountAmount,
+				...(storeId ? { storeId } : {}),
 			};
-			console.log('ORDER DATA:', orderData);
+
+			// Remove any undefined fields (extra safety)
 			Object.keys(orderData).forEach(
 				(key) => orderData[key] === undefined && delete orderData[key]
 			);
+
+			// Create order document
+			const orderRef = doc(db, 'orders', response.transactionRef.reference);
 			await setDoc(orderRef, orderData);
 
 			// Create notification for the user
@@ -94,8 +93,10 @@ export default function PaymentScreen({ navigation, route }) {
 				timestamp: serverTimestamp(),
 			});
 
-			// Clear cart after initiating payment
-			clearCart(restaurantId);
+			// Clear cart only if we have a valid store identifier
+			if (storeId) {
+				clearCart(storeId);
+			}
 
 			// Navigate to success screen with appropriate message
 			navigation.replace('OrderConfirmation', {
@@ -149,22 +150,6 @@ export default function PaymentScreen({ navigation, route }) {
 							</Text>
 						</View>
 					))}
-					<View
-						style={{
-							flexDirection: 'row',
-							justifyContent: 'space-between',
-							marginTop: 8,
-						}}
-					>
-						<Text style={styles.discountText2}>
-							Discount
-						</Text>
-						<Text style={styles.discountText2}>
-							{discountApplied && discountAmount > 0
-								? `- ₦${discountAmount.toLocaleString()}`
-								: '₦0'}
-						</Text>
-					</View>
 					<View style={styles.totalRow}>
 						<Text style={styles.totalLabel}>Total Amount:</Text>
 						<Text style={styles.totalAmount}>
@@ -231,14 +216,7 @@ export default function PaymentScreen({ navigation, route }) {
 				</View>
 
 				<Paystack
-					paystackKey={PAYSTACK_PUBLIC_KEY}
-					{...(!PAYSTACK_PUBLIC_KEY && {
-						onSuccess: () =>
-							Alert.alert(
-								'Configuration error',
-								'PAYSTACK_PUBLIC_KEY is not set. Please contact support.'
-							),
-					})}
+					paystackKey="pk_test_1700cc30d4e1158c6da9ca80f549205b762b9eed"
 					amount={totalAmount}
 					billingEmail={userData.email}
 					activityIndicatorColor="#FF521B"
@@ -259,7 +237,7 @@ export default function PaymentScreen({ navigation, route }) {
 					onPress={() => paystackWebViewRef.current?.startTransaction()}
 				>
 					<Text style={styles.payButtonText}>
-						Pay Now
+						Pay ₦{totalAmount.toLocaleString()} Now
 					</Text>
 				</TouchableOpacity>
 			</ScrollView>
@@ -315,8 +293,8 @@ const styles = StyleSheet.create({
 	},
 	sectionTitle: {
 		fontSize: 16,
-		fontWeight: 'bold',
-		color: '#000',
+		fontWeight: 'semi-bold',
+		color: '#FF521B',
 		marginBottom: 16,
 	},
 	orderItem: {
@@ -334,11 +312,6 @@ const styles = StyleSheet.create({
 		color: '#2A324B',
 		fontWeight: '500',
 	},
-	discountText2: {
-		fontStyle: 'italic',
-		color: '#21A179',
-		fontSize: 16,
-	},
 	totalRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
@@ -353,7 +326,7 @@ const styles = StyleSheet.create({
 		color: '#2A324B',
 	},
 	totalAmount: {
-		fontSize: 16,
+		fontSize: 18,
 		fontWeight: 'bold',
 		color: '#FF521B',
 	},
@@ -390,6 +363,8 @@ const styles = StyleSheet.create({
 		backgroundColor: '#FF521B',
 		borderRadius: 4,
 		padding: 16,
+        paddingVertical: 14,
+		alignItems: 'center',
 		alignItems: 'center',
 		marginTop: 24,
 		marginBottom: 24,
@@ -397,5 +372,6 @@ const styles = StyleSheet.create({
 	payButtonText: {
 		color: 'white',
 		fontSize: 16,
+		// fontWeight: 'bold',
 	},
 });

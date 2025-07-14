@@ -13,7 +13,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
 
 export default function ConfirmationScreen({ navigation, route }) {

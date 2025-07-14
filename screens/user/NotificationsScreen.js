@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { getAuth } from 'firebase/auth';
-import { db } from '../firebase';
+import { db } from '../../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
 export default function NotificationsScreen({ navigation }) {
@@ -57,7 +57,7 @@ export default function NotificationsScreen({ navigation }) {
 		<View style={styles.container}>
 			<Pressable
 				style={styles.backButton}
-				onPress={() => navigation.navigate('Profile')}
+				onPress={() => navigation.navigate('Home')}
 			>
 				<Text style={styles.backButtonText}>← Back</Text>
 			</Pressable>

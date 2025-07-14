@@ -11,7 +11,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { getAuth } from 'firebase/auth';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db } from '../../firebase';
 
 export default function OrdersScreen({ navigation }) {
     const [orders, setOrders] = useState([]);

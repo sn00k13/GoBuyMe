@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
-import { useStoreCart } from './StoreCartContext';
+import { db } from '../../firebase';
+import { useStoreCart } from '../app/StoreCartContext';
 import { useFocusEffect } from '@react-navigation/native';
 
 function SelectProductScreen({ navigation, route }) {
@@ -221,7 +221,7 @@ function SelectProductScreen({ navigation, route }) {
 					source={
 						item.imgUrl
 							? { uri: item.imgUrl }
-							: require('../assets/placeholder.jpg')
+							: require('../../assets/placeholder.jpg')
 					}
 					style={styles.productImage}
 					resizeMode="cover"

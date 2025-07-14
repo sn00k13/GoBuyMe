@@ -10,7 +10,7 @@ const LandingScreen = () => {
 		<View style={styles.container}>
 			{/* App Logo/Title Section */}
 			<View style={styles.header}>
-				<Image source={require('../assets/logo.png')} style={styles.logo} />
+				<Image source={require('../../assets/logo.png')} style={styles.logo} />
 				<Text style={styles.title}>GoBuyMe</Text>
 				<Text style={styles.subtitle}>Your favorite meals, delivered fast</Text>
 			</View>

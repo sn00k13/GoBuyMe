@@ -34,8 +34,8 @@ export default function AppearancePersonalization({ navigation }) {
 				<Image
 					source={
 						darkMode
-							? require('../assets/phone-dark.png')
-							: require('../assets/phone-light.png')
+							? require('../../assets/phone-dark.png')
+							: require('../../assets/phone-light.png')
 					}
 					style={styles.phoneImage}
 					resizeMode="contain"

@@ -9,7 +9,7 @@ import {
 	TextInput,
 	Alert,
 } from 'react-native';
-import { useStoreCart } from './StoreCartContext';
+import { useStoreCart } from '../app/StoreCartContext';
 
 function EMartCartDetails({ navigation, route }) {
 	// Provide default storeId if not passed in route params
@@ -114,7 +114,7 @@ function EMartCartDetails({ navigation, route }) {
 				source={
 					item.imgUrl
 						? { uri: item.imgUrl }
-						: require('../assets/placeholder.jpg')
+						: require('../../assets/placeholder.jpg')
 				}
 				style={styles.cartImage}
 			/>

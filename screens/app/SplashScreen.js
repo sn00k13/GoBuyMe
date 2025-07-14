@@ -8,7 +8,7 @@ export default function SplashScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('../assets/platter.jpg')}
+        source={require('../../assets/platter.jpg')}
         style={styles.backgroundImage}
         resizeMode="cover"
       >

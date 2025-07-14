@@ -29,7 +29,7 @@ export default function OffersScreen({ navigation }) {
 			{/* Back Button */}
 			<Pressable
 				style={styles.backButton}
-				onPress={() => navigation.toggleDrawer()}
+				onPress={() => navigation.goBack()}
 			>
 				<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
 			</Pressable>

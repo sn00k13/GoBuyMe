@@ -8,7 +8,7 @@ import {
 	Pressable,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useCart } from './CartContext';
+import { useCart } from '../app/CartContext';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function RestaurantMenuItemScreen({ route, navigation }) {
@@ -54,7 +54,7 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
 					source={
 						menuItem.imageUrl
 							? { uri: menuItem.imageUrl }
-							: require('../assets/placeholder.jpg')
+							: require('../../assets/placeholder.jpg')
 					}
 					style={styles.itemImage}
 				/>

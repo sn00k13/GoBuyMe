@@ -73,11 +73,6 @@ const SettingsScreen = ({ navigation }) => {
           <FontAwesome6 name="universal-access" size={24} color="#B3B3B3" />
 						<Text>Permissions</Text>
 					</Pressable>
-					<Pressable style={styles.listView}
-          onPress={() => navigation.navigate('AccountsPasswordsSettings')}>
-						<Entypo name="lock" size={24} color="#B3B3B3" />
-						<Text>Accounts and Password Settings</Text>
-					</Pressable>
 					
 				</View>
         <View style={styles.generalSettings}>

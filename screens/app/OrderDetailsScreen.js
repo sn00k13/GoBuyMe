@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
-import { useCart } from './CartContext';
+import { db } from '../../firebase';
+import { useCart } from '../app/CartContext';
 
 export default function OrderDetailsScreen({ navigation, route }) {
 	const { orderId } = route.params;

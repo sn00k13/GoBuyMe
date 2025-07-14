@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
-import { useCart } from './CartContext';
+import { db } from '../../firebase';
+import { useCart } from '../app/CartContext';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function RestaurantDetailScreen({ route, navigation }) {
@@ -116,7 +116,7 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 					source={
 						item.imageUrl
 							? { uri: item.imageUrl }
-							: require('../assets/placeholder.jpg')
+							: require('../../assets/placeholder.jpg')
 					}
 					style={styles.menuItemImage}
 				/>
@@ -246,7 +246,7 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 						source={
 							restaurant.imageUrl
 								? { uri: restaurant.imageUrl }
-								: require('../assets/placeholder.jpg')
+								: require('../../assets/placeholder.jpg')
 						}
 						style={styles.restaurantImage}
 					/>

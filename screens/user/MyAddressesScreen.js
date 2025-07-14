@@ -10,11 +10,11 @@ import {
 } from 'react-native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { db } from '../firebase';
+import { db } from '../../firebase';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 
-export default function AddressesScreen({ navigation }) {
+export default function MyAddressesScreen({ navigation }) {
 	const [addresses, setAddresses] = useState({});
 	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [isAddingNew, setIsAddingNew] = useState(false);
@@ -25,6 +25,7 @@ export default function AddressesScreen({ navigation }) {
 		state: '',
 		country: '',
 		landmark: '',
+		district: '',
 		isDefault: false,
 	});
 	const [editingAddressId, setEditingAddressId] = useState(null);
@@ -154,8 +155,8 @@ export default function AddressesScreen({ navigation }) {
 					state: '',
 					country: '',
 					landmark: '',
-					isDefault: false,
 					district: '',
+					isDefault: false,
 				});
 				setIsAddingNew(false);
 				setEditingAddressId(null); // Reset editing state
@@ -203,7 +204,7 @@ export default function AddressesScreen({ navigation }) {
 			<View style={styles.header}>
 				<Pressable
 					style={styles.backButton}
-					onPress={() => navigation.goBack()}
+					onPress={() => navigation.toggleDrawer()}
 				>
 					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
 				</Pressable>

@@ -9,7 +9,7 @@ import {
 	ImageBackground,
 } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth } from '../../firebase';
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function LoginScreen({ navigation }) {
@@ -28,7 +28,7 @@ export default function LoginScreen({ navigation }) {
 
 	return (
 		<ImageBackground
-			source={require('../assets/background.jpg')} // Replace with your image path
+			source={require('../../assets/background.jpg')} // Replace with your image path
 			style={styles.background}
 		>
 			{/* Tint overlay */}

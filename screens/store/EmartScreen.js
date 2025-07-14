@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
-import logoImg from '../assets/logo.png';
-const PLACEHOLDER_IMAGE = require('../assets/placeholder.jpg');
+import { db } from '../../firebase';
+import logoImg from '../../assets/logo.png';
+const PLACEHOLDER_IMAGE = require('../../assets/placeholder.jpg');
 
 function EmartScreen({ navigation, route }) {
 	const [categories, setCategories] = useState([]);
