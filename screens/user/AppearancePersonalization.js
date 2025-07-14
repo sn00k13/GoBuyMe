@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'react-native';
+import { useTheme } from '../../utils/ThemeContext';
+import ColorText from '../../assets/components/colorText';
 
 const ACCENT_COLORS = [
 	{ name: 'Orange', color: '#FF521B' },
@@ -12,6 +14,7 @@ const ACCENT_COLORS = [
 export default function AppearancePersonalization({ navigation }) {
 	const [darkMode, setDarkMode] = useState(false);
 	const [accent, setAccent] = useState(ACCENT_COLORS[0].color);
+	const { theme, mode, setMode } = useTheme();
 
 	return (
 		<View
@@ -46,16 +49,9 @@ export default function AppearancePersonalization({ navigation }) {
 			</View>
 			{/* Theme Mode */}
 			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Theme</Text>
-				<View style={styles.row}>
-					<Text style={styles.label}>Dark Mode</Text>
-					<Switch
-						value={darkMode}
-						onValueChange={setDarkMode}
-						thumbColor={darkMode ? '#FF521B' : '#f4f3f4'}
-						trackColor={{ false: '#ccc', true: '#FF521B' }}
-					/>
-				</View>
+				<Pressable onPress={() => setMode(mode === 'light' ? 'dark' : 'light')}>
+								<ColorText color="accent">Toggle Theme</ColorText>
+				</Pressable>
 			</View>
 
 			{/* Accent Color */}

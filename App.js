@@ -13,7 +13,7 @@ import FavoritesScreen from './screens/user/FavoritesScreen';
 import OrderHistoryScreen from './screens/user/OrderHistoryScreen';
 import OffersScreen from './screens/user/OffersScreen';
 import MealCardScreen from './screens/MealCardScreen';
-import VendorListScreen from './screens/app/VendorListScreen'; 
+import VendorListScreen from './screens/app/VendorListScreen';
 import PaymentOptionsScreen from './screens/app/PaymentOptionsScreen';
 import ConfirmationScreen from './screens/store/ConfirmationScreen';
 import RestaurantConfirmation from './screens/restaurant/RestaurantConfirmation';
@@ -47,152 +47,203 @@ import RestaurantMenuItemScreen from './screens/restaurant/RestaurantMenuItemScr
 import { CartProvider } from './screens/app/CartContext';
 import { StoreCartProvider } from './screens/app/StoreCartContext';
 import { MaterialIcons, FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
+import { ThemeProvider } from './utils/ThemeContext';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
 function HomeStack() {
-  return (
-    <StoreCartProvider>
-    <CartProvider>
-      <Stack.Navigator
-        initialRouteName="Splash"
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="Landing" component={LandingScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-        <Stack.Screen name="ResetPasswordSuccess" component={ResetPasswordSuccessScreen} />
-        <Stack.Screen name="HomeMain" component={HomeScreen} />
-        <Stack.Screen name="VendorList" component={VendorListScreen} />
-        <Stack.Screen name="MealCard" component={MealCardScreen} />
-        <Stack.Screen name="Address" component={AddressScreen} />
-        <Stack.Screen name="MyAddresses" component={MyAddressesScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="Chat" component={ChatScreen} />
-        <Stack.Screen name="Cart" component={CartDetails} />
-        <Stack.Screen name="PaymentOptions" component={PaymentOptionsScreen} />
-        <Stack.Screen name="Confirmation" component={ConfirmationScreen} />
-        <Stack.Screen name="RestaurantConfirmation" component={RestaurantConfirmation} />
-        <Stack.Screen name="Favorites" component={FavoritesScreen} />
-        <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-        <Stack.Screen name="TermsService" component={TermsService} />
-        <Stack.Screen name="Permissions" component={Permissions} />
-        <Stack.Screen name="EmartScreen" component={EmartScreen} />        
-        <Stack.Screen name="SelectProductScreen" component={SelectProductScreen} />
-        <Stack.Screen name="EMartCartDetails" component={EMartCartDetails}/>
-        <Stack.Screen name="PaymentScreen" component={PaymentScreen}/>
-        <Stack.Screen name="RestaurantPaymentScreen" component={RestaurantPaymentScreen}/>
-        <Stack.Screen name="CashOnDelivery" component={CashOnDeliveryScreen}/>
-        <Stack.Screen name="OrderConfirmation" component={OrderConfirmation}/>
-        <Stack.Screen name="Orders" component={OrdersScreen}/>
-        <Stack.Screen name="OrderDetails" component={OrderDetailsScreen}/>
-        <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen}/>
-        <Stack.Screen name="RestaurantMenuItem" component={RestaurantMenuItemScreen}/>
-      </Stack.Navigator>
-    </CartProvider>
-    </StoreCartProvider>
-  );
+	return (
+		<StoreCartProvider>
+			<CartProvider>
+				<Stack.Navigator
+					initialRouteName="Splash"
+					screenOptions={{
+						headerShown: false,
+					}}
+				>
+					<Stack.Screen name="Splash" component={SplashScreen} />
+					<Stack.Screen name="Landing" component={LandingScreen} />
+					<Stack.Screen name="Login" component={LoginScreen} />
+					<Stack.Screen name="Register" component={RegisterScreen} />
+					<Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+					<Stack.Screen
+						name="ResetPasswordSuccess"
+						component={ResetPasswordSuccessScreen}
+					/>
+					<Stack.Screen name="HomeMain" component={HomeScreen} />
+					<Stack.Screen name="VendorList" component={VendorListScreen} />
+					<Stack.Screen name="MealCard" component={MealCardScreen} />
+					<Stack.Screen name="Address" component={AddressScreen} />
+					<Stack.Screen name="MyAddresses" component={MyAddressesScreen} />
+					<Stack.Screen name="Profile" component={ProfileScreen} />
+					<Stack.Screen name="Chat" component={ChatScreen} />
+					<Stack.Screen name="Cart" component={CartDetails} />
+					<Stack.Screen
+						name="PaymentOptions"
+						component={PaymentOptionsScreen}
+					/>
+					<Stack.Screen name="Confirmation" component={ConfirmationScreen} />
+					<Stack.Screen
+						name="RestaurantConfirmation"
+						component={RestaurantConfirmation}
+					/>
+					<Stack.Screen name="Favorites" component={FavoritesScreen} />
+					<Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+					<Stack.Screen name="Settings" component={SettingsScreen} />
+					<Stack.Screen name="TermsService" component={TermsService} />
+					<Stack.Screen name="Permissions" component={Permissions} />
+					<Stack.Screen name="EmartScreen" component={EmartScreen} />
+					<Stack.Screen
+						name="SelectProductScreen"
+						component={SelectProductScreen}
+					/>
+					<Stack.Screen name="EMartCartDetails" component={EMartCartDetails} />
+					<Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+					<Stack.Screen
+						name="RestaurantPaymentScreen"
+						component={RestaurantPaymentScreen}
+					/>
+					<Stack.Screen
+						name="CashOnDelivery"
+						component={CashOnDeliveryScreen}
+					/>
+					<Stack.Screen
+						name="OrderConfirmation"
+						component={OrderConfirmation}
+					/>
+					<Stack.Screen name="Orders" component={OrdersScreen} />
+					<Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
+					<Stack.Screen
+						name="RestaurantDetail"
+						component={RestaurantDetailScreen}
+					/>
+					<Stack.Screen
+						name="RestaurantMenuItem"
+						component={RestaurantMenuItemScreen}
+					/>
+				</Stack.Navigator>
+			</CartProvider>
+		</StoreCartProvider>
+	);
 }
 
 function DrawerNavigator() {
-  return (
-    <Drawer.Navigator
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
-      screenOptions={{
-        headerShown: false,
-        drawerActiveTintColor: '#FF6B6B',
-        drawerInactiveTintColor: '#555',
-        drawerLabelStyle: {
-          marginLeft: 5,
-          fontSize: 15,
-          fontWeight: '500',
-        },
-        drawerStyle: {
-          width: 300,
-        },
-        drawerItemStyle: {
-          borderRadius: 8,
-          paddingLeft: 5,
-        },
-        drawerIconContainerStyle: {
-          marginRight: -20,
-          marginLeft: 10,
-        },
-      }}
-    >
-      <Drawer.Screen
-        name="Home"
-        component={HomeStack}
-        options={{
-          drawerIcon: ({ color }) => <MaterialIcons name="home" size={22} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="My Profile"
-        component={ProfileScreen}
-        options={{
-          drawerIcon: ({ color }) => <MaterialIcons name="person" size={22} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="My Addresses"
-        component={MyAddressesScreen}
-        options={{
-          drawerIcon: ({ color }) => <FontAwesome6 name="location-dot" size={20} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="My Notification"
-        component={NotificationsScreen}
-        options={{
-          drawerIcon: ({ color }) => <FontAwesome6 name="location-dot" size={20} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="Awoof Packages"
-        component={OffersScreen}
-        options={{
-          drawerIcon: ({ color }) => <MaterialIcons name="local-offer" size={20} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{
-          drawerIcon: ({ color }) => <FontAwesome6 name="gear" size={20} color={color} />,
-        }}
-      />
-    </Drawer.Navigator>
-  );
+	return (
+		<Drawer.Navigator
+			drawerContent={(props) => <CustomDrawerContent {...props} />}
+			screenOptions={{
+				headerShown: false,
+				drawerActiveTintColor: '#FF6B6B',
+				drawerInactiveTintColor: '#555',
+				drawerLabelStyle: {
+					marginLeft: 5,
+					fontSize: 15,
+					fontWeight: '500',
+				},
+				drawerStyle: {
+					width: 300,
+				},
+				drawerItemStyle: {
+					borderRadius: 8,
+					paddingLeft: 5,
+				},
+				drawerIconContainerStyle: {
+					marginRight: -20,
+					marginLeft: 10,
+				},
+			}}
+		>
+			<Drawer.Screen
+				name="Home"
+				component={HomeStack}
+				options={{
+					drawerIcon: ({ color }) => (
+						<MaterialIcons name="home" size={22} color={color} />
+					),
+				}}
+			/>
+			<Drawer.Screen
+				name="My Profile"
+				component={ProfileScreen}
+				options={{
+					drawerIcon: ({ color }) => (
+						<MaterialIcons name="person" size={22} color={color} />
+					),
+				}}
+			/>
+			<Drawer.Screen
+				name="My Addresses"
+				component={MyAddressesScreen}
+				options={{
+					drawerIcon: ({ color }) => (
+						<FontAwesome6 name="location-dot" size={20} color={color} />
+					),
+				}}
+			/>
+			<Drawer.Screen
+				name="My Notification"
+				component={NotificationsScreen}
+				options={{
+					drawerIcon: ({ color }) => (
+						<FontAwesome6 name="location-dot" size={20} color={color} />
+					),
+				}}
+			/>
+			<Drawer.Screen
+				name="Awoof Packages"
+				component={OffersScreen}
+				options={{
+					drawerIcon: ({ color }) => (
+						<MaterialIcons name="local-offer" size={20} color={color} />
+					),
+				}}
+			/>
+			<Drawer.Screen
+				name="Settings"
+				component={SettingsScreen}
+				options={{
+					drawerIcon: ({ color }) => (
+						<FontAwesome6 name="gear" size={20} color={color} />
+					),
+				}}
+			/>
+		</Drawer.Navigator>
+	);
 }
 
 export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="Drawer" component={DrawerNavigator} />
-        <Stack.Screen name="Appearance" component={AppearancePersonalization} />
-        <Stack.Screen name="Language" component={LanguageInput} />
-        <Stack.Screen name="DataStorage" component={DataStorage} />
-        <Stack.Screen name="NotificationsOptions" component={NotificationsOptions} />
-        <Stack.Screen name="Chat" component={ChatScreen} />
-        <Stack.Screen name="PushNotifications" component={PushNotifications} />        
-        <Stack.Screen name="AboutScreen" component={AboutScreen} />
-        <Stack.Screen name="OffersScreen" component={OffersScreen} />                
-        <Stack.Screen name="Permissions" component={Permissions} />                
-        <Stack.Screen name="TermsService" component={TermsService} />
-        <Stack.Screen name="Notifications" component={NotificationsScreen} />              
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+	return (
+		<ThemeProvider>
+			<NavigationContainer>
+				<Stack.Navigator
+					screenOptions={{
+						headerShown: false,
+					}}
+				>
+					<Stack.Screen name="Drawer" component={DrawerNavigator} />
+					<Stack.Screen
+						name="Appearance"
+						component={AppearancePersonalization}
+					/>
+					<Stack.Screen name="Language" component={LanguageInput} />
+					<Stack.Screen name="DataStorage" component={DataStorage} />
+					<Stack.Screen
+						name="NotificationsOptions"
+						component={NotificationsOptions}
+					/>
+					<Stack.Screen name="Chat" component={ChatScreen} />
+					<Stack.Screen
+						name="PushNotifications"
+						component={PushNotifications}
+					/>
+					<Stack.Screen name="AboutScreen" component={AboutScreen} />
+					<Stack.Screen name="OffersScreen" component={OffersScreen} />
+					<Stack.Screen name="Permissions" component={Permissions} />
+					<Stack.Screen name="TermsService" component={TermsService} />
+					<Stack.Screen name="Notifications" component={NotificationsScreen} />
+				</Stack.Navigator>
+			</NavigationContainer>
+		</ThemeProvider>
+	);
 }

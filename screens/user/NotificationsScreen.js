@@ -3,10 +3,13 @@ import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { useTheme } from '../../utils/ThemeContext';
+import ColorText from '../../assets/components/colorText';
 
 export default function NotificationsScreen({ navigation }) {
 	const [notifications, setNotifications] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const { theme, mode, setMode } = useTheme();
 
 	useEffect(() => {
 		const fetchNotifications = async () => {
@@ -54,14 +57,20 @@ export default function NotificationsScreen({ navigation }) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			<Pressable
 				style={styles.backButton}
 				onPress={() => navigation.navigate('Home')}
 			>
 				<Text style={styles.backButtonText}>← Back</Text>
 			</Pressable>
-			<Text style={styles.title}>Notifications</Text>
+			<ColorText
+				style={styles.title}
+				color={mode === 'dark' ? 'textDark' : 'textLight'}
+			>
+				Notifications
+			</ColorText>
+
 			{loading ? (
 				<Text style={styles.loadingText}>Loading...</Text>
 			) : notifications.length === 0 ? (
@@ -73,6 +82,9 @@ export default function NotificationsScreen({ navigation }) {
 					keyExtractor={(item) => item.id}
 				/>
 			)}
+			<Pressable onPress={() => setMode(mode === 'light' ? 'dark' : 'light')}>
+				<ColorText color="accent">Toggle Theme</ColorText>
+			</Pressable>
 		</View>
 	);
 }
@@ -81,7 +93,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 16,
-		backgroundColor: '#FFF0EB',
+		// backgroundColor will be set inline using theme.background
 	},
 	backButton: {
 		marginTop: 20,
@@ -94,7 +106,6 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 24,
 		fontWeight: 'bold',
-		color: '#FF521B',
 		marginBottom: 16,
 	},
 	loadingText: {
