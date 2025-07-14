@@ -48,6 +48,7 @@ import { CartProvider } from './screens/app/CartContext';
 import { StoreCartProvider } from './screens/app/StoreCartContext';
 import { MaterialIcons, FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import { ThemeProvider } from './utils/ThemeContext';
+import { useTheme } from './utils/ThemeContext';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -129,13 +130,14 @@ function HomeStack() {
 }
 
 function DrawerNavigator() {
+  const { theme, mode, setMode } = useTheme();
 	return (
 		<Drawer.Navigator
 			drawerContent={(props) => <CustomDrawerContent {...props} />}
 			screenOptions={{
 				headerShown: false,
-				drawerActiveTintColor: '#FF6B6B',
-				drawerInactiveTintColor: '#555',
+				drawerActiveTintColor: theme.primary,
+				drawerInactiveTintColor: theme.text,
 				drawerLabelStyle: {
 					marginLeft: 5,
 					fontSize: 15,

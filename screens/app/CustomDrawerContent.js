@@ -6,24 +6,26 @@ import {
 } from '@react-navigation/drawer';
 import { MaterialIcons } from '@expo/vector-icons';
 import { getAuth, signOut } from 'firebase/auth';
+import { useTheme } from '../../utils/ThemeContext';
 
 const CustomDrawerContent = (props) => {
+	const { theme, mode, setMode } = useTheme();
 	return (
 		<View style={styles.container}>
 			{/* Custom Header */}
-			<View style={styles.header}>
+			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}>
 				<Image source={require('../../assets/logo.png')} style={styles.logo} />				
 			</View>
 
 			{/* Scrollable Content */}
-			<View style={styles.scrollContainer}>
+			<View style={[styles.scrollContainer, { backgroundColor: theme.cards }]}>
 				<DrawerContentScrollView {...props}>
 					<DrawerItemList {...props} />
 				</DrawerContentScrollView>
 			</View>
 
 			{/* Fixed Footer with Sign Out */}
-			<View style={styles.footer}>
+			<View style={[styles.footer, { backgroundColor: theme.cards, borderTopColor: theme.borderBottom }]}>
 				<Pressable
 					style={styles.logoutButton}
 					onPress={async () => {
@@ -53,13 +55,11 @@ const styles = StyleSheet.create({
 	header: {
 		padding: 20,
 		borderBottomWidth: 1,
-		borderBottomColor: '#F0F0F0',
 		alignItems: 'center',
 	},
 	logo: {
 		width: 100,
 		height: 150,
-		// borderRadius: 40,
 		marginBottom: 10,
 		marginTop: 40,
 	},
