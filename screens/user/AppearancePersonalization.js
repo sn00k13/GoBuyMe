@@ -36,7 +36,7 @@ export default function AppearancePersonalization({ navigation }) {
 				<Text style={[styles.previewText, { color: accent }]}>Preview</Text>
 				<Image
 					source={
-						darkMode
+						mode === 'dark'
 							? require('../../assets/phone-dark.png')
 							: require('../../assets/phone-light.png')
 					}
@@ -44,14 +44,22 @@ export default function AppearancePersonalization({ navigation }) {
 					resizeMode="contain"
 				/>
 				<Text style={styles.phoneLabel}>
-					{darkMode ? 'Dark Mode' : 'Light Mode'}
+					{mode === 'dark' ? 'Dark Mode' : 'Light Mode'}
 				</Text>
 			</View>
 			{/* Theme Mode */}
 			<View style={styles.section}>
-				<Pressable onPress={() => setMode(mode === 'light' ? 'dark' : 'light')}>
-								<ColorText color="accent">Toggle Theme</ColorText>
-				</Pressable>
+				<View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+					<ColorText color="accent" style={{ fontWeight: 'bold' }}>
+						{mode === 'dark' ? 'Dark Mode' : 'Light Mode'}
+					</ColorText>
+					<Switch
+						value={mode === 'dark'}
+						onValueChange={(val) => setMode(val ? 'dark' : 'light')}
+						thumbColor={mode === 'dark' ? theme.accent : theme.primary}
+						trackColor={{ false: '#ccc', true: theme.accent }}
+					/>
+				</View>
 			</View>
 
 			{/* Accent Color */}
