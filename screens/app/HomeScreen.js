@@ -102,7 +102,7 @@ export default function HomeScreen({ navigation }) {
 									
 								</>
 							) : (
-								<Text style={styles.addressText}>No default address set</Text>
+								<Text style={[styles.addressText, {color: theme.text}]}>No default address set</Text>
 							)}
 						</View>
 					</View>

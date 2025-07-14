@@ -13,9 +13,11 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useStoreCart } from '../app/StoreCartContext';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '../../utils/ThemeContext';
 
 function SelectProductScreen({ navigation, route }) {
 	const [categories, setCategories] = useState([]);
+	const { theme, mode, setMode } = useTheme();
 	const [activeCategory, setActiveCategory] = useState(
 		route?.params?.selectedCategory
 	);
@@ -215,7 +217,7 @@ function SelectProductScreen({ navigation, route }) {
 		}));
 	// Render each product card
 	const renderProductCard = ({ item }) => (
-		<View style={styles.productCard}>
+		<View style={[styles.productCard, { backgroundColor: theme.cards }]}>
 			<View style={styles.imagenTitle}>
 				<Image
 					source={
@@ -226,11 +228,11 @@ function SelectProductScreen({ navigation, route }) {
 					style={styles.productImage}
 					resizeMode="cover"
 				/>
-				<Text style={styles.productName}>{item.name}</Text>
+				<Text style={[styles.productName, {color: theme.secondary}]}>{item.name}</Text>
 			</View>
 			<View style={styles.pricenSize}>
-				<Text style={styles.productSize}>{item.size}</Text>
-				<Text style={styles.productPrice}>₦{item.price}</Text>
+				<Text style={[styles.productSize, {color: theme.text}]}>{item.size}</Text>
+				<Text style={[styles.productPrice, {color: theme.text}]}>₦{item.price}</Text>
 			</View>
 			<View style={styles.addToCartAlt}>
 				<Pressable
@@ -239,8 +241,8 @@ function SelectProductScreen({ navigation, route }) {
 				>
 					<Text style={styles.cartButtonText}>-</Text>
 				</Pressable>
-				<View style={styles.quantityBox}>
-					<Text style={styles.quantityText}>
+				<View style={[styles.quantityBox, {backgroundColor: theme.background, borderColor: theme.accent	}]}>
+					<Text style={[styles.quantityText, {color: theme.text}]}>
 						{quantities[item.name] || '0'}
 					</Text>
 				</View>
@@ -255,14 +257,14 @@ function SelectProductScreen({ navigation, route }) {
 	);
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			{/* Header */}
-			<View style={styles.header}>
+			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.border }]}>
 				<Pressable
 					onPress={() => navigation.goBack()}
 					
 				>
-					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
 				<Text style={styles.locationText}>Select Products</Text>
 				<View style={{ width: 24 }} />
@@ -285,7 +287,7 @@ function SelectProductScreen({ navigation, route }) {
 				/>
 			</View>
 			{/* Horizontal subcategory list with highlight */}
-			<View style={styles.subcategoryList}>
+			<View style={[styles.subcategoryList, { backgroundColor: theme.cards }]}>
 				<FlatList
 					data={subcategories}
 					renderItem={renderSubcategory}
@@ -296,7 +298,7 @@ function SelectProductScreen({ navigation, route }) {
 				/>
 			</View>
 			<FlatList
-				style={styles.productsGrid}
+				style={[styles.productsGrid, { backgroundColor: theme.background }]}
 				data={products}
 				renderItem={renderProductCard}
 				keyExtractor={(item, idx) => item.name + idx}
@@ -317,7 +319,7 @@ function SelectProductScreen({ navigation, route }) {
 						storeId 
 					})}
 				>
-					<MaterialIcons name="shopping-cart" size={28} color="#fff" />
+					<MaterialIcons name="shopping-cart" size={28} color={theme.background} />
 					{cartItemCount > 0 && (
 						<View style={styles.cartCounter}>
 							<Text style={styles.cartCounterText}>

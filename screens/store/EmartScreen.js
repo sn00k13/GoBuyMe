@@ -12,12 +12,14 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import logoImg from '../../assets/logo.png';
+import { useTheme } from '../../utils/ThemeContext';
 const PLACEHOLDER_IMAGE = require('../../assets/placeholder.jpg');
 
 function EmartScreen({ navigation, route }) {
 	const [categories, setCategories] = useState([]);
 	const [search, setSearch] = useState('');
 	const [store, setStore] = useState(null);
+	const { theme, mode, setMode } = useTheme();
 
 	// You should pass storeId via navigation params, fallback to a default for dev
 	const storeId = route?.params?.storeId || 'J3GO05mnhnoccDG9Bchc';
@@ -56,7 +58,7 @@ function EmartScreen({ navigation, route }) {
 
 	const renderCategory = ({ item }) => (
 		<Pressable
-			style={styles.productCard}
+			style={[styles.productCard, { backgroundColor: theme.cards }]}
 			onPress={() =>
 				navigation.navigate('SelectProductScreen', {
 					categories, // pass the whole categories array
@@ -69,14 +71,14 @@ function EmartScreen({ navigation, route }) {
 				style={styles.productImage}
 				resizeMode="cover"
 			/>
-			<Text style={styles.productName}>{item.name}</Text>
+			<Text style={[styles.productName, {color: theme.text}]}>{item.name}</Text>
 		</Pressable>
 	);
 
 	const renderTodaysHoursWithStatus = () => {
 		if (!store?.openingHours) {
 			return (
-				<Text style={styles.noHoursText}>Opening hours not available</Text>
+				<Text style={[styles.noHoursText, {color: theme.text}]}>Opening hours not available</Text>
 			);
 		}
 
@@ -93,7 +95,7 @@ function EmartScreen({ navigation, route }) {
 		const todaysHours = store.openingHours[today];
 
 		if (!todaysHours) {
-			return <Text style={styles.noHoursText}>Closed today</Text>;
+			return <Text style={[styles.noHoursText, {color: theme.text}]}>Closed today</Text>;
 		}
 
 		const { openTime, closeTime } =
@@ -107,7 +109,7 @@ function EmartScreen({ navigation, route }) {
 		return (
 			<View style={styles.hoursContainer}>
 				<View style={styles.hoursRow}>
-					<Text style={styles.todaysHoursText}>{hoursText}</Text>
+					<Text style={[styles.todaysHoursText, {color: theme.secondary}]}>{hoursText}</Text>
 					<View
 						style={[
 							styles.statusIndicator,
@@ -119,7 +121,7 @@ function EmartScreen({ navigation, route }) {
 						</Text>
 					</View>
 				</View>
-				<Text style={styles.todaysHoursLabel}>Today's Hours</Text>
+				<Text style={[styles.todaysHoursLabel, {color: theme.text}]}>Today's Hours</Text>
 			</View>
 		);
 	};
@@ -164,18 +166,18 @@ function EmartScreen({ navigation, route }) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			{/* Header */}
-			<View style={styles.header}>
+			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}>
 				<Pressable onPress={() => navigation.navigate('VendorList')}>
-					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
 				<Text style={styles.locationText}>eMart</Text>
 				<View style={{ width: 24 }} />
 			</View>
 
 			{/* Store Card */}
-			<View style={styles.emartCard}>
+			<View style={[styles.emartCard, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}>
 				<View style={styles.cardContainer}>
 					<Image
 						style={styles.storeImageContainer}
@@ -184,23 +186,23 @@ function EmartScreen({ navigation, route }) {
 					/>
 					<View style={styles.storeDetails}>
 						<View>
-							<Text style={styles.emartInfoTitle}>Payment: </Text>
-							<Text style={styles.emartInfDesc}>
+							<Text style={[styles.emartInfoTitle, {color: theme.text}]}>Payment: </Text>
+							<Text style={[styles.emartInfDesc, {color: theme.text}]}>
 								Bank Transfer, Cards and Cash on Delivery
 							</Text>
 						</View>
 						<View>
-							<Text style={styles.emartInfoTitle}>Average Delivery Time: </Text>
-							<Text style={styles.emartInfDesc}>45mins</Text>
+							<Text style={[styles.emartInfoTitle, {color: theme.text}]}>Average Delivery Time: </Text>
+							<Text style={[styles.emartInfDesc, {color: theme.text}]}>45mins</Text>
 						</View>
 						<View>
-							<Text style={styles.emartInfoTitle}>Minimum Order Amount: </Text>
-							<Text style={styles.emartInfDesc}>N3000</Text>
+							<Text style={[styles.emartInfoTitle, {color: theme.text}]}>Minimum Order Amount: </Text>
+							<Text style={[styles.emartInfDesc, {color: theme.text}]}>N3000</Text>
 						</View>
 					</View>
 				</View>
 				<View>
-					<Text style={styles.openingHours}>Opening Hours</Text>
+					<Text style={[styles.openingHours, {color: theme.text}]}>Opening Hours</Text>
 					{renderTodaysHoursWithStatus()}
 				</View>
 			</View>
