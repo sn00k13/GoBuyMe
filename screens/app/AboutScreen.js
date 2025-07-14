@@ -9,17 +9,19 @@ import {
 	ScrollView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../../utils/ThemeContext';
 
 export default function AboutScreen({ navigation }) {
+	const { theme, mode, setMode } = useTheme();
 	return (
 		<ScrollView
-			style={styles.container}
+			style={[styles.container, { backgroundColor: theme.background }]}
 			contentContainerStyle={{ paddingBottom: 32 }}
 		>
 			{/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={28} color="#0B3948" />
+					<MaterialIcons name="arrow-back" size={28} color={theme.text} />
 				</Pressable>
 				<Text style={styles.title}>About GoBuyMe</Text>
 				<View style={{ width: 28 }} />
@@ -29,16 +31,16 @@ export default function AboutScreen({ navigation }) {
 			<View style={styles.logoContainer}>
 				<Image
 					source={require('../../assets/logo.png')}
-					style={styles.logo}
+					style={[styles.logo, { backgroundColor: theme.cards }]}
 					resizeMode="contain"
 				/>
 			</View>
 
 			{/* App Info */}
-			<View style={styles.section}>
-				<Text style={styles.appName}>GoBuyMe</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.appName, {color: theme.secondary}]}>GoBuyMe</Text>
 				<Text style={styles.version}>Version 1.0.0</Text>
-				<Text style={styles.description}>
+				<Text style={[styles.description, {color: theme.text}]}>
 					GoBuyMe is your trusted shopping companion. Discover amazing deals,
 					order with ease, and enjoy fast delivery. Our mission is to make
 					shopping simple, secure, and rewarding for everyone.
@@ -46,8 +48,8 @@ export default function AboutScreen({ navigation }) {
 			</View>
 
 			{/* Contact & Links */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Contact & Support</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.text}]}>Contact & Support</Text>
 				<Pressable
 					onPress={() => Linking.openURL('mailto:support@gobuyme.shop')}
 				>
@@ -59,8 +61,8 @@ export default function AboutScreen({ navigation }) {
 			</View>
 
 			{/* Legal */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Legal</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.text}]}>Legal</Text>
 				<Pressable
 					onPress={() => Linking.openURL('https://gobuyme.shop/privacy')}
 				>

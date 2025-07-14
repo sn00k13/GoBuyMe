@@ -130,19 +130,7 @@ const SettingsScreen = ({ navigation }) => {
 						<MaterialIcons name="support-agent" size={24} color={theme.text} />
 						<Text style={[{ color: theme.text }]}>Live support</Text>
 					</Pressable>
-					<Pressable
-						style={[
-							styles.listView,
-							{
-								backgroundColor: theme.cards,
-								borderBottomColor: theme.borderBottom,
-							},
-						]}
-						onPress={() => navigation.navigate('OffersScreen')}
-					>
-						<FontAwesome6 name="gift" size={24} color={theme.text} />
-						<Text style={[{ color: theme.text }]}>Offers</Text>
-					</Pressable>
+					
 				</View>
 				<View style={styles.generalSettings}>
 					<View>

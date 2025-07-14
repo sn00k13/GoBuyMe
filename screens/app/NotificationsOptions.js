@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, Pressable } from 'react-native';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
+import { useTheme } from '../../utils/ThemeContext';
 
 export default function NotificationsOptions({ navigation }) {
 	const [orderUpdates, setOrderUpdates] = useState(true);
 	const [promotions, setPromotions] = useState(false);
 	const [appUpdates, setAppUpdates] = useState(true);
+	const { theme, mode, setMode } = useTheme();
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			{/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={28} color="#0B3948" />
+					<MaterialIcons name="arrow-back" size={28} color={theme.text} />
 				</Pressable>
 				<Text style={styles.title}>Notifications</Text>
 				<View style={{ width: 28 }} />
 			</View>
 
 			{/* Order Updates */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Order Updates</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.text}]}>Order Updates</Text>
 				<View style={styles.row}>
 					<Feather name="shopping-bag" size={22} color="#58A4B0" />
 					<Text style={styles.value}>Get notified about your orders</Text>
@@ -34,8 +36,8 @@ export default function NotificationsOptions({ navigation }) {
 			</View>
 
 			{/* Promotions */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Promotions</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.text}]}>Promotions</Text>
 				<View style={styles.row}>
 					<MaterialIcons name="local-offer" size={22} color="#58A4B0" />
 					<Text style={styles.value}>Receive special offers & deals</Text>
@@ -49,8 +51,8 @@ export default function NotificationsOptions({ navigation }) {
 			</View>
 
 			{/* App Updates */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>App Updates</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.text}]}>App Updates</Text>
 				<View style={styles.row}>
 					<MaterialIcons name="update" size={22} color="#58A4B0" />
 					<Text style={styles.value}>Be informed about new features</Text>

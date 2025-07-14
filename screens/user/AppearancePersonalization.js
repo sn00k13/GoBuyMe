@@ -28,7 +28,7 @@ export default function AppearancePersonalization({ navigation }) {
 				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={28} color={theme.text} />
 				</Pressable>
-				<Text style={styles.title}>Appearance & Personalization</Text>
+				<Text style={[styles.title, {color: theme.primary}]}>Appearance & Personalization</Text>
 				<View style={{ width: 28 }} />
 			</View>
 			{/* Preview */}
@@ -110,13 +110,12 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 18,
 		fontWeight: 'bold',
-		color: '#FF521B',
 	},
 	section: {
 		backgroundColor: '#FFF',
 		marginHorizontal: 16,
 		marginBottom: 24,
-		borderRadius: 10,
+		borderRadius: 4,
 		padding: 16,
 		shadowColor: '#000',
 		shadowOpacity: 0.04,
@@ -126,7 +125,6 @@ const styles = StyleSheet.create({
 	sectionTitle: {
 		fontSize: 16,
 		fontWeight: '600',
-		color: '#0B3948',
 		marginBottom: 12,
 	},
 	row: {
@@ -136,7 +134,6 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontSize: 15,
-		color: '#58A4B0',
 	},
 	colorRow: {
 		flexDirection: 'row',
@@ -161,7 +158,7 @@ const styles = StyleSheet.create({
 	previewButton: {
 		paddingVertical: 12,
 		paddingHorizontal: 40,
-		borderRadius: 8,
+		borderRadius: 4,
 		alignItems: 'center',
 	},
 	phoneImage: {
@@ -171,7 +168,6 @@ const styles = StyleSheet.create({
 	},
 	phoneLabel: {
 		fontSize: 14,
-		color: '#0B3948',
 		fontWeight: '500',
 		marginTop: 4,
 	},

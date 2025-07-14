@@ -8,6 +8,7 @@ import {
 	FlatList,
 } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { useTheme } from '../../utils/ThemeContext';
 
 const LANGUAGES = [
 	{ code: 'en', label: 'English' },
@@ -28,42 +29,43 @@ export default function LanguageInput({ navigation }) {
 	const [inputMethod, setInputMethod] = useState(INPUT_METHODS[0]);
 	const [langModal, setLangModal] = useState(false);
 	const [inputModal, setInputModal] = useState(false);
+	const { theme, mode, setMode } = useTheme();
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			{/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={28} color="#0B3948" />
+					<MaterialIcons name="arrow-back" size={28} color={theme.text} />
 				</Pressable>
 				<Text style={styles.title}>Language & Input</Text>
 				<View style={{ width: 28 }} />
 			</View>
 
 			{/* Language Setting */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>App Language</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.secondary}]}>App Language</Text>
 				<Pressable style={styles.row} onPress={() => setLangModal(true)}>
-					<FontAwesome name="language" size={22} color="#58A4B0" />
-					<Text style={styles.value}>{language.label}</Text>
+					<FontAwesome name="language" size={22} color={theme.text} />
+					<Text style={[styles.value, {color: theme.text}]}>{language.label}</Text>
 					<MaterialIcons
 						name="keyboard-arrow-right"
 						size={24}
-						color="#0B3948"
+						color={theme.text}
 					/>
 				</Pressable>
 			</View>
 
 			{/* Input Method Setting */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Input Method</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.secondary}]}>Input Method</Text>
 				<Pressable style={styles.row} onPress={() => setInputModal(true)}>
-					<MaterialIcons name="keyboard" size={22} color="#58A4B0" />
-					<Text style={styles.value}>{inputMethod.label}</Text>
+					<MaterialIcons name="keyboard" size={22} color={theme.text} />
+					<Text style={[styles.value, {color: theme.text}]}>{inputMethod.label}</Text>
 					<MaterialIcons
 						name="keyboard-arrow-right"
 						size={24}
-						color="#0B3948"
+						color={theme.text}
 					/>
 				</Pressable>
 			</View>

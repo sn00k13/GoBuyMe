@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, Pressable, Alert } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { useTheme } from '../../utils/ThemeContext';
+
 
 export default function DataStorage({ navigation }) {
 	const [saveData, setSaveData] = useState(true);
 	const [autoDownload, setAutoDownload] = useState(false);
+	const { theme, mode, setMode } = useTheme();
 
 	const handleClearCache = () => {
 		Alert.alert(
@@ -24,19 +27,19 @@ export default function DataStorage({ navigation }) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			{/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={28} color="#0B3948" />
+					<MaterialIcons name="arrow-back" size={28} color={theme.text} />
 				</Pressable>
 				<Text style={styles.title}>Data & Storage</Text>
 				<View style={{ width: 28 }} />
 			</View>
 
 			{/* Save Data */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Save Data</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.text}]}>Save Data</Text>
 				<View style={styles.row}>
 					<FontAwesome name="database" size={22} color="#58A4B0" />
 					<Text style={styles.value}>Reduce data usage</Text>
@@ -50,8 +53,8 @@ export default function DataStorage({ navigation }) {
 			</View>
 
 			{/* Auto Download */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Auto Download Media</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.text}]}>Auto Download Media</Text>
 				<View style={styles.row}>
 					<MaterialIcons name="file-download" size={22} color="#58A4B0" />
 					<Text style={styles.value}>Download images automatically</Text>
@@ -65,8 +68,8 @@ export default function DataStorage({ navigation }) {
 			</View>
 
 			{/* Clear Cache */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Storage</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.text}]}>Storage</Text>
 				<Pressable style={styles.row} onPress={handleClearCache}>
 					<MaterialIcons name="delete-sweep" size={22} color="#FF521B" />
 					<Text style={[styles.value, { color: '#FF521B' }]}>Clear Cache</Text>

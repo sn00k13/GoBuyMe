@@ -14,6 +14,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from 'socket.io-client';
+import { useTheme } from '../../utils/ThemeContext';
 
 const ChatScreen = ({ navigation }) => {
 	const [messages, setMessages] = useState([
@@ -32,6 +33,7 @@ const ChatScreen = ({ navigation }) => {
 	const [isConnected, setIsConnected] = useState(false);
 	const [userId, setUserId] = useState(null);
 	const flatListRef = useRef(null);
+	const { theme, mode, setMode } = useTheme();
 
 	// Initialize socket connection
 	useEffect(() => {
@@ -130,13 +132,13 @@ const ChatScreen = ({ navigation }) => {
 	return (
 		<KeyboardAvoidingView
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-			style={styles.container}
+			style={[styles.container, { backgroundColor: theme.background }]}
 			keyboardVerticalOffset={90}
 		>
 			<Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-				<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+				<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 			</Pressable>
-			<View style={styles.header}>
+			<View style={[styles.header, { backgroundColor: theme.cards }]}>
 				<Text style={styles.headerTitle}>Customer Support</Text>
 				<View style={styles.connectionStatus}>
 					<View
@@ -169,7 +171,7 @@ const ChatScreen = ({ navigation }) => {
 				}
 			/>
 
-			<View style={styles.inputContainer}>
+			<View style={[styles.inputContainer, { backgroundColor: theme.cards, borderColor: theme.border }]}>
 				<TextInput
 					style={styles.input}
 					value={newMessage}
@@ -198,12 +200,10 @@ const ChatScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#FFF9F7',
 	},
 	header: {
 		padding: 16,
 		borderBottomWidth: 1,
-		borderBottomColor: '#EDEDF4',
 		backgroundColor: '#FFF',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
@@ -291,8 +291,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 12,
 		borderTopWidth: 1,
-		borderTopColor: '#EDEDF4',
-		backgroundColor: '#FFF',
+
 	},
 	input: {
 		flex: 1,
@@ -300,7 +299,7 @@ const styles = StyleSheet.create({
 		maxHeight: 100,
 		paddingHorizontal: 16,
 		paddingVertical: 12,
-		backgroundColor: '#EDEDF4',
+		backgroundColor: '#cdcdd0ff',
 		borderRadius: 25,
 		fontSize: 16,
 		color: '#2A324B',

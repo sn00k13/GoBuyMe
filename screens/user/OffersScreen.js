@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../../utils/ThemeContext';
 
 const offers = [
 	{
@@ -24,24 +25,25 @@ const offers = [
 ];
 
 export default function OffersScreen({ navigation }) {
+	const { theme, mode, setMode } = useTheme();
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			{/* Back Button */}
 			<Pressable
 				style={styles.backButton}
-				onPress={() => navigation.goBack()}
+				onPress={() => navigation.toggleDrawer()}
 			>
-				<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+				<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 			</Pressable>
-			<Text style={styles.title}>Available Offers</Text>
+			<Text style={[styles.title, {color: theme.primary}]}>Available Offers</Text>
 			<FlatList
 				data={offers}
 				keyExtractor={(item) => item.id}
 				contentContainerStyle={{ paddingBottom: 32 }}
 				renderItem={({ item }) => (
-					<View style={styles.offerCard}>
-						<Text style={styles.offerTitle}>{item.title}</Text>
-						<Text style={styles.offerDesc}>{item.description}</Text>
+					<View style={[styles.offerCard, { backgroundColor: theme.cards }]}>
+						<Text style={[styles.offerTitle, {color: theme.secondary}]}>{item.title}</Text>
+						<Text style={[styles.offerDesc, {color: theme.text}]}>{item.description}</Text>
 						<Text style={styles.offerValid}>{item.validTill}</Text>
 					</View>
 				)}

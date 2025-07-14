@@ -60,7 +60,7 @@ export default function NotificationsScreen({ navigation }) {
 		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			<Pressable
 				style={styles.backButton}
-				onPress={() => navigation.navigate('Home')}
+				onPress={() => navigation.toggleDrawer()}
 			>
 				<Text style={styles.backButtonText}>← Back</Text>
 			</Pressable>

@@ -13,11 +13,13 @@ import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import { useTheme } from '../../utils/ThemeContext';
 
 export default function MyAddressesScreen({ navigation }) {
 	const [addresses, setAddresses] = useState({});
 	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [isAddingNew, setIsAddingNew] = useState(false);
+	const { theme, mode, setMode } = useTheme();
 	const [newAddress, setNewAddress] = useState({
 		street: '',
 		city: '',
@@ -199,27 +201,26 @@ export default function MyAddressesScreen({ navigation }) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			{/* Header */}
-			<View style={styles.header}>
+			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.border }]}>
 				<Pressable
 					style={styles.backButton}
 					onPress={() => navigation.toggleDrawer()}
 				>
-					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
-				<Text style={styles.locationText}>Choose a delivery location</Text>
+				<Text style={[styles.locationText, {color: theme.primary}]}>Choose a delivery location</Text>
 				<View style={{ width: 24 }} />
 			</View>
 
 			<Text
-				style={{
-					color: '#0B3948',
+				style={[{					
 					fontStyle: 'italic',
 					paddingVertical: 8,
 					paddingHorizontal: 16,
 					marginBottom: 0,
-				}}
+				}, { color: theme.text }]}
 			>
 				Select a default address for your orders. You can add or edit addresses
 				as needed.
@@ -228,23 +229,23 @@ export default function MyAddressesScreen({ navigation }) {
 				{Object.entries(addresses).map(([id, address]) => (
 					<Pressable
 						key={id}
-						style={styles.addressContainer}
+						style={[styles.addressContainer, { backgroundColor: theme.cards }]}
 						onPress={() => handleSelectAddress(id)}
 					>
 						<View style={styles.checkbox}>
 							{address.isDefault && <View style={styles.checkboxChecked} />}
 						</View>
 						<View style={{ flex: 1, padding: 8 }}>
-							<Text style={styles.addressText}>{address.street}</Text>
-							<Text style={styles.addressText}>
+							<Text style={[styles.addressText, {color: theme.text}]}>{address.street}</Text>
+							<Text style={[styles.addressText, {color: theme.text}]}>
 								{address.city}, {address.state}, {address.zipCode}
 							</Text>
-							<Text style={styles.addressText}>{address.country}</Text>
+							<Text style={[styles.addressText, {color: theme.text}]}>{address.country}</Text>
 							{address.landmark && (
-								<Text style={styles.addressText}>{address.landmark}</Text>
+								<Text style={[styles.addressText, {color: theme.text}]}>{address.landmark}</Text>
 							)}
 							{address.district && (
-								<Text style={styles.addressText}>{address.district}</Text>
+								<Text style={[styles.addressText, {color: theme.text}]}>{address.district}</Text>
 							)}
 						</View>
 						{/* Edit Button */}

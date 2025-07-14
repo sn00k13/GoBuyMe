@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, Pressable } from 'react-native';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
+import { useTheme } from '../../utils/ThemeContext';
 
 export default function Permissions({ navigation }) {
   const [location, setLocation] = useState(true);
   const [camera, setCamera] = useState(false);
   const [notifications, setNotifications] = useState(true);
+  const { theme, mode, setMode } = useTheme();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()}>
-          <MaterialIcons name="arrow-back" size={28} color="#0B3948" />
+          <MaterialIcons name="arrow-back" size={28} color={theme.text} />
         </Pressable>
         <Text style={styles.title}>Permissions</Text>
         <View style={{ width: 28 }} />
       </View>
 
       {/* Location Permission */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Location</Text>
+      <View style={[styles.section, { backgroundColor: theme.cards }]}>
+        <Text style={[styles.sectionTitle, {color: theme.text}]}>Location</Text>
         <View style={styles.row}>
           <Feather name="map-pin" size={22} color="#58A4B0" />
           <Text style={styles.value}>Allow access to your location</Text>
@@ -34,8 +36,8 @@ export default function Permissions({ navigation }) {
       </View>
 
       {/* Camera Permission */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Camera</Text>
+      <View style={[styles.section, { backgroundColor: theme.cards }]}>
+        <Text style={[styles.sectionTitle, {color: theme.text}]}>Camera</Text>
         <View style={styles.row}>
           <Feather name="camera" size={22} color="#58A4B0" />
           <Text style={styles.value}>Allow access to your camera</Text>
@@ -49,8 +51,8 @@ export default function Permissions({ navigation }) {
       </View>
 
       {/* Notifications Permission */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notifications</Text>
+      <View style={[styles.section, { backgroundColor: theme.cards }]}>
+        <Text style={[styles.sectionTitle, {color: theme.text}]}>Notifications</Text>
         <View style={styles.row}>
           <MaterialIcons name="notifications-active" size={22} color="#58A4B0" />
           <Text style={styles.value}>Allow push notifications</Text>
