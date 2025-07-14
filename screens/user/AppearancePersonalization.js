@@ -20,13 +20,13 @@ export default function AppearancePersonalization({ navigation }) {
 		<View
 			style={[
 				styles.container,
-				{ backgroundColor: darkMode ? '#222' : '#FFF0EB' },
+				{ backgroundColor: theme.background },
 			]}
 		>
 			{/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={28} color="#0B3948" />
+					<MaterialIcons name="arrow-back" size={28} color={theme.text} />
 				</Pressable>
 				<Text style={styles.title}>Appearance & Personalization</Text>
 				<View style={{ width: 28 }} />
@@ -43,12 +43,12 @@ export default function AppearancePersonalization({ navigation }) {
 					style={styles.phoneImage}
 					resizeMode="contain"
 				/>
-				<Text style={styles.phoneLabel}>
+				<Text style={[styles.phoneLabel, { color: theme.text }]}>
 					{mode === 'dark' ? 'Dark Mode' : 'Light Mode'}
 				</Text>
 			</View>
 			{/* Theme Mode */}
-			<View style={styles.section}>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
 				<View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
 					<ColorText color="accent" style={{ fontWeight: 'bold' }}>
 						{mode === 'dark' ? 'Dark Mode' : 'Light Mode'}
@@ -63,8 +63,8 @@ export default function AppearancePersonalization({ navigation }) {
 			</View>
 
 			{/* Accent Color */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Accent Color</Text>
+			<View style={[styles.section, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.sectionTitle, {color: theme.text}]}>Accent Color</Text>
 				<View style={styles.colorRow}>
 					{ACCENT_COLORS.map((item) => (
 						<Pressable

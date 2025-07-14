@@ -8,6 +8,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../../utils/ThemeContext';
 
 export default function ProfileScreen({ navigation }) {
   const [userData, setUserData] = useState(null);
@@ -15,6 +16,7 @@ export default function ProfileScreen({ navigation }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [uploading, setUploading] = useState(false);
+  const { theme, mode, setMode } = useTheme();
 
   // Fetch user data from Firestore
   useEffect(() => {
@@ -106,13 +108,13 @@ export default function ProfileScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Back Button */}
       <Pressable 
         style={styles.backButton}
         onPress={() => navigation.toggleDrawer()}
       >
-        <MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+        <MaterialIcons name="arrow-back" size={24} color={theme.text} />
       </Pressable>
 
       <View style={styles.profileHeader}>
@@ -150,8 +152,8 @@ export default function ProfileScreen({ navigation }) {
           <>
             {/* Editable Profile Image */}
             <Pressable onPress={handleImagePicker}>
-              <View style={styles.line1}>
-                <View style={styles.line2}>
+              <View style={[styles.line1, { color: theme.text }]}>
+                <View style={[styles.line2, {color: theme.text }]}>
                   <Image
                     source={
                       userData?.profileImage
@@ -163,10 +165,10 @@ export default function ProfileScreen({ navigation }) {
                 </View>
               </View>
             </Pressable>
-            <Text style={styles.label}>Tap the image to change</Text>
-            <Text style={styles.value}>{userData?.name || 'Not set'}</Text>
-            <Text style={styles.value2}>{auth.currentUser?.email}</Text>
-            <Text style={styles.value2}>{userData?.phone || 'Not set'}</Text>
+            <Text style={[styles.label, {color: theme.text}]}>Tap the image to change</Text>
+            <Text style={[styles.value, {color: theme.text}]}>{userData?.name || 'Not set'}</Text>
+            <Text style={[styles.value2, {color: theme.text}]}>{auth.currentUser?.email}</Text>
+            <Text style={[styles.value2, {color: theme.text}]}>{userData?.phone || 'Not set'}</Text>
           </>
         )}
       </View>
@@ -175,15 +177,15 @@ export default function ProfileScreen({ navigation }) {
               onPress={() => setIsEditing(true)}
             >
               <View style={styles.profileOptions}>
-              <FontAwesome5 name="user-edit" size={24} color="#0b3948" />
-              <Text style={styles.buttonText}>Edit Profile</Text>
+              <FontAwesome5 name="user-edit" size={24} color={theme.text} />
+              <Text style={[styles.buttonText, {color: theme.text}]}>Edit Profile</Text>
               </View>
               
             </Pressable>
       <Pressable style={styles.button} onPress={() => navigation.navigate('Home', { screen: 'ResetPassword' })}>
       <View style={styles.profileOptions}>
-      <Entypo name="lock" size={24} color="#0b3948" />
-      <Text style={styles.buttonText}>Reset Password</Text>
+      <Entypo name="lock" size={24} color={theme.text} />
+      <Text style={[styles.buttonText, {color: theme.text}]}>Reset Password</Text>
       </View>
       
       </Pressable>
@@ -192,8 +194,8 @@ export default function ProfileScreen({ navigation }) {
         onPress={() => navigation.navigate('Home', { screen: 'MyAddresses' })}
       >
         <View style={styles.profileOptions}>
-        <FontAwesome6 name="location-dot" size={20} color="#0b3948" />
-        <Text style={styles.buttonText}>Edit My Addresses</Text>
+        <FontAwesome6 name="location-dot" size={20} color={theme.text} />
+        <Text style={[styles.buttonText, {color: theme.text}]}>Edit My Addresses</Text>
         </View>
         
       </Pressable>
@@ -202,8 +204,8 @@ export default function ProfileScreen({ navigation }) {
         onPress={() => navigation.navigate('Home', { screen: 'Notifications' })}
       >
         <View style={styles.profileOptions}>
-        <Entypo name="chat" size={24} color="#0B3948" />
-        <Text style={styles.buttonText}>My Notifications</Text>
+        <Entypo name="chat" size={24} color={theme.text} />
+        <Text style={[styles.buttonText, {color: theme.text}]}>My Notifications</Text>
         </View>
         
       </Pressable>
