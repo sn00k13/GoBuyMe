@@ -50,7 +50,7 @@ export default function VendorListScreen({ navigation }) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [stores, setStores] = useState([]);
-  const { theme, mode, setMode } = useTheme();
+	const { theme, mode, setMode } = useTheme();
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -107,7 +107,7 @@ export default function VendorListScreen({ navigation }) {
 	// Render each store item (same as restaurant)
 	const renderStoreItem = ({ item }) => (
 		<Pressable
-			style={styles.restaurantCard}
+			style={[styles.restaurantCard, { backgroundColor: theme.cards }]}
 			onPress={() => navigation.navigate('EmartScreen')}
 		>
 			<Image
@@ -119,8 +119,10 @@ export default function VendorListScreen({ navigation }) {
 				style={styles.restaurantImage2}
 			/>
 			<View style={styles.restaurantInfo}>
-				<Text style={styles.restaurantName}>{item.name}</Text>
-				<Text style={styles.restaurantCuisine}>
+				<Text style={[styles.restaurantName, { color: theme.text }]}>
+					{item.name}
+				</Text>
+				<Text style={[styles.restaurantCuisine, { color: theme.text }]}>
 					{item.category || 'General Store'}
 				</Text>
 				<View style={styles.restaurantMeta}>
@@ -173,7 +175,7 @@ export default function VendorListScreen({ navigation }) {
 	// Render each restaurant item
 	const renderRestaurantItem = ({ item }) => (
 		<Pressable
-			style={styles.restaurantCard}
+			style={[styles.restaurantCard, { backgroundColor: theme.cards }]}
 			onPress={() =>
 				navigation.navigate('RestaurantDetail', { restaurantId: item.id })
 			}
@@ -187,8 +189,10 @@ export default function VendorListScreen({ navigation }) {
 				style={styles.restaurantImage}
 			/>
 			<View style={styles.restaurantInfo}>
-				<Text style={styles.restaurantName}>{item.name}</Text>
-				<Text style={styles.restaurantCuisine}>
+				<Text style={[styles.restaurantName, { color: theme.text }]}>
+					{item.name}
+				</Text>
+				<Text style={[styles.restaurantCuisine, { color: theme.text }]}>
 					{Array.isArray(item.cuisineType)
 						? item.cuisineType.join(' • ')
 						: item.cuisine || 'Various cuisines'}
@@ -223,23 +227,39 @@ export default function VendorListScreen({ navigation }) {
 	}
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			{/* Header */}
-			<View style={styles.header}>
+			<View
+				style={[
+					styles.header,
+					{
+						backgroundColor: theme.cards,
+						borderBottomColor: theme.borderBottom,
+					},
+				]}
+			>
 				<Pressable onPress={() => navigation.navigate('HomeMain')}>
-					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
 				<ColorText color="primary" style={{ fontSize: 20 }}>
 					Owerri
 				</ColorText>
 				{/* <Text style={styles.locationText}>Owerri</Text> */}
 				<View style={{ width: 24 }}>
-					<AntDesign name="like1" size={22} color="#FF521B" />
+					<AntDesign name="like1" size={22} color={theme.text} />
 				</View>
 			</View>
 
 			{/* Tab Headers */}
-			<View style={styles.tabContainer}>
+			<View
+				style={[
+					styles.tabContainer,
+					{
+						backgroundColor: theme.cards,
+						borderBottomColor: theme.borderBottom,
+					},
+				]}
+			>
 				<Pressable
 					style={[
 						styles.tabButton,
@@ -383,7 +403,6 @@ const styles = StyleSheet.create({
 		marginHorizontal: 16,
 		marginTop: 16,
 		borderBottomWidth: 1,
-		borderBottomColor: '#E0E0E0',
 	},
 	tabButton: {
 		flex: 1,

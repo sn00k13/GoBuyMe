@@ -7,89 +7,217 @@ import Entypo from '@expo/vector-icons/Entypo';
 import Octicons from '@expo/vector-icons/Octicons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useTheme } from '../../utils/ThemeContext';
 
 const SettingsScreen = ({ navigation }) => {
+	const { theme, mode, setMode } = useTheme();
 	return (
-		<View style={styles.container}>
-			<View style={styles.header}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
+			<View style={[styles.header, { backgroundColor: theme.cards }]}>
 				<Pressable onPress={() => navigation.toggleDrawer()}>
-					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
-				<Text style={styles.locationText}>Settings</Text>
+				<Text style={[styles.locationText, { color: theme.primary }]}>
+					Settings
+				</Text>
 				<View style={{ width: 24 }}></View>
 			</View>
 			<ScrollView>
 				<View style={styles.generalSettings}>
 					<View>
-						<Text style={styles.title}>General Settings</Text>
+						<Text
+							style={[
+								styles.title,
+								{ backgroundColor: theme.background, color: theme.text },
+							]}
+						>
+							General Settings
+						</Text>
 					</View>
-					<Pressable style={styles.listView}
-          onPress={() => navigation.navigate('Appearance')}>
-            <Entypo name="eye" size={18} color="#B3B3B3" />
-						<Text>Appearance</Text>
+					<Pressable
+						style={[
+							styles.listView,
+							{
+								backgroundColor: theme.cards,
+								borderBottomColor: theme.borderBottom,
+							},
+						]}
+						onPress={() => navigation.navigate('Appearance')}
+					>
+						<Entypo name="eye" size={18} color={theme.text} />
+						<Text style={[{ color: theme.text }]}>Appearance</Text>
 					</Pressable>
-					<Pressable style={styles.listView}
-          onPress={() => navigation.navigate('Language')}>
-						<Ionicons name="language-outline" size={18} color="#B3B3B3" />
-						<Text>Language and Input Settings</Text>
+					<Pressable
+						style={[
+							styles.listView,
+							{
+								backgroundColor: theme.cards,
+								borderBottomColor: theme.borderBottom,
+							},
+						]}
+						onPress={() => navigation.navigate('Language')}
+					>
+						<Ionicons name="language-outline" size={18} color={theme.text} />
+						<Text style={[{ color: theme.text }]}>
+							Language and Input Settings
+						</Text>
 					</Pressable>
-					<Pressable style={styles.listView}
-          onPress={() => navigation.navigate('DataStorage')}>
-						<FontAwesome5 name="database" size={18} color="#B3B3B3" />
-						<Text>Data and Storage</Text>
+					<Pressable
+						style={[
+							styles.listView,
+							{
+								backgroundColor: theme.cards,
+								borderBottomColor: theme.borderBottom,
+							},
+						]}
+						onPress={() => navigation.navigate('DataStorage')}
+					>
+						<FontAwesome5 name="database" size={18} color={theme.text} />
+						<Text style={[{ color: theme.text }]}>Data and Storage</Text>
 					</Pressable>
 				</View>
-        <View style={styles.generalSettings}>
+				<View style={styles.generalSettings}>
 					<View>
-						<Text style={styles.title}>Notifications</Text>
+						<Text
+							style={[
+								styles.title,
+								{
+									backgroundColor: theme.background,
+									borderBottomColor: theme.borderBottom,
+									color: theme.text,
+								},
+							]}
+						>
+							Notifications
+						</Text>
 					</View>
-					<Pressable style={styles.listView}
-          onPress={() => navigation.navigate('NotificationsOptions')}>
-          <FontAwesome6 name="gear" size={24} color="#B3B3B3" />
-						<Text>Notification Options</Text>
+					<Pressable
+						style={[
+							styles.listView,
+							{
+								backgroundColor: theme.cards,
+								borderBottomColor: theme.borderBottom,
+							},
+						]}
+						onPress={() => navigation.navigate('NotificationsOptions')}
+					>
+						<FontAwesome6 name="gear" size={24} color={theme.text} />
+						<Text style={[{ color: theme.text }]}>Notification Options</Text>
 					</Pressable>
-					<Pressable style={styles.listView}
-          onPress={() => navigation.navigate('PushNotifications')}>
-						<FontAwesome name="bell" size={24} color="#B3B3B3" />
-						<Text>Push Notifications</Text>
+					<Pressable
+						style={[
+							styles.listView,
+							{
+								backgroundColor: theme.cards,
+								borderBottomColor: theme.borderBottom,
+							},
+						]}
+						onPress={() => navigation.navigate('PushNotifications')}
+					>
+						<FontAwesome name="bell" size={24} color={theme.text} />
+						<Text style={[{ color: theme.text }]}>Push Notifications</Text>
 					</Pressable>
-					<Pressable style={styles.listView}
-          onPress={() => navigation.navigate('Chat')}>
-						<MaterialIcons name="support-agent" size={24} color="#B3B3B3" />
-						<Text>Live support</Text>
+					<Pressable
+						style={[
+							styles.listView,
+							{
+								backgroundColor: theme.cards,
+								borderBottomColor: theme.borderBottom,
+							},
+						]}
+						onPress={() => navigation.navigate('Chat')}
+					>
+						<MaterialIcons name="support-agent" size={24} color={theme.text} />
+						<Text style={[{ color: theme.text }]}>Live support</Text>
 					</Pressable>
-          <Pressable style={styles.listView}
-          onPress={() => navigation.navigate('OffersScreen')}>
-						<FontAwesome6 name="gift" size={24} color="#B3B3B3" />
-						<Text>Offers</Text>
+					<Pressable
+						style={[
+							styles.listView,
+							{
+								backgroundColor: theme.cards,
+								borderBottomColor: theme.borderBottom,
+							},
+						]}
+						onPress={() => navigation.navigate('OffersScreen')}
+					>
+						<FontAwesome6 name="gift" size={24} color={theme.text} />
+						<Text style={[{ color: theme.text }]}>Offers</Text>
 					</Pressable>
 				</View>
-        <View style={styles.generalSettings}>
+				<View style={styles.generalSettings}>
 					<View>
-						<Text style={styles.title}>Privacy</Text>
+						<Text
+							style={[
+								styles.title,
+								{
+									backgroundColor: theme.background,
+									borderBottomColor: theme.borderBottom,
+									color: theme.text,
+								},
+							]}
+						>
+							Privacy
+						</Text>
 					</View>
-					<Pressable style={styles.listView}
-          onPress={() => navigation.navigate('Permissions')}>
-          <FontAwesome6 name="universal-access" size={24} color="#B3B3B3" />
-						<Text>Permissions</Text>
+					<Pressable
+						style={[
+							styles.listView,
+							{
+								backgroundColor: theme.cards,
+								borderBottomColor: theme.borderBottom,
+							},
+						]}
+						onPress={() => navigation.navigate('Permissions')}
+					>
+						<FontAwesome6
+							name="universal-access"
+							size={24}
+							color={theme.text}
+						/>
+						<Text style={[{ color: theme.text }]}>Permissions</Text>
 					</Pressable>
-					
 				</View>
-        <View style={styles.generalSettings}>
+				<View style={styles.generalSettings}>
 					<View>
-						<Text style={styles.title}>Legal</Text>
+						<Text
+							style={[
+								styles.title,
+								{
+									backgroundColor: theme.background,
+									borderBottomColor: theme.borderBottom,
+									color: theme.text,
+								},
+							]}
+						>
+							Legal
+						</Text>
 					</View>
-					<Pressable style={styles.listView}
-          onPress={() => navigation.navigate('AboutScreen')}>
-          <Entypo name="info-with-circle" size={18} color="#B3B3B3" />
-						<Text>About</Text>
+					<Pressable
+						style={[
+							styles.listView,
+							{
+								backgroundColor: theme.cards,
+								borderBottomColor: theme.borderBottom,
+							},
+						]}
+						onPress={() => navigation.navigate('AboutScreen')}
+					>
+						<Entypo name="info-with-circle" size={18} color={theme.text} />
+						<Text style={[{ color: theme.text }]}>About</Text>
 					</Pressable>
-					<Pressable style={styles.listView}
-          onPress={() => navigation.navigate('TermsService')}>
-						<Octicons name="law" size={24} color="#B3B3B3" />
-						<Text>Terms of Service</Text>
+					<Pressable
+						style={[
+							styles.listView,
+							{
+								backgroundColor: theme.cards,
+								borderBottomColor: theme.borderBottom,
+							},
+						]}
+						onPress={() => navigation.navigate('TermsService')}
+					>
+						<Octicons name="law" size={24} color={theme.text} />
+						<Text style={[{ color: theme.text }]}>Terms of Service</Text>
 					</Pressable>
-					
 				</View>
 			</ScrollView>
 		</View>
@@ -99,7 +227,6 @@ const SettingsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#FFF0EB',
 	},
 	backButton: {
 		marginTop: 20,
@@ -112,17 +239,14 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 16,
 		fontWeight: 500,
-		color: '#0B3948',
-    padding: 16,
-    paddingTop: 8,
-    paddingBottom: 8,
-    backgroundColor: '#FFF0EB',
+		padding: 16,
+		paddingTop: 8,
+		paddingBottom: 8,
 	},
-  locationText: {
-    fontSize: 18,
-    fontWeight: 400,
-    color: '#0B3948',
-  },
+	locationText: {
+		fontSize: 18,
+		fontWeight: 400,
+	},
 	header: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
@@ -130,18 +254,15 @@ const styles = StyleSheet.create({
 		padding: 16,
 		backgroundColor: 'white',
 		borderBottomWidth: 1,
-		borderBottomColor: '#7F9172',
 		marginTop: 40,
 	},
-  listView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    borderColor: '#B3B3B3',
-    borderBottomWidth: 1,
-    backgroundColor: 'white',
-    padding: 16,
-  }
+	listView: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 10,
+		borderBottomWidth: 1,
+		padding: 16,
+	},
 });
 
 export default SettingsScreen;
