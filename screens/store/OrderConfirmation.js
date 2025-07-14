@@ -46,7 +46,7 @@ export default function OrderConfirmation({ navigation, route }) {
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
-            <View style={styles.content}>
+            <View style={[styles.content, {borderColor: theme.border}]}>
                 <View style={styles.checkmarkContainer}>
                     <Animated.View
                         style={[
@@ -66,36 +66,36 @@ export default function OrderConfirmation({ navigation, route }) {
                     </Animated.View>
                 </View>
 
-                <Text style={styles.title}>
+                <Text style={[styles.title, {color: theme.text}]}>
                     {isPendingTransfer ? 'Transfer Initiated!' : 'Order Confirmed!'}
                 </Text>
-                <Text style={styles.message}>
+                <Text style={[styles.message, {color: theme.text}]}>
                     {isPendingTransfer 
                         ? 'Please complete the bank transfer using the provided account details. Your order will be processed once payment is confirmed.'
                         : 'Thank you for your purchase. Your order has been successfully placed.'}
                 </Text>
 
-                <View style={styles.orderInfo}>
+                <View style={[styles.orderInfo, { backgroundColor: theme.cards }]}>
                     <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Order ID</Text>
-                        <Text style={styles.infoValue}>#{(orderId || '').slice(-6)}</Text>
+                        <Text style={[styles.infoLabel, {color: theme.text}]}>Order ID</Text>
+                        <Text style={[styles.infoValue, {color: theme.primary}]}>#{(orderId || '').slice(-6)}</Text>
                     </View>
                     <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Amount {isPendingTransfer ? 'to Pay' : 'Paid'}</Text>
-                        <Text style={styles.infoValue}>₦{(amount || 0).toLocaleString()}</Text>
+                        <Text style={[styles.infoLabel, {color: theme.text}]}>Amount {isPendingTransfer ? 'to Pay' : 'Paid'}</Text>
+                        <Text style={[styles.infoValue, {color: theme.primary}]}>₦{(amount || 0).toLocaleString()}</Text>
                     </View>
                 </View>
 
                 <View style={styles.divider} />
 
-                <Text style={styles.statusMessage}>
+                <Text style={[styles.statusMessage, {color: theme.text}]}>
                     {isPendingTransfer
                         ? 'You will receive an email confirmation once your payment is confirmed. This usually takes 5-15 minutes.'
                         : 'You will receive an email confirmation shortly with your order details.'}
                 </Text>
             </View>
 
-            <View style={styles.footer}>
+            <View style={[styles.footer, { backgroundColor: theme.cards, borderTopColor: theme.border }]}>
                 <TouchableOpacity
                     style={[styles.button, styles.primaryButton]}
                     onPress={handleViewOrder}

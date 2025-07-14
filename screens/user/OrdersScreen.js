@@ -12,11 +12,13 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { getAuth } from 'firebase/auth';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { useTheme } from '../../utils/ThemeContext';
 
 export default function OrdersScreen({ navigation }) {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const { theme, mode, setMode } = useTheme();
     const auth = getAuth();
 
     const fetchOrders = async () => {
@@ -94,11 +96,11 @@ export default function OrdersScreen({ navigation }) {
 
     const renderOrder = ({ item }) => (
         <Pressable
-            style={styles.orderCard}
+            style={[styles.orderCard, { backgroundColor: theme.cards }]}
             onPress={() => navigation.navigate('OrderDetails', { orderId: item.id })}
         >
             <View style={styles.orderHeader}>
-                <Text style={styles.orderId}>Order #{item.id.slice(-6)}</Text>
+                <Text style={[styles.orderId,{color: theme.text}]}>Order #{item.id.slice(-6)}</Text>
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
                     <MaterialIcons 
                         name={getStatusIcon(item.status)} 
@@ -113,29 +115,29 @@ export default function OrdersScreen({ navigation }) {
             </View>
 
             <View style={styles.orderInfo}>
-                <Text style={styles.dateText}>
+                <Text style={[styles.dateText, {color: theme.text}]}>
                     {formatDate(item.createdAt)}
                 </Text>
-                <Text style={styles.amountText}>
+                <Text style={[styles.amountText, {color: theme.primary}]}>
                     ₦{item.totalAmount?.toLocaleString()}
                 </Text>
             </View>
 
             <View style={styles.itemsList}>
                 {item.items.map((orderItem, index) => (
-                    <Text key={index} style={styles.itemText} numberOfLines={1}>
+                    <Text key={index} style={[styles.itemText, {color: theme.text}]} numberOfLines={1}>
                         {orderItem.quantity}x {orderItem.name}
                     </Text>
                 ))}
             </View>
 
             <View style={styles.paymentInfo}>
-                <Text style={styles.paymentMethod}>
+                <Text style={[styles.paymentMethod, {color: theme.text}]}>
                     {item.paymentMethod === 'cash_on_delivery' 
                         ? 'Cash on Delivery'
                         : ((item.paymentMethod || 'card').charAt(0).toUpperCase() + (item.paymentMethod || 'card').slice(1))}
                 </Text>
-                <Text style={[styles.paymentStatus, { color: getStatusColor(item.paymentStatus) }]}>
+                <Text style={[styles.paymentStatus, { color: theme.secondary }]}>
                     {(item.paymentStatus || 'pending').charAt(0).toUpperCase() + (item.paymentStatus || 'pending').slice(1)}
                 </Text>
             </View>
@@ -144,19 +146,19 @@ export default function OrdersScreen({ navigation }) {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
+            <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
                 <ActivityIndicator size="large" color="#FF521B" />
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
+            <View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.accent }]}>
             <Pressable onPress={() => navigation.navigate('HomeMain')}>
-          <MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+          <MaterialIcons name="arrow-back" size={24} color={theme.text} />
         </Pressable>
-                <Text style={styles.headerText}>My Orders</Text>
+                <Text style={[styles.headerText, {color: theme.primary}]}>My Orders</Text>
                 <View></View>
             </View>
 

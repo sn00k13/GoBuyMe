@@ -11,12 +11,14 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useCart } from '../app/CartContext';
+import { useTheme } from '../../utils/ThemeContext';
 
 export default function OrderDetailsScreen({ navigation, route }) {
 	const { orderId } = route.params;
 	const [order, setOrder] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const { addToCart } = useCart();
+	const { theme, mode, setMode } = useTheme();
 
 	useEffect(() => {
 		const fetchOrder = async () => {
@@ -79,19 +81,19 @@ export default function OrderDetailsScreen({ navigation, route }) {
 	}
 
 	return (
-		<View style={styles.container}>
-			<View style={styles.header}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
+			<View style={[styles.header, { backgroundColor: theme.cards }]}>
 				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
-				<Text style={styles.headerText}>Order Details</Text>
+				<Text style={[styles.headerText, {color: theme.primary}]}>Order Details</Text>
 				<View style={{ width: 24 }} />
 			</View>
 
 			<ScrollView style={styles.content}>
-				<View style={styles.section}>
+				<View style={[styles.section, {backgroundColor: theme.cards}]}>
 					<View style={styles.orderHeader}>
-						<Text style={styles.orderId}>Order #{order.id.slice(-6)}</Text>
+						<Text style={[styles.orderId, {color: theme.text}]}>Order #{order.id.slice(-6)}</Text>
 						<View
 							style={[
 								styles.statusBadge,
@@ -104,20 +106,20 @@ export default function OrderDetailsScreen({ navigation, route }) {
 							</Text>
 						</View>
 					</View>
-					<Text style={styles.dateText}>{formatDate(order.createdAt)}</Text>
+					<Text style={[styles.dateText, {color: theme.text}]}>{formatDate(order.createdAt)}</Text>
 				</View>
 
-				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>Items</Text>
+				<View style={[styles.section, {backgroundColor: theme.cards}]}>
+					<Text style={[styles.sectionTitle, {color: theme.text}]}>Items</Text>
 					{order.items.map((item, index) => (
 						<View key={index} style={styles.itemRow}>
 							<View style={styles.itemInfo}>
-								<Text style={styles.itemName}>{item.name}</Text>
-								<Text style={styles.itemQuantity}>
+								<Text style={[styles.itemName, {color: theme.text}]}>{item.name}</Text>
+								<Text style={[styles.itemQuantity, {color: theme.text}]}>
 									Quantity: {item.quantity}
 								</Text>
 							</View>
-							<Text style={styles.itemPrice}>
+							<Text style={[styles.itemPrice, {color: theme.primary}]}>
 								₦
 								{(
 									parseFloat(item.price) * parseInt(item.quantity, 10)
@@ -132,28 +134,28 @@ export default function OrderDetailsScreen({ navigation, route }) {
 							marginTop: 8,
 						}}
 					>
-						<Text style={{ color: '#21A179', fontWeight: 'bold' }}>
+						<Text style={[{ fontWeight: 'bold' }, {color: theme.secondary}]}>
 							Discount
 						</Text>
-						<Text style={{ color: '#21A179', fontWeight: 'bold' }}>
+						<Text style={[{ fontWeight: 'bold' }, {color: theme.secondary}]}>
 							{order.discountAmount && order.discountAmount > 0
 								? `-₦${order.discountAmount.toLocaleString()}`
 								: '₦0'}
 						</Text>
 					</View>
 					<View style={styles.totalRow}>
-						<Text style={styles.totalLabel}>Total Amount</Text>
-						<Text style={styles.totalAmount}>
+						<Text style={[styles.totalLabel, {color: theme.text}]}>Total Amount</Text>
+						<Text style={[styles.totalAmount, {color: theme.primary}]}>
 							₦{(order.totalAmount || 0).toLocaleString()}
 						</Text>
 					</View>
 				</View>
 
-				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>Payment Information</Text>
+				<View style={[styles.section, {backgroundColor: theme.cards}]}>
+					<Text style={[styles.sectionTitle, {color: theme.text}]}>Payment Information</Text>
 					<View style={styles.infoRow}>
-						<Text style={styles.infoLabel}>Method</Text>
-						<Text style={styles.infoValue}>
+						<Text style={[styles.infoLabel, {color: theme.text}]}>Method</Text>
+						<Text style={[styles.infoValue, {color: theme.text}]}>
 							{order.paymentMethod === 'cash_on_delivery'
 								? 'Cash on Delivery'
 								: (order.paymentMethod || 'card').charAt(0).toUpperCase() +
@@ -161,11 +163,11 @@ export default function OrderDetailsScreen({ navigation, route }) {
 						</Text>
 					</View>
 					<View style={styles.infoRow}>
-						<Text style={styles.infoLabel}>Status</Text>
+						<Text style={[styles.infoLabel, {color: theme.text}]}>Status</Text>
 						<Text
 							style={[
 								styles.infoValue,
-								{ color: getStatusColor(order.paymentStatus || 'pending') },
+								{ color: theme.secondary },
 							]}
 						>
 							{(order.paymentStatus || 'pending').charAt(0).toUpperCase() +
@@ -174,31 +176,31 @@ export default function OrderDetailsScreen({ navigation, route }) {
 					</View>
 					{order.paymentReference && (
 						<View style={styles.infoRow}>
-							<Text style={styles.infoLabel}>Reference</Text>
-							<Text style={styles.infoValue}>{order.paymentReference}</Text>
+							<Text style={[styles.infoLabel, {color: theme.text}]}>Reference</Text>
+							<Text style={[styles.infoValue, {color: theme.text}]}>{order.paymentReference}</Text>
 						</View>
 					)}
 				</View>
 
-				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>Customer Information</Text>
+				<View style={[styles.section, {backgroundColor: theme.cards}]}>
+					<Text style={[styles.sectionTitle, {color: theme.text}]}>Customer Information</Text>
 					<View style={styles.infoRow}>
-						<Text style={styles.infoLabel}>Name</Text>
-						<Text style={styles.infoValue}>{order.customerName}</Text>
+						<Text style={[styles.infoLabel, {color: theme.text}]}>Name</Text>
+						<Text style={[styles.infoValue, {color: theme.text}]}>{order.customerName}</Text>
 					</View>
 					<View style={styles.infoRow}>
-						<Text style={styles.infoLabel}>Phone</Text>
-						<Text style={styles.infoValue}>{order.customerPhone}</Text>
+						<Text style={[styles.infoLabel, {color: theme.text}]}>Phone</Text>
+						<Text style={[styles.infoValue, {color: theme.text}]}>{order.customerPhone}</Text>
 					</View>
 					<View style={styles.infoRow}>
-						<Text style={styles.infoLabel}>Email</Text>
-						<Text style={styles.infoValue}>{order.customerEmail}</Text>
+						<Text style={[styles.infoLabel, {color: theme.text}]}>Email</Text>
+						<Text style={[styles.infoValue, {color: theme.text}]}>{order.customerEmail}</Text>
 					</View>
 				</View>
 
 				{order.status === 'pending' && (
 					<Pressable
-						style={styles.cancelButton}
+						style={[styles.cancelButton, { backgroundColor: theme.primary }]}
 						onPress={async () => {
 							// Repeat Order: Add all items back to cart
 							if (!order || !order.items || !order.restaurantId) return;

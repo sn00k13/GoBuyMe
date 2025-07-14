@@ -571,7 +571,6 @@ const styles = StyleSheet.create({
 	},
 	input: {
 		borderWidth: 1,
-		borderColor: '#FF521B',
 		borderRadius: 4,
 		padding: 8,
 		marginBottom: 8,
@@ -610,7 +609,6 @@ const styles = StyleSheet.create({
 	},
 	picker: {
 		borderWidth: 1,
-		borderColor: '#FF521B',
 		borderRadius: 4,
 		padding: 8,
 		backgroundColor: '#fff',

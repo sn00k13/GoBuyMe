@@ -14,6 +14,7 @@ import { doc, setDoc, serverTimestamp, addDoc, collection } from 'firebase/fires
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { useStoreCart } from '../app/StoreCartContext';
+import { useTheme } from '../../utils/ThemeContext';
 
 export default function PaymentScreen({ navigation, route }) {
 	const {
@@ -26,6 +27,7 @@ export default function PaymentScreen({ navigation, route }) {
 	const [selectedMethod, setSelectedMethod] = useState('card'); // 'card' or 'bank'
 	const auth = getAuth();
 	const { clearCart } = useStoreCart();
+	const { theme, mode, setMode } = useTheme();
 	const paystackWebViewRef = useRef();
 
 	// Redirect to cart if no items
@@ -117,32 +119,32 @@ export default function PaymentScreen({ navigation, route }) {
 
 	if (processing) {
 		return (
-			<View style={styles.loadingContainer}>
+			<View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
 				<ActivityIndicator size="large" color="#FF521B" />
-				<Text style={styles.loadingText}>Processing your payment...</Text>
+				<Text style={[styles.loadingText, {color: theme.text}]}>Processing your payment...</Text>
 			</View>
 		);
 	}
 
 	return (
-		<View style={styles.container}>
-			<View style={styles.header}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
+			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.accent }]}>
 				<TouchableOpacity onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</TouchableOpacity>
-				<Text style={styles.headerTitle}>Payment</Text>
+				<Text style={[styles.headerTitle, {color: theme.primary}]}>Payment</Text>
 				<View style={{ width: 24 }} />
 			</View>
 
 			<ScrollView style={styles.content}>
-				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>Order Summary</Text>
+				<View style={[styles.section, { backgroundColor: theme.cards }]}>
+					<Text style={[styles.sectionTitle, {color: theme.primary}]}>Order Summary</Text>
 					{cartItems.map((item, index) => (
 						<View key={index} style={styles.orderItem}>
-							<Text style={styles.itemName}>
+							<Text style={[styles.itemName, {color: theme.text}]}>
 								{item.name} x {item.quantity}
 							</Text>
-							<Text style={styles.itemPrice}>
+							<Text style={[styles.itemPrice, {color: theme.primary}]}>
 								₦
 								{(
 									parseFloat(item.price) * parseInt(item.quantity)
@@ -151,15 +153,15 @@ export default function PaymentScreen({ navigation, route }) {
 						</View>
 					))}
 					<View style={styles.totalRow}>
-						<Text style={styles.totalLabel}>Total Amount:</Text>
+						<Text style={[styles.totalLabel, {color: theme.text}]}>Total Amount:</Text>
 						<Text style={styles.totalAmount}>
 							₦{totalAmount.toLocaleString()}
 						</Text>
 					</View>
 				</View>
 
-				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>Payment Method</Text>
+				<View style={[styles.section, { backgroundColor: theme.cards }]}>
+					<Text style={[styles.sectionTitle, {color: theme.primary}]}>Payment Method</Text>
 					<TouchableOpacity
 						style={[
 							styles.methodOption,
@@ -170,18 +172,19 @@ export default function PaymentScreen({ navigation, route }) {
 						<MaterialIcons
 							name="credit-card"
 							size={24}
-							color={selectedMethod === 'card' ? '#FF521B' : '#666'}
+							color={selectedMethod === 'card' ? '#FF521B' : theme.accent}
 						/>
 						<View style={styles.methodTextContainer}>
 							<Text
 								style={[
 									styles.methodTitle,
 									selectedMethod === 'card' && styles.methodTitleSelected,
+									{color: selectedMethod === 'card' ? '#FF521B' : theme.accent},
 								]}
 							>
 								Card Payment
 							</Text>
-							<Text style={styles.methodDescription}>
+							<Text style={[styles.methodDescription, {color: selectedMethod === 'card' ? '#FF521B' : theme.accent},]}>
 								Pay with your debit/credit card
 							</Text>
 						</View>
@@ -197,18 +200,19 @@ export default function PaymentScreen({ navigation, route }) {
 						<MaterialIcons
 							name="account-balance"
 							size={24}
-							color={selectedMethod === 'bank' ? '#FF521B' : '#666'}
+							color={selectedMethod === 'bank' ? '#FF521B' : theme.accent}
 						/>
 						<View style={styles.methodTextContainer}>
 							<Text
 								style={[
 									styles.methodTitle,
 									selectedMethod === 'bank' && styles.methodTitleSelected,
+									{color: selectedMethod === 'bank' ? '#FF521B' : theme.accent},
 								]}
 							>
 								Bank Transfer
 							</Text>
-							<Text style={styles.methodDescription}>
+							<Text style={[styles.methodDescription, {color: selectedMethod === 'bank' ? '#FF521B' : theme.accent},]}>
 								Pay via bank transfer
 							</Text>
 						</View>
@@ -248,18 +252,15 @@ export default function PaymentScreen({ navigation, route }) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#FFF0EB',
 	},
 	loadingContainer: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: '#FFF0EB',
 	},
 	loadingText: {
 		marginTop: 16,
 		fontSize: 16,
-		color: '#FF521B',
 	},
 	header: {
 		flexDirection: 'row',
