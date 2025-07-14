@@ -8,11 +8,13 @@ import {
     Easing,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../../utils/ThemeContext';
 
 export default function OrderConfirmation({ navigation, route }) {
     const { orderId = '', amount = 0, isPendingTransfer = false } = route.params || {};
     const checkmarkScale = new Animated.Value(0);
     const checkmarkOpacity = new Animated.Value(0);
+    const { theme, mode, setMode } = useTheme();
 
     useEffect(() => {
         // Animate the checkmark
@@ -43,7 +45,7 @@ export default function OrderConfirmation({ navigation, route }) {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
             <View style={styles.content}>
                 <View style={styles.checkmarkContainer}>
                     <Animated.View

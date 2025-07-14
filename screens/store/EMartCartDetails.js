@@ -10,6 +10,7 @@ import {
 	Alert,
 } from 'react-native';
 import { useStoreCart } from '../app/StoreCartContext';
+import { useTheme } from '../../utils/ThemeContext';
 
 function EMartCartDetails({ navigation, route }) {
 	// Provide default storeId if not passed in route params
@@ -21,6 +22,7 @@ function EMartCartDetails({ navigation, route }) {
 	const [discountMessage, setDiscountMessage] = React.useState('');
 	const [discountError, setDiscountError] = React.useState('');
 	const [appliedDiscountCode, setAppliedDiscountCode] = React.useState('');
+	const { theme, mode, setMode } = useTheme();
 
 	// Sync with global cart state when component mounts
 	useEffect(() => {
@@ -109,7 +111,7 @@ function EMartCartDetails({ navigation, route }) {
 	};
 
 	const renderCartItem = ({ item, index }) => (
-		<View style={styles.cartItem}>
+		<View style={[styles.cartItem, { backgroundColor: theme.cards }]}>
 			<Image
 				source={
 					item.imgUrl
@@ -119,15 +121,15 @@ function EMartCartDetails({ navigation, route }) {
 				style={styles.cartImage}
 			/>
 			<View style={styles.cartDetails}>
-				<Text style={styles.cartName}>{item.name}</Text>
-				<Text style={styles.cartSize}>{item.size}</Text>
-				<Text style={styles.cartPrice}>
+				<Text style={[styles.cartName, {color: theme.text}]}>{item.name}</Text>
+				<Text style={[styles.cartSize, {color: theme.text}]}>{item.size}</Text>
+				<Text style={[styles.cartPrice, {color: theme.primary}]}>
 					₦{item.price} x {item.quantity}
 				</Text>
 			</View>
 			<View style={styles.delete}>
 				<Pressable onPress={() => handleRemoveFromCart(index)}>
-					<Text style={styles.deleteText}>Remove from cart</Text>
+					<Text style={[styles.deleteText, {color: theme.secondary}]}>Remove from cart</Text>
 				</Pressable>
 				<Text style={styles.cartItemTotal}>
 					₦
@@ -140,7 +142,7 @@ function EMartCartDetails({ navigation, route }) {
 	);
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
 			<Text style={styles.header}>My Basket</Text>
 			<FlatList
 				data={cartItemsState}
@@ -154,16 +156,17 @@ function EMartCartDetails({ navigation, route }) {
 				}
 			/>
 			<View style={{ marginVertical: 16 }}>
-				<Text style={{ fontSize: 15, marginBottom: 6 }}>Discount Code</Text>
+				<Text style={[{ fontSize: 15, marginBottom: 6 }, {color: theme.text}]}>Discount Code</Text>
 				<TextInput
-					style={{
+					style={[{
 						borderWidth: 1,
 						borderColor: '#FF521B',
 						borderRadius: 4,
 						padding: 8,
 						backgroundColor: '#fff',
 						fontSize: 15,
-					}}
+					}, {borderColor: theme.accent}]}
+					
 					placeholder="Enter discount code."
 					value={discountCode}
 					onChangeText={setDiscountCode}
@@ -193,7 +196,7 @@ function EMartCartDetails({ navigation, route }) {
 				</Pressable>
 			</View>
 			<View style={styles.summary}>
-				<Text style={styles.totalLabel}>Total:</Text>
+				<Text style={[styles.totalLabel, {color: theme.text}]}>Total:</Text>
 				<Text style={styles.totalValue}>
 					₦
 					{getDiscountedTotal().toLocaleString(undefined, {
@@ -218,7 +221,6 @@ function EMartCartDetails({ navigation, route }) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#FFF0EB',
 		padding: 16,
 	},
 	header: {

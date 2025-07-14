@@ -15,6 +15,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
+import { useTheme } from '../../utils/ThemeContext';
 
 export default function ConfirmationScreen({ navigation, route }) {
 	const [addresses, setAddresses] = useState([]);
@@ -49,6 +50,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 	});
 	const [loading, setLoading] = useState(false);
 	const [userData, setUserData] = useState(null);
+	const { theme, mode, setMode } = useTheme();
 	const auth = getAuth();
 
 	// Get cart items and total from route params
@@ -196,25 +198,25 @@ export default function ConfirmationScreen({ navigation, route }) {
 	}
 
 	return (
-		<View style={styles.container}>
-			<View style={styles.header}>
+		<View style={[styles.container, { backgroundColor: theme.background }]}>
+			<View style={[styles.header, { backgroundColor: theme.cards }]}>
 				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
-				<Text style={styles.locationText}>Address and Billing</Text>
+				<Text style={[styles.locationText, {color: theme.primary}]}>Address and Billing</Text>
 				<View style={{ width: 24 }} />
 			</View>
 
 			<View
-				style={{
+				style={[{
 					backgroundColor: 'white',
 					margin: 16,
 					borderRadius: 4,
 					padding: 16,
 					elevation: 1,
-				}}
+				}, { backgroundColor: theme.cards }]}
 			>
-				<Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }}>
+				<Text style={[{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }, {color: theme.text}]}>
 					Cart Items
 				</Text>
 				{Array.isArray(cartItems) && cartItems.length > 0 ? (
@@ -222,16 +224,16 @@ export default function ConfirmationScreen({ navigation, route }) {
 						{cartItems.map((item, idx) => (
 							<View
 								key={item.id || item.name + idx}
-								style={{
+								style={[{
 									flexDirection: 'row',
 									justifyContent: 'space-between',
 									marginBottom: 6,
-								}}
+								}, {color: theme.text}]}
 							>
-								<Text style={{ fontSize: 15 }}>
+								<Text style={[{ fontSize: 15 }, {color: theme.text}]}>
 									{item.name} x {item.quantity}
 								</Text>
-								<Text style={{ fontSize: 15 }}>
+								<Text style={[{ fontSize: 15 }, {color: theme.primary}]}>
 									₦
 									{(
 										parseFloat(item.price) * (parseInt(item.quantity, 10) || 0)
@@ -249,31 +251,31 @@ export default function ConfirmationScreen({ navigation, route }) {
 								justifyContent: 'space-between',
 							}}
 						>
-							<Text style={{ fontWeight: 'bold', fontSize: 16 }}>Total:</Text>
-							<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+							<Text style={[{ fontWeight: 'bold', fontSize: 16 }, {color: theme.text}]}>Total:</Text>
+							<Text style={[{ fontWeight: 'bold', fontSize: 16 }, {color: theme.text}]}>
 								₦{totalAmount.toLocaleString()}
 							</Text>
 						</View>
 					</>
 				) : (
-					<Text style={{ color: '#aaa' }}>Your cart is empty.</Text>
+					<Text style={[{color: theme.text}]}>Your cart is empty.</Text>
 				)}
 			</View>
 
-			<View style={styles.deliveryAddress}>
-				<Text style={styles.addressHeader}>Delivery Address</Text>
+			<View style={[styles.deliveryAddress, { backgroundColor: theme.cards }]}>
+				<Text style={[styles.addressHeader, {color: theme.text}]}>Delivery Address</Text>
 				{defaultAddress ? (
 					<>
-						<Text style={styles.addressText}>{defaultAddress.street}</Text>
-						<Text style={styles.addressText}>
+						<Text style={[styles.addressText, {color: theme.text}]}>{defaultAddress.street}</Text>
+						<Text style={[styles.addressText, {color: theme.text}]}>
 							{defaultAddress.city}, {defaultAddress.state},{' '}
 							{defaultAddress.country}
 						</Text>
-						<Text style={styles.addressText}>{defaultAddress.landmark}</Text>
-						<Text style={styles.addressText}>{defaultAddress.district}</Text>
+						<Text style={[styles.addressText, {color: theme.text}]}>Landmark: {defaultAddress.landmark}</Text>
+						<Text style={[styles.addressText, {color: theme.text}]}>District: {defaultAddress.district}</Text>
 					</>
 				) : (
-					<Text style={styles.addressText}>No default address set</Text>
+					<Text style={[styles.addressText, {color: theme.text}]}>No default address set</Text>
 				)}
 				<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 					<Pressable
@@ -283,18 +285,18 @@ export default function ConfirmationScreen({ navigation, route }) {
 						}}
 						style={{ marginTop: 10 }}
 					>
-						<Text style={{ color: '#21A179' }}>My Addresses</Text>
+						<Text style={[{ color: theme.secondary }]}>My Addresses</Text>
 					</Pressable>
 					<Pressable
 						onPress={() => setShowAddAddressModal(true)}
 						style={{ marginTop: 10 }}
 					>
-						<Text style={{ color: '#FF521B' }}>Add New Delivery Address</Text>
+						<Text style={[{ color: theme.primary }]}>Add New Delivery Address</Text>
 					</Pressable>
 				</View>
 				<Modal visible={showAddressesModal} animationType="slide" transparent>
 					<View style={styles.modalOverlay}>
-						<View style={styles.modalContent}>
+						<View style={[styles.modalContent, { backgroundColor: theme.cards }]}>
 							<Pressable
 								onPress={() => setShowAddressesModal(false)}
 								style={{
@@ -305,15 +307,15 @@ export default function ConfirmationScreen({ navigation, route }) {
 									padding: 4,
 								}}
 							>
-								<MaterialIcons name="close" size={24} color="#FF521B" />
+								<MaterialIcons name="close" size={24} color={theme.text} />
 							</Pressable>
 							<Text
-								style={{
+								style={[{
 									fontWeight: 'bold',
 									fontSize: 16,
 									marginBottom: 8,
 									textAlign: 'center',
-								}}
+								}, {color: theme.text}]}
 							>
 								My Addresses
 							</Text>
@@ -340,19 +342,19 @@ export default function ConfirmationScreen({ navigation, route }) {
 											}}
 											color="#FF521B"
 										/>
-										<Text style={{ marginLeft: 8 }}>
+										<Text style={[{ marginLeft: 8 }, {color: theme.text}]}>
 											{item.street?.slice(0, 10) +
 												(item.street?.length > 10 ? '...' : '')}
 										</Text>
 										{item.isDefault && (
-											<Text style={{ color: '#21A179', marginLeft: 8 }}>
+											<Text style={[{ color: theme.secondary, marginLeft: 8 }]}>
 												(Default)
 											</Text>
 										)}
 									</Pressable>
 								)}
 								ListEmptyComponent={
-									<Text style={{ color: '#aaa', marginVertical: 8 }}>
+									<Text style={[{ marginVertical: 8 }, {color: theme.text}]}>
 										No addresses found.
 									</Text>
 								}
@@ -363,9 +365,9 @@ export default function ConfirmationScreen({ navigation, route }) {
 				</Modal>
 				<Modal visible={showAddAddressModal} animationType="slide" transparent>
 					<View style={styles.modalOverlay}>
-						<View style={styles.modalContent}>
+						<View style={[styles.modalContent, { backgroundColor: theme.cards }]}>
 							<Text
-								style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }}
+								style={[{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }, {color: theme.text}]}
 							>
 								Add New Address
 							</Text>
@@ -378,12 +380,12 @@ export default function ConfirmationScreen({ navigation, route }) {
 										onChangeText={(text) =>
 											setForm((f) => ({ ...f, [field]: text }))
 										}
-										style={styles.input}
+										style={[styles.input, { borderColor: theme.accent }]}
 									/>
 								)
 							)}
 							<View style={styles.pickerContainer}>
-								<Text style={styles.pickerLabel}>District *</Text>
+								<Text style={[styles.pickerLabel, {color: theme.text}]}>District *</Text>
 								<Picker
 									selectedValue={form.district}
 									onValueChange={(itemValue) => setForm((f) => ({ ...f, district: itemValue }))}
@@ -410,7 +412,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 									}
 									color="#FF521B"
 								/>
-								<Text style={{ marginLeft: 8 }}>Set as default address</Text>
+								<Text style={[{ marginLeft: 8 }, {color: theme.text}]}>Set as default address</Text>
 							</View>
 							<View
 								style={{
@@ -517,13 +519,11 @@ export default function ConfirmationScreen({ navigation, route }) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#FFF9F7',
 	},
 	loadingContainer: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: '#FFF9F7',
 	},
 	header: {
 		flexDirection: 'row',
@@ -536,7 +536,6 @@ const styles = StyleSheet.create({
 	locationText: {
 		fontSize: 18,
 		fontWeight: 'bold',
-		color: '#FF521B',
 	},
 	deliveryAddress: {
 		paddingVertical: 16,
