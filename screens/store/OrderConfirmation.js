@@ -6,12 +6,13 @@ import {
     TouchableOpacity,
     Animated,
     Easing,
+    SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../../utils/ThemeContext';
 
 export default function OrderConfirmation({ navigation, route }) {
-    const { orderId = '', amount = 0, isPendingTransfer = false } = route.params || {};
+    const { orderId = '', totalAmount = 0, isPendingTransfer = false } = route.params || {};
     const checkmarkScale = new Animated.Value(0);
     const checkmarkOpacity = new Animated.Value(0);
     const { theme, mode, setMode } = useTheme();
@@ -45,7 +46,7 @@ export default function OrderConfirmation({ navigation, route }) {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF0EB' }}>
             <View style={[styles.content, {borderColor: theme.border}]}>
                 <View style={styles.checkmarkContainer}>
                     <Animated.View
@@ -82,7 +83,7 @@ export default function OrderConfirmation({ navigation, route }) {
                     </View>
                     <View style={styles.infoRow}>
                         <Text style={[styles.infoLabel, {color: theme.text}]}>Amount {isPendingTransfer ? 'to Pay' : 'Paid'}</Text>
-                        <Text style={[styles.infoValue, {color: theme.primary}]}>₦{(amount || 0).toLocaleString()}</Text>
+                        <Text style={[styles.infoValue, {color: theme.primary}]}>₦{(totalAmount || 0).toLocaleString()}</Text>
                     </View>
                 </View>
 
@@ -110,7 +111,7 @@ export default function OrderConfirmation({ navigation, route }) {
                     <Text style={styles.secondaryButtonText}>Continue Shopping</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -184,8 +185,6 @@ const styles = StyleSheet.create({
     footer: {
         padding: 16,
         backgroundColor: 'white',
-        borderTopWidth: 1,
-        borderTopColor: '#E0E0E0',
     },
     button: {
         padding: 16,

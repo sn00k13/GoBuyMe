@@ -6,6 +6,7 @@ import {
 	Pressable,
 	Alert,
 	ScrollView,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
@@ -47,7 +48,7 @@ export default function CashOnDeliveryScreen({ navigation, route }) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={{ flex: 1 }}>
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
@@ -102,7 +103,7 @@ export default function CashOnDeliveryScreen({ navigation, route }) {
 					<Text style={styles.confirmButtonText}>Confirm Order</Text>
 				</Pressable>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -117,7 +118,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
 	},
 	headerText: {
 		fontSize: 18,

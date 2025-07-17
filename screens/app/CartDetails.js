@@ -8,6 +8,8 @@ import {
 	Image,
 	TextInput,
 	Alert,
+	SafeAreaView,
+	KeyboardAvoidingView,
 } from 'react-native';
 import { useCart } from '../app/CartContext';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -95,73 +97,78 @@ export default function CartDetails({ route, navigation }) {
 	};
 
 	return (
-		<View style={styles.container}>
-			{/* Header */}
-			<View style={styles.header}>
-				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
-				</Pressable>
-				<Text style={styles.headerText}>My Cart - {restaurantName}</Text>
-				<View style={{ width: 24 }} />
-			</View>
-			{/* Render FlatList here */}
-			<FlatList
-				data={cartItems}
-				renderItem={renderCartItem}
-				keyExtractor={(item, idx) => item.id?.toString() || idx.toString()}
-				contentContainerStyle={{ padding: 16 }}
-				ListEmptyComponent={
-					<Text style={{ textAlign: 'center', marginTop: 40, color: '#888' }}>
-						Your cart is empty.
-					</Text>
-				}
-			/>
-			{/* Discount code section */}
-			<View style={{ padding: 16 }}>
-				<Text style={{ fontSize: 15, marginBottom: 6 }}>Discount Code</Text>
-				<View style={styles.discountSection}>
-					<View>
-						<TextInput
-							style={styles.discountText}
-							placeholder="Enter discount code"
-							value={discountCode}
-							onChangeText={setDiscountCode}
-							autoCapitalize="characters"
-						/>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#FFF0EB' }}>
+			<View style={styles.container}>
+				{/* Header */}
+				<View style={styles.header}>
+					<Pressable onPress={() => navigation.goBack()}>
+						<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+					</Pressable>
+					<Text style={styles.headerText}>My Cart - {restaurantName}</Text>
+					<View style={{ width: 24 }} />
+				</View>
+				{/* Render FlatList here */}
+				<FlatList
+					data={cartItems}
+					renderItem={renderCartItem}
+					keyExtractor={(item, idx) => item.id?.toString() || idx.toString()}
+					contentContainerStyle={{ padding: 16 }}
+					ListEmptyComponent={
+						<Text style={{ textAlign: 'center', marginTop: 40, color: '#888' }}>
+							Your cart is empty.
+						</Text>
+					}
+				/>
+				{/* Discount code section */}
+				<KeyboardAvoidingView>
+				<View style={{ padding: 16 }}>
+					<Text style={{ fontSize: 15, marginBottom: 6 }}>Discount Code</Text>
+					<View style={styles.discountSection}>
+						<View>
+							<TextInput
+								style={styles.discountText}
+								placeholder="Enter discount code"
+								value={discountCode}
+								onChangeText={setDiscountCode}
+								autoCapitalize="characters"
+							/>
+						</View>
+						{discountApplied && (
+							<Text style={{ color: '#21A179', marginTop: 6 }}>
+								Discount applied! 10% off.
+							</Text>
+						)}
+						{discountError ? (
+							<Text style={{ color: '#E14E1F', marginTop: 6 }}>
+								{discountError}
+							</Text>
+						) : null}
+						<Pressable style={styles.applyDiscount} onPress={handleApplyDiscount}>
+							<Text style={styles.proceedCheckoutText}>Apply</Text>
+						</Pressable>
 					</View>
-					{discountApplied && (
-						<Text style={{ color: '#21A179', marginTop: 6 }}>
-							Discount applied! 10% off.
-						</Text>
-					)}
-					{discountError ? (
-						<Text style={{ color: '#E14E1F', marginTop: 6 }}>
-							{discountError}
-						</Text>
-					) : null}
-					<Pressable style={styles.applyDiscount} onPress={handleApplyDiscount}>
-						<Text style={styles.proceedCheckoutText}>Apply</Text>
+				</View>
+				</KeyboardAvoidingView>
+				{/* Total */}
+				<View style={styles.orderTotal}>
+					<Text style={styles.orderTotalText1}>Total:</Text>
+					<Text style={styles.orderTotalText}>
+						₦{discountedTotal.toLocaleString()}
+					</Text>
+				</View>
+				<View style={styles.proceedCheckout}>
+					<Pressable onPress={() => navigation.navigate('RestaurantMenuItem')}>
+						<Text style={styles.proceedCheckoutText}>Continue Shopping</Text>
+					</Pressable>
+				</View>
+				<View style={styles.proceedCheckout2}>
+					<Pressable onPress={handleCheckout}>
+						<Text style={styles.proceedCheckoutText}>Proceed to Checkout</Text>
 					</Pressable>
 				</View>
 			</View>
-			{/* Total */}
-			<View style={styles.orderTotal}>
-				<Text style={styles.orderTotalText1}>Total:</Text>
-				<Text style={styles.orderTotalText}>
-					₦{discountedTotal.toLocaleString()}
-				</Text>
-			</View>
-			<View style={styles.proceedCheckout}>
-				<Pressable onPress={() => navigation.navigate('RestaurantMenuItem')}>
-					<Text style={styles.proceedCheckoutText}>Continue Shopping</Text>
-				</Pressable>
-			</View>
-			<View style={styles.proceedCheckout2}>
-				<Pressable onPress={handleCheckout}>
-					<Text style={styles.proceedCheckoutText}>Proceed to Checkout</Text>
-				</Pressable>
-			</View>
-		</View>
+			
+		</SafeAreaView>
 	);
 }
 
@@ -177,9 +184,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		borderBottomWidth: 1,
-		borderBottomColor: '#F0F0F0',
-		marginTop: 40,
 	},
 	headerText: {
 		fontSize: 18,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -12,7 +12,7 @@ import { useTheme } from '../../utils/ThemeContext';
 const SettingsScreen = ({ navigation }) => {
 	const { theme, mode, setMode } = useTheme();
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			<View style={[styles.header, { backgroundColor: theme.cards }]}>
 				<Pressable onPress={() => navigation.toggleDrawer()}>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
@@ -208,7 +208,7 @@ const SettingsScreen = ({ navigation }) => {
 					</Pressable>
 				</View>
 			</ScrollView>
-		</View>
+		</SafeAreaView>
 	);
 };
 
@@ -241,8 +241,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		borderBottomWidth: 1,
-		marginTop: 40,
 	},
 	listView: {
 		flexDirection: 'row',

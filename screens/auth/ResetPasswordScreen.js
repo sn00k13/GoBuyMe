@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, Alert, SafeAreaView } from 'react-native';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../firebase';
 
@@ -16,7 +16,7 @@ export default function ResetPasswordScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Reset Password</Text>
       <Text style={styles.subtitle}>Enter your email to receive a reset link</Text>
 
@@ -37,7 +37,7 @@ export default function ResetPasswordScreen({ navigation }) {
       onPress={() => navigation.goBack()}>
         <Text style={styles.link}>Back</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 

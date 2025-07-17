@@ -7,6 +7,7 @@ import {
 	ScrollView,
 	TextInput,
 	Alert,
+	SafeAreaView,
 } from 'react-native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
@@ -198,7 +199,7 @@ export default function AddressesScreen({ navigation }) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#FFF0EB' }}>
 			{/* Header */}
 			<View style={styles.header}>
 				<Pressable
@@ -360,7 +361,7 @@ export default function AddressesScreen({ navigation }) {
 					<Text style={styles.addButtonText}>Add New Address</Text>
 				</Pressable>
 			)}
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -375,9 +376,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		borderBottomWidth: 1,
-		borderBottomColor: '#F0F0F0',
-		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,

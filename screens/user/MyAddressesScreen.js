@@ -7,6 +7,7 @@ import {
 	ScrollView,
 	TextInput,
 	Alert,
+	SafeAreaView,
 } from 'react-native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
@@ -201,7 +202,7 @@ export default function MyAddressesScreen({ navigation }) {
 	};
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			{/* Header */}
 			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.border }]}>
 				<Pressable
@@ -362,7 +363,7 @@ export default function MyAddressesScreen({ navigation }) {
 					<Text style={styles.addButtonText}>Add New Address</Text>
 				</Pressable>
 			)}
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -377,9 +378,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		borderBottomWidth: 1,
-		borderBottomColor: '#F0F0F0',
-		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,

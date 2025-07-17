@@ -6,6 +6,7 @@ import {
 	Pressable,
 	Modal,
 	FlatList,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { useTheme } from '../../utils/ThemeContext';
@@ -32,7 +33,7 @@ export default function LanguageInput({ navigation }) {
 	const { theme, mode, setMode } = useTheme();
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			{/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
@@ -139,7 +140,7 @@ export default function LanguageInput({ navigation }) {
 					</View>
 				</View>
 			</Modal>
-		</View>
+		</SafeAreaView>
 	);
 }
 

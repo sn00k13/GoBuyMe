@@ -6,6 +6,7 @@ import {
 	StyleSheet,
 	Image,
 	Linking,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -23,16 +24,16 @@ export default function HomeScreen({ navigation }) {
 	const { theme, mode, setMode } = useTheme();
 
 	useEffect(() => {
+		const auth = getAuth();
+		const user = auth.currentUser;
+
+		if (!user) {
+			navigation.replace('Login');
+			return;
+		}
+
 		const fetchDefaultAddress = async () => {
 			try {
-				const auth = getAuth();
-				const user = auth.currentUser;
-
-				if (!user) {
-					console.error('User is not authenticated');
-					return;
-				}
-
 				const userId = user.uid;
 				const userDoc = await getDoc(doc(db, 'users', userId));
 
@@ -61,7 +62,7 @@ export default function HomeScreen({ navigation }) {
 	}, []);
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			{/* Header */}
 			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}>
 				<Pressable onPress={() => navigation.toggleDrawer()}>
@@ -160,7 +161,7 @@ export default function HomeScreen({ navigation }) {
 				<FontAwesome name="angle-right" size={24} color={theme.text} />
 			</Pressable>
 			<View style={{ padding: 5 }}></View>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -173,9 +174,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		padding: 16,
-		backgroundColor: 'white',
-		borderBottomWidth: 1,
-		marginTop: 40,
 	},
 	logoText: {
 		fontSize: 20,

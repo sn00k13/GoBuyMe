@@ -1,5 +1,6 @@
 // CartContext.js
 import React, { createContext, useContext, useState } from 'react';
+import { SafeAreaView } from 'react-native';
 
 const CartContext = createContext();
 
@@ -96,7 +97,7 @@ export function CartProvider({ children }) {
 				getCartTotal,
 			}}
 		>
-			{children}
+			<SafeAreaView style={{ flex: 1 }}>{children}</SafeAreaView>
 		</CartContext.Provider>
 	);
 }

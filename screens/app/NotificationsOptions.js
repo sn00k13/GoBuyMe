@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Switch, Pressable, SafeAreaView } from 'react-native';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme } from '../../utils/ThemeContext';
 
@@ -10,7 +10,7 @@ export default function NotificationsOptions({ navigation }) {
 	const { theme, mode, setMode } = useTheme();
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			{/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
@@ -64,7 +64,7 @@ export default function NotificationsOptions({ navigation }) {
 					/>
 				</View>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 }
 

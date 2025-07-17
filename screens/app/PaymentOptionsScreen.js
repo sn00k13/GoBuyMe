@@ -1,9 +1,10 @@
 // screens/VendorListScreen.js
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, SafeAreaView } from 'react-native';
 
 export default function PaymentOptionsScreen({ navigation }) {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF9F7' }}>
+      <View style={styles.container}>
             {/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
@@ -20,6 +21,7 @@ export default function PaymentOptionsScreen({ navigation }) {
         </Text>
       </Pressable>
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -28,7 +30,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#FFF9F7',
-    marginTop: 40,
   },
   title: {
     fontSize: 24,

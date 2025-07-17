@@ -1,9 +1,10 @@
 // screens/VendorListScreen.js
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, SafeAreaView } from 'react-native';
 
 export default function OrderHistoryScreen({ navigation }) {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF9F7' }}>
+      <View style={styles.container}>
             {/* Back Button */}
                   <Pressable 
                     style={styles.backButton}
@@ -14,6 +15,7 @@ export default function OrderHistoryScreen({ navigation }) {
       <Text style={styles.title}>Order History</Text>
       <Text>This screen will show order history and ability to repeat order.</Text>
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -22,7 +24,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#FFF9F7',
-    marginTop: 40,
   },
   title: {
     fontSize: 24,

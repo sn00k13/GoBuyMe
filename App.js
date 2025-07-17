@@ -61,6 +61,7 @@ function HomeStack() {
 					initialRouteName="Splash"
 					screenOptions={{
 						headerShown: false,
+						gestureEnabled: false,
 					}}
 				>
 					<Stack.Screen name="Splash" component={SplashScreen} />
@@ -138,6 +139,7 @@ function DrawerNavigator() {
 				headerShown: false,
 				drawerActiveTintColor: theme.primary,
 				drawerInactiveTintColor: theme.text,
+				swipeEnabled: false,
 				drawerLabelStyle: {
 					marginLeft: 5,
 					fontSize: 15,

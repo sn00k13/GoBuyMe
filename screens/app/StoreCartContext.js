@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { SafeAreaView } from 'react-native';
 
 const StoreCartContext = createContext();
 
@@ -60,7 +61,9 @@ export const StoreCartProvider = ({ children }) => {
 
   return (
     <StoreCartContext.Provider value={{ getCart, updateCart, removeFromCart, clearCart }}>
-      {children}
+      <SafeAreaView style={{ flex: 1 }}>
+        {children}
+      </SafeAreaView>
     </StoreCartContext.Provider>
   );
 };

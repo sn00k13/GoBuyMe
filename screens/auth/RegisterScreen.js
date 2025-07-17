@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, Platform, SafeAreaView } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
@@ -80,82 +80,84 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
-      
-      <TextInput
-        placeholder="Full Name"
-        value={name}
-        onChangeText={(value) => handleFieldChange(value, setName)}
-        style={styles.input}
-      />
-      
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={(value) => handleFieldChange(value, setEmail)}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        style={styles.input}
-      />
-      
-      <View style={styles.passwordContainer}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Create Account</Text>
+        
         <TextInput
-          placeholder="Password"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={(value) => handleFieldChange(value, setPassword)}
-          style={[styles.input, styles.passwordInput]}
+          placeholder="Full Name"
+          value={name}
+          onChangeText={(value) => handleFieldChange(value, setName)}
+          style={styles.input}
         />
-        <Pressable
-          onPress={() => setShowPassword(!showPassword)}
-          style={styles.eyeIcon}
-        >
-          <MaterialIcons
-            name={showPassword ? 'visibility-off' : 'visibility'}
-            size={24}
-            color="#666"
+        
+        <TextInput
+          placeholder="Email"
+          value={email}
+          onChangeText={(value) => handleFieldChange(value, setEmail)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          style={styles.input}
+        />
+        
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder="Password"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={(value) => handleFieldChange(value, setPassword)}
+            style={[styles.input, styles.passwordInput]}
           />
+          <Pressable
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeIcon}
+          >
+            <MaterialIcons
+              name={showPassword ? 'visibility-off' : 'visibility'}
+              size={24}
+              color="#666"
+            />
+          </Pressable>
+        </View>
+        
+        <TextInput
+          placeholder="Phone Number"
+          value={phone}
+          onChangeText={(value) => handleFieldChange(value, setPhone)}
+          keyboardType="phone-pad"
+          style={styles.input}
+        />
+
+        <Recaptcha
+          ref={recaptchaRef}
+          siteKey={RECAPTCHA_CONFIG.siteKey}
+          baseUrl={RECAPTCHA_CONFIG.baseUrl}
+          onVerify={onVerify}
+          onExpire={onExpire}
+          onError={onError}
+          size="invisible"
+          enterprise
+          hideBadge
+        />
+
+        <Pressable 
+          onPress={handleRegister}
+          style={[
+            styles.button,
+            isLoading && styles.buttonDisabled
+          ]}
+          disabled={isLoading}
+        >
+          <Text style={styles.buttonText}>
+            {isLoading ? 'Registering...' : 'Register'}
+          </Text>
+        </Pressable>
+        
+        <Pressable onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.link}>Already have an account? Login</Text>
         </Pressable>
       </View>
-      
-      <TextInput
-        placeholder="Phone Number"
-        value={phone}
-        onChangeText={(value) => handleFieldChange(value, setPhone)}
-        keyboardType="phone-pad"
-        style={styles.input}
-      />
-
-      <Recaptcha
-        ref={recaptchaRef}
-        siteKey={RECAPTCHA_CONFIG.siteKey}
-        baseUrl={RECAPTCHA_CONFIG.baseUrl}
-        onVerify={onVerify}
-        onExpire={onExpire}
-        onError={onError}
-        size="invisible"
-        enterprise
-        hideBadge
-      />
-
-      <Pressable 
-        onPress={handleRegister}
-        style={[
-          styles.button,
-          isLoading && styles.buttonDisabled
-        ]}
-        disabled={isLoading}
-      >
-        <Text style={styles.buttonText}>
-          {isLoading ? 'Registering...' : 'Register'}
-        </Text>
-      </Pressable>
-      
-      <Pressable onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.link}>Already have an account? Login</Text>
-      </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 

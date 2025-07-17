@@ -9,6 +9,7 @@ import {
 	Modal,
 	Alert,
 	ActivityIndicator,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -49,7 +50,7 @@ export default function RestaurantConfirmation({ navigation, route }) {
 				[
 					{
 						text: 'OK',
-						onPress: () => navigation.navigate('EMartCartDetails'),
+						onPress: () => navigation.navigate('CartDetails'),
 					},
 				]
 			);
@@ -184,7 +185,7 @@ export default function RestaurantConfirmation({ navigation, route }) {
 	}
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
@@ -483,7 +484,7 @@ export default function RestaurantConfirmation({ navigation, route }) {
 					Proceed to Payment
 				</Text>
 			</Pressable>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -504,7 +505,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,

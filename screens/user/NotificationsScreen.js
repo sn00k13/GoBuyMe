@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Pressable, SafeAreaView } from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
@@ -57,7 +57,7 @@ export default function NotificationsScreen({ navigation }) {
 	};
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			<Pressable
 				style={styles.backButton}
 				onPress={() => navigation.toggleDrawer()}
@@ -85,7 +85,7 @@ export default function NotificationsScreen({ navigation }) {
 			<Pressable onPress={() => setMode(mode === 'light' ? 'dark' : 'light')}>
 				<ColorText color="accent">Toggle Theme</ColorText>
 			</Pressable>
-		</View>
+		</SafeAreaView>
 	);
 }
 

@@ -7,6 +7,7 @@ import {
 	Pressable,
 	Image,
 	FlatList,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
@@ -166,7 +167,7 @@ function EmartScreen({ navigation, route }) {
 	};
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			{/* Header */}
 			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}>
 				<Pressable onPress={() => navigation.navigate('VendorList')}>
@@ -234,7 +235,7 @@ function EmartScreen({ navigation, route }) {
 					</Text>
 				}
 			/>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -251,7 +252,6 @@ const styles = StyleSheet.create({
 		backgroundColor: 'white',
 		borderBottomWidth: 1,
 		borderBottomColor: '#F0F0F0',
-		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,

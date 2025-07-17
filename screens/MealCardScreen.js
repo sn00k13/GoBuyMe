@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, ActivityIndicator, SafeAreaView } from 'react-native';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -46,22 +46,24 @@ export default function MealCardScreen({ navigation, route }) {
 	}
 
 	return (
-		<View style={styles.container}>
-			<Image
-				source={
-					meal.imageUrl
-						? { uri: meal.imageUrl }
-						: require('../assets/placeholder.jpg')
-				}
-				style={styles.mealImage}
-			/>
-			<Text style={styles.mealName}>{meal.name}</Text>
-			<Text style={styles.mealDescription}>
-				{meal.description || 'No description available'}
-			</Text>
-			<Text style={styles.mealPrice}>₦{meal.price || '--'}</Text>
-			{/* Add more meal details as needed */}
-		</View>
+		<SafeAreaView style={{ flex: 1 }}>
+			<View style={styles.container}>
+				<Image
+					source={
+						meal.imageUrl
+							? { uri: meal.imageUrl }
+							: require('../assets/placeholder.jpg')
+					}
+					style={styles.mealImage}
+				/>
+				<Text style={styles.mealName}>{meal.name}</Text>
+				<Text style={styles.mealDescription}>
+					{meal.description || 'No description available'}
+				</Text>
+				<Text style={styles.mealPrice}>₦{meal.price || '--'}</Text>
+				{/* Add more meal details as needed */}
+			</View>
+		</SafeAreaView>
 	);
 }
 

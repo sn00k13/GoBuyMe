@@ -1,53 +1,55 @@
 // LandingScreen.js
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const LandingScreen = () => {
 	const navigation = useNavigation();
 
 	return (
-		<View style={styles.container}>
-			{/* App Logo/Title Section */}
-			<View style={styles.header}>
-				<Image source={require('../../assets/logo.png')} style={styles.logo} />
-				<Text style={styles.title}>GoBuyMe</Text>
-				<Text style={styles.subtitle}>Your favorite meals, delivered fast</Text>
-			</View>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#FFF0EB' }}>
+			<View style={styles.container}>
+				{/* App Logo/Title Section */}
+				<View style={styles.header}>
+					<Image source={require('../../assets/logo.png')} style={styles.logo} />
+					<Text style={styles.title}>GoBuyMe</Text>
+					<Text style={styles.subtitle}>Your favorite meals, delivered fast</Text>
+				</View>
 
-			{/* Action Buttons */}
-			<View style={styles.buttonContainer}>
-				<TouchableOpacity
-					style={[styles.button, styles.primaryButton]}
-					onPress={() => navigation.navigate('Register')}
-				>
-					<Text style={styles.buttonText}>Create Account</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					style={[styles.button, styles.secondaryButton]}
-					onPress={() => navigation.navigate('Login')}
-				>
-					<Text style={[styles.buttonText, styles.secondaryButtonText]}>
-						Sign In
-					</Text>
-				</TouchableOpacity>
-			</View>
-
-			{/* Footer */}
-			<View style={styles.footer}>
-				<Text style={styles.footerText}>By continuing, you agree to our</Text>
-				<View style={styles.linksContainer}>
-					<TouchableOpacity onPress={() => navigation.navigate('TermsService')}>
-						<Text style={styles.linkText}>Terms of Service</Text>
+				{/* Action Buttons */}
+				<View style={styles.buttonContainer}>
+					<TouchableOpacity
+						style={[styles.button, styles.primaryButton]}
+						onPress={() => navigation.navigate('Register')}
+					>
+						<Text style={styles.buttonText}>Create Account</Text>
 					</TouchableOpacity>
-					<Text style={styles.footerText}> and </Text>
-					<TouchableOpacity onPress={() => navigation.navigate('Permissions')}>
-						<Text style={styles.linkText}>Privacy Policy</Text>
+
+					<TouchableOpacity
+						style={[styles.button, styles.secondaryButton]}
+						onPress={() => navigation.navigate('Login')}
+					>
+						<Text style={[styles.buttonText, styles.secondaryButtonText]}>
+							Sign In
+						</Text>
 					</TouchableOpacity>
 				</View>
+
+				{/* Footer */}
+				<View style={styles.footer}>
+					<Text style={styles.footerText}>By continuing, you agree to our</Text>
+					<View style={styles.linksContainer}>
+						<TouchableOpacity onPress={() => navigation.navigate('TermsService')}>
+							<Text style={styles.linkText}>Terms of Service</Text>
+						</TouchableOpacity>
+						<Text style={styles.footerText}> and </Text>
+						<TouchableOpacity onPress={() => navigation.navigate('Permissions')}>
+							<Text style={styles.linkText}>Privacy Policy</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 };
 

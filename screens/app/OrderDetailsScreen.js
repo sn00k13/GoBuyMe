@@ -6,6 +6,7 @@ import {
 	ScrollView,
 	ActivityIndicator,
 	Pressable,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
@@ -81,7 +82,7 @@ export default function OrderDetailsScreen({ navigation, route }) {
 	}
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			<View style={[styles.header, { backgroundColor: theme.cards }]}>
 				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
@@ -203,27 +204,35 @@ export default function OrderDetailsScreen({ navigation, route }) {
 						style={[styles.cancelButton, { backgroundColor: theme.primary }]}
 						onPress={async () => {
 							// Repeat Order: Add all items back to cart
-							if (!order || !order.items || !order.restaurantId) return;
-							for (const item of order.items) {
-								await addToCart(order.restaurantId, {
-									id: item.id,
-									name: item.name,
-									price: item.price,
-									quantity: item.quantity,
-									imageUrl: item.imageUrl || null,
+							if (!order || !order.items) return;
+							if (order.restaurantId) {
+								for (const item of order.items) {
+									await addToCart(order.restaurantId, {
+										id: item.id,
+										name: item.name,
+										price: item.price,
+										quantity: item.quantity,
+										imageUrl: item.imageUrl || null,
+									});
+								}
+								navigation.navigate('CartDetails', {
+									restaurantId: order.restaurantId,
+									restaurantName: order.restaurantName || '',
+								});
+							} else if (order.storeId) {
+								// For store orders, navigate to EMartCartDetails
+								navigation.navigate('EMartCartDetails', {
+									storeId: order.storeId,
+									cartItems: order.items,
 								});
 							}
-							navigation.navigate('CartDetails', {
-								restaurantId: order.restaurantId,
-								restaurantName: order.restaurantName || '',
-							});
 						}}
 					>
 						<Text style={styles.cancelButtonText}>Repeat Order</Text>
 					</Pressable>
 				)}
 			</ScrollView>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -238,7 +247,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
 	},
 	headerText: {
 		fontSize: 18,

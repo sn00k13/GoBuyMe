@@ -7,6 +7,7 @@ import {
     Pressable,
     RefreshControl,
     ActivityIndicator,
+    SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { getAuth } from 'firebase/auth';
@@ -153,7 +154,7 @@ export default function OrdersScreen({ navigation }) {
     }
 
     return (
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
             <View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.accent }]}>
             <Pressable onPress={() => navigation.navigate('HomeMain')}>
           <MaterialIcons name="arrow-back" size={24} color={theme.text} />
@@ -177,7 +178,7 @@ export default function OrdersScreen({ navigation }) {
                     </View>
                 }
             />
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -189,12 +190,9 @@ const styles = StyleSheet.create({
     header: {
         backgroundColor: 'white',
         padding: 16,
-        marginTop: 40,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderBottomWidth: 1,
-        borderBottomColor: '#E0E0E0',
     },
     headerText: {
         fontSize: 18,

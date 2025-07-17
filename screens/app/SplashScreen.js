@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
 
 export default function SplashScreen({ navigation }) {
   setTimeout(() => {
@@ -6,7 +6,7 @@ export default function SplashScreen({ navigation }) {
   }, 5000);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ImageBackground
         source={require('../../assets/platter.jpg')}
         style={styles.backgroundImage}
@@ -21,7 +21,7 @@ export default function SplashScreen({ navigation }) {
           <Text style={styles.subtitle}>..battle that hunger! ..avoid the stress!</Text>
         </View>
       </ImageBackground>
-    </View>
+    </SafeAreaView>
   );
 }
 

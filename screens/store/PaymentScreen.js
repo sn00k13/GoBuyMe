@@ -7,6 +7,7 @@ import {
 	ScrollView,
 	Alert,
 	ActivityIndicator,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Paystack } from 'react-native-paystack-webview';
@@ -127,7 +128,7 @@ export default function PaymentScreen({ navigation, route }) {
 	}
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.accent }]}>
 				<TouchableOpacity onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
@@ -245,7 +246,7 @@ export default function PaymentScreen({ navigation, route }) {
 					</Text>
 				</TouchableOpacity>
 			</ScrollView>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -268,9 +269,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		borderBottomWidth: 1,
-		borderBottomColor: '#F0F0F0',
-		marginTop: 40,
 	},
 	headerTitle: {
 		fontSize: 18,

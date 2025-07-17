@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Image, SafeAreaView } from 'react-native';
 import {
 	DrawerContentScrollView,
 	DrawerItemList,
@@ -11,7 +11,7 @@ import { useTheme } from '../../utils/ThemeContext';
 const CustomDrawerContent = (props) => {
 	const { theme, mode, setMode } = useTheme();
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#FFF' }}>
 			{/* Custom Header */}
 			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}>
 				<Image source={require('../../assets/logo.png')} style={styles.logo} />				
@@ -43,7 +43,7 @@ const CustomDrawerContent = (props) => {
 					<Text style={styles.logoutText}>Sign Out</Text>
 				</Pressable>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 };
 

@@ -9,6 +9,7 @@ import {
 	Modal,
 	Alert,
 	ActivityIndicator,
+	SafeAreaView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -56,6 +57,9 @@ export default function ConfirmationScreen({ navigation, route }) {
 	// Get cart items and total from route params
 	const cartItems = route.params?.cartItems || [];
 	const totalAmount = route.params?.totalAmount || 0;
+	const originalTotal = route.params?.originalTotal || 0;
+	const discountApplied = route.params?.discountApplied;
+	const discountValue = route.params?.discountValue || 0;
 	const storeId = route.params?.storeId;
 
 	useEffect(() => {
@@ -186,6 +190,8 @@ export default function ConfirmationScreen({ navigation, route }) {
 			},
 			totalAmount,
 			storeId,
+			discountApplied, // pass this if you want to show a message
+			discountValue,
 		});
 	};
 
@@ -198,7 +204,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 	}
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			<View style={[styles.header, { backgroundColor: theme.cards }]}>
 				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
@@ -241,6 +247,14 @@ export default function ConfirmationScreen({ navigation, route }) {
 								</Text>
 							</View>
 						))}
+						{discountApplied && (
+							<View style={styles.discountText}>
+								<Text style={styles.discountText2}>Discount Applied:</Text>
+								<Text style={styles.discountText2}>
+									- ₦{discountValue.toLocaleString()}
+								</Text>
+							</View>
+						)}
 						<View
 							style={{
 								borderTopWidth: 1,
@@ -512,7 +526,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 					Proceed to Payment
 				</Text>
 			</Pressable>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -531,7 +545,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,
@@ -554,6 +567,17 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 	},
 	addressText: {
+		fontSize: 16,
+	},
+	discountText: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		paddingVertical: 8,
+		marginTop: 8,
+	},
+	discountText2: {
+		fontStyle: 'italic',
+		color: '#21A179',
 		fontSize: 16,
 	},
 	modalOverlay: {

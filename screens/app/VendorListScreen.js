@@ -10,6 +10,8 @@ import {
 	FlatList,
 	Dimensions,
 	ActivityIndicator,
+	Alert,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -131,7 +133,7 @@ export default function VendorListScreen({ navigation }) {
 						<Text style={styles.ratingText}>{item.rating || 'N/A'}</Text>
 					</View>
 					<Text style={styles.deliveryTime}>
-						{item.deliveryTime || 'Time not specified'}
+						Avg. Time: {item.deliveryTime || 'Time not specified'}
 					</Text>
 				</View>
 			</View>
@@ -168,17 +170,29 @@ export default function VendorListScreen({ navigation }) {
 		const cuisine = String(restaurant.cuisine || '').toLowerCase(); // Handles all cases
 		const name = String(restaurant.name || '').toLowerCase();
 		const searchTerm = restaurantSearch.toLowerCase().trim();
-
 		return name.includes(searchTerm) || cuisine.includes(searchTerm);
+	})
+	// Sort: open restaurants first, closed last
+	.sort((a, b) => {
+		if (a.isOpen === b.isOpen) return 0;
+		if (a.isOpen) return -1;
+		return 1;
 	});
 
 	// Render each restaurant item
 	const renderRestaurantItem = ({ item }) => (
 		<Pressable
-			style={[styles.restaurantCard, { backgroundColor: theme.cards }]}
-			onPress={() =>
-				navigation.navigate('RestaurantDetail', { restaurantId: item.id })
-			}
+			style={[
+				styles.restaurantCard,
+				{ backgroundColor: theme.cards, opacity: item.isOpen === false ? 0.5 : 1 },
+			]}
+			onPress={() => {
+				if (item.isOpen === false) {
+					Alert.alert('This restaurant is closed at this moment');
+				} else {
+					navigation.navigate('RestaurantDetail', { restaurantId: item.id });
+				}
+			}}
 		>
 			<Image
 				source={
@@ -203,7 +217,7 @@ export default function VendorListScreen({ navigation }) {
 						<Text style={styles.ratingText}>{item.rating || 'N/A'}</Text>
 					</View>
 					<Text style={styles.deliveryTime}>
-						{item.deliveryTime || 'Time not specified'}
+						Avg. Time: {item.deliveryTime || 'Time not specified'}
 					</Text>
 				</View>
 			</View>
@@ -227,141 +241,143 @@ export default function VendorListScreen({ navigation }) {
 	}
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
-			{/* Header */}
-			<View
-				style={[
-					styles.header,
-					{
-						backgroundColor: theme.cards,
-						borderBottomColor: theme.borderBottom,
-					},
-				]}
-			>
-				<Pressable onPress={() => navigation.navigate('HomeMain')}>
-					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
-				</Pressable>
-				<ColorText color="primary" style={{ fontSize: 20 }}>
-					Owerri
-				</ColorText>
-				{/* <Text style={styles.locationText}>Owerri</Text> */}
-				<View style={{ width: 24 }}>
-					<AntDesign name="like1" size={22} color={theme.text} />
-				</View>
-			</View>
-
-			{/* Tab Headers */}
-			<View
-				style={[
-					styles.tabContainer,
-					{
-						backgroundColor: theme.cards,
-						borderBottomColor: theme.borderBottom,
-					},
-				]}
-			>
-				<Pressable
+		<SafeAreaView style={{ flex: 1 }}>
+			<View style={[styles.container, { backgroundColor: theme.background }]}>
+				{/* Header */}
+				<View
 					style={[
-						styles.tabButton,
-						activeTab === 'restaurants' && styles.activeTab,
+						styles.header,
+						{
+							backgroundColor: theme.cards,
+							borderBottomColor: theme.borderBottom,
+						},
 					]}
-					onPress={() => setActiveTab('restaurants')}
 				>
-					<Text
-						style={[
-							styles.tabText,
-							activeTab === 'restaurants' && styles.activeTabText,
-						]}
-					>
-						Branches
-					</Text>
-				</Pressable>
+					<Pressable onPress={() => navigation.navigate('HomeMain')}>
+						<MaterialIcons name="arrow-back" size={24} color={theme.text} />
+					</Pressable>
+					<ColorText color="primary" style={{ fontSize: 20 }}>
+						Owerri
+					</ColorText>
+					{/* <Text style={styles.locationText}>Owerri</Text> */}
+					<View style={{ width: 24 }}>
+						<AntDesign name="like1" size={22} color={theme.text} />
+					</View>
+				</View>
 
-				<Pressable
-					style={[styles.tabButton, activeTab === 'meals' && styles.activeTab]}
-					onPress={() => setActiveTab('meals')}
+				{/* Tab Headers */}
+				<View
+					style={[
+						styles.tabContainer,
+						{
+							backgroundColor: theme.cards,
+							borderBottomColor: theme.borderBottom,
+						},
+					]}
 				>
-					<Text
+					<Pressable
 						style={[
-							styles.tabText,
-							activeTab === 'meals' && styles.activeTabText,
+							styles.tabButton,
+							activeTab === 'restaurants' && styles.activeTab,
 						]}
+						onPress={() => setActiveTab('restaurants')}
 					>
-						Meals
-					</Text>
-				</Pressable>
+						<Text
+							style={[
+								styles.tabText,
+								activeTab === 'restaurants' && styles.activeTabText,
+							]}
+						>
+							Branches
+						</Text>
+					</Pressable>
+
+					<Pressable
+						style={[styles.tabButton, activeTab === 'meals' && styles.activeTab]}
+						onPress={() => setActiveTab('meals')}
+					>
+						<Text
+							style={[
+								styles.tabText,
+								activeTab === 'meals' && styles.activeTabText,
+							]}
+						>
+							Meals
+						</Text>
+					</Pressable>
+				</View>
+
+				{/* Tab Content */}
+				<ScrollView style={styles.contentContainer}>
+					{activeTab === 'restaurants' ? (
+						<View>
+							<View style={styles.searchContainer}>
+								<MaterialIcons
+									name="search"
+									size={20}
+									color="#777"
+									style={styles.searchIcon}
+								/>
+								<TextInput
+									style={styles.searchInput}
+									placeholder="Search restaurants..."
+									value={restaurantSearch}
+									onChangeText={setRestaurantSearch}
+								/>
+							</View>
+							{/*Emart list content*/}
+
+							<FlatList
+								data={filteredStores}
+								renderItem={renderStoreItem}
+								keyExtractor={(item) => item.id}
+								scrollEnabled={false}
+								contentContainerStyle={styles.restaurantList2}
+								key="store-list"
+							/>
+							{/* Restaurant list content */}
+							<FlatList
+								data={filteredRestaurants}
+								renderItem={renderRestaurantItem}
+								keyExtractor={(item) => item.id}
+								scrollEnabled={false}
+								contentContainerStyle={styles.restaurantList}
+								key="restaurant-list" // Unique key for this list
+							/>
+						</View>
+					) : (
+						<View>
+							<View style={styles.searchContainer}>
+								<MaterialIcons
+									name="search"
+									size={20}
+									color="#777"
+									style={styles.searchIcon}
+								/>
+								<TextInput
+									style={styles.searchInput}
+									placeholder="Search meals..."
+									value={mealSearch}
+									onChangeText={setMealSearch}
+								/>
+							</View>
+
+							{/* Meals Grid */}
+							<FlatList
+								data={filteredMeals}
+								renderItem={renderMealItem}
+								keyExtractor={(item) => item.id}
+								numColumns={3}
+								scrollEnabled={false}
+								columnWrapperStyle={styles.mealRow}
+								contentContainerStyle={styles.mealGrid}
+								key="meal-grid" // Unique key for this list
+							/>
+						</View>
+					)}
+				</ScrollView>
 			</View>
-
-			{/* Tab Content */}
-			<ScrollView style={styles.contentContainer}>
-				{activeTab === 'restaurants' ? (
-					<View>
-						<View style={styles.searchContainer}>
-							<MaterialIcons
-								name="search"
-								size={20}
-								color="#777"
-								style={styles.searchIcon}
-							/>
-							<TextInput
-								style={styles.searchInput}
-								placeholder="Search restaurants..."
-								value={restaurantSearch}
-								onChangeText={setRestaurantSearch}
-							/>
-						</View>
-						{/*Emart list content*/}
-
-						<FlatList
-							data={filteredStores}
-							renderItem={renderStoreItem}
-							keyExtractor={(item) => item.id}
-							scrollEnabled={false}
-							contentContainerStyle={styles.restaurantList2}
-							key="store-list"
-						/>
-						{/* Restaurant list content */}
-						<FlatList
-							data={filteredRestaurants}
-							renderItem={renderRestaurantItem}
-							keyExtractor={(item) => item.id}
-							scrollEnabled={false}
-							contentContainerStyle={styles.restaurantList}
-							key="restaurant-list" // Unique key for this list
-						/>
-					</View>
-				) : (
-					<View>
-						<View style={styles.searchContainer}>
-							<MaterialIcons
-								name="search"
-								size={20}
-								color="#777"
-								style={styles.searchIcon}
-							/>
-							<TextInput
-								style={styles.searchInput}
-								placeholder="Search meals..."
-								value={mealSearch}
-								onChangeText={setMealSearch}
-							/>
-						</View>
-
-						{/* Meals Grid */}
-						<FlatList
-							data={filteredMeals}
-							renderItem={renderMealItem}
-							keyExtractor={(item) => item.id}
-							numColumns={3}
-							scrollEnabled={false}
-							columnWrapperStyle={styles.mealRow}
-							contentContainerStyle={styles.mealGrid}
-							key="meal-grid" // Unique key for this list
-						/>
-					</View>
-				)}
-			</ScrollView>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -389,9 +405,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		borderBottomWidth: 1,
-		borderBottomColor: '#F0F0F0',
-		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,

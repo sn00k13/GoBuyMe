@@ -7,6 +7,7 @@ import {
 	FlatList,
 	Image,
 	TextInput,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
@@ -257,7 +258,7 @@ function SelectProductScreen({ navigation, route }) {
 	);
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			{/* Header */}
 			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.border }]}>
 				<Pressable
@@ -329,7 +330,7 @@ function SelectProductScreen({ navigation, route }) {
 					)}
 				</Pressable>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -344,9 +345,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		borderBottomWidth: 1,
-		borderBottomColor: '#F0F0F0',
-		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,

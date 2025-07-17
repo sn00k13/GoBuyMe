@@ -6,6 +6,7 @@ import {
 	Image,
 	ScrollView,
 	Pressable,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useCart } from '../app/CartContext';
@@ -38,7 +39,7 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			{/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
@@ -114,7 +115,7 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
 					<Text style={styles.addButtonText}>Add to Cart</Text>
 				</Pressable>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -130,7 +131,6 @@ const styles = StyleSheet.create({
 		padding: 16,
 		backgroundColor: '#fff',
 		elevation: 2,
-		marginTop: 40,
 	},
 	headerText: {
 		fontSize: 18,

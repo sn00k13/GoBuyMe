@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, TextInput, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput, Image, Alert, SafeAreaView } from 'react-native';
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, auth } from '../../firebase';
@@ -108,108 +108,110 @@ export default function ProfileScreen({ navigation }) {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Back Button */}
-      <Pressable 
-        style={styles.backButton}
-        onPress={() => navigation.toggleDrawer()}
-      >
-        <MaterialIcons name="arrow-back" size={24} color={theme.text} />
-      </Pressable>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+      <View style={styles.container}>
+        {/* Back Button */}
+        <Pressable 
+          style={styles.backButton}
+          onPress={() => navigation.toggleDrawer()}
+        >
+          <MaterialIcons name="arrow-back" size={24} color={theme.text} />
+        </Pressable>
 
-      <View style={styles.profileHeader}>
-        <Text style={styles.title}>My Profile</Text>
-      </View>
+        <View style={styles.profileHeader}>
+          <Text style={styles.title}>My Profile</Text>
+        </View>
 
-      <View style={styles.profileInfo}>
-        {isEditing ? (
-          <>
-            <Text style={styles.label}>Edit Name:</Text>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              placeholder="Your Name"
-            />
+        <View style={styles.profileInfo}>
+          {isEditing ? (
+            <>
+              <Text style={styles.label}>Edit Name:</Text>
+              <TextInput
+                style={styles.input}
+                value={name}
+                onChangeText={setName}
+                placeholder="Your Name"
+              />
 
-            <Text style={styles.label}>Edit Phone:</Text>
-            <TextInput
-              style={styles.input}
-              value={phone}
-              onChangeText={setPhone}
-              placeholder="Phone Number"
-              keyboardType="phone-pad"
-            />
+              <Text style={styles.label}>Edit Phone:</Text>
+              <TextInput
+                style={styles.input}
+                value={phone}
+                onChangeText={setPhone}
+                placeholder="Phone Number"
+                keyboardType="phone-pad"
+              />
 
-            <Pressable 
-              style={styles.button1}
-              onPress={handleSave}
-            >
-              <Text style={styles.buttonText1}>Save Changes</Text>
-            </Pressable>
-          </>
-        ) : (
-          <>
-            {/* Editable Profile Image */}
-            <Pressable onPress={handleImagePicker}>
-              <View style={[styles.line1, { color: theme.text }]}>
-                <View style={[styles.line2, {color: theme.text }]}>
-                  <Image
-                    source={
-                      userData?.profileImage
-                        ? { uri: userData.profileImage } // Use profileImage from Firestore
-                        : require('../../assets/default-profile.png') // Fallback image
-                    }
-                    style={styles.profileImage}
-                  />
+              <Pressable 
+                style={styles.button1}
+                onPress={handleSave}
+              >
+                <Text style={styles.buttonText1}>Save Changes</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              {/* Editable Profile Image */}
+              <Pressable onPress={handleImagePicker}>
+                <View style={[styles.line1, { color: theme.text }]}>
+                  <View style={[styles.line2, {color: theme.text }]}>
+                    <Image
+                      source={
+                        userData?.profileImage
+                          ? { uri: userData.profileImage } // Use profileImage from Firestore
+                          : require('../../assets/default-profile.png') // Fallback image
+                      }
+                      style={styles.profileImage}
+                    />
+                  </View>
                 </View>
-              </View>
-            </Pressable>
-            <Text style={[styles.label, {color: theme.text}]}>Tap the image to change</Text>
-            <Text style={[styles.value, {color: theme.text}]}>{userData?.name || 'Not set'}</Text>
-            <Text style={[styles.value2, {color: theme.text}]}>{auth.currentUser?.email}</Text>
-            <Text style={[styles.value2, {color: theme.text}]}>{userData?.phone || 'Not set'}</Text>
-          </>
-        )}
-      </View>
-      <Pressable 
-              style={[styles.button, { marginTop: 20 }]}
-              onPress={() => setIsEditing(true)}
-            >
-              <View style={styles.profileOptions}>
-              <FontAwesome5 name="user-edit" size={24} color={theme.text} />
-              <Text style={[styles.buttonText, {color: theme.text}]}>Edit Profile</Text>
-              </View>
-              
-            </Pressable>
-      <Pressable style={styles.button} onPress={() => navigation.navigate('Home', { screen: 'ResetPassword' })}>
-      <View style={styles.profileOptions}>
-      <Entypo name="lock" size={24} color={theme.text} />
-      <Text style={[styles.buttonText, {color: theme.text}]}>Reset Password</Text>
-      </View>
-      
-      </Pressable>
-      <Pressable 
-        style={styles.button}
-        onPress={() => navigation.navigate('Home', { screen: 'MyAddresses' })}
-      >
+              </Pressable>
+              <Text style={[styles.label, {color: theme.text}]}>Tap the image to change</Text>
+              <Text style={[styles.value, {color: theme.text}]}>{userData?.name || 'Not set'}</Text>
+              <Text style={[styles.value2, {color: theme.text}]}>{auth.currentUser?.email}</Text>
+              <Text style={[styles.value2, {color: theme.text}]}>{userData?.phone || 'Not set'}</Text>
+            </>
+          )}
+        </View>
+        <Pressable 
+                style={[styles.button, { marginTop: 20 }]}
+                onPress={() => setIsEditing(true)}
+              >
+                <View style={styles.profileOptions}>
+                <FontAwesome5 name="user-edit" size={24} color={theme.text} />
+                <Text style={[styles.buttonText, {color: theme.text}]}>Edit Profile</Text>
+                </View>
+                
+              </Pressable>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('Home', { screen: 'ResetPassword' })}>
         <View style={styles.profileOptions}>
-        <FontAwesome6 name="location-dot" size={20} color={theme.text} />
-        <Text style={[styles.buttonText, {color: theme.text}]}>Edit My Addresses</Text>
+        <Entypo name="lock" size={24} color={theme.text} />
+        <Text style={[styles.buttonText, {color: theme.text}]}>Reset Password</Text>
         </View>
         
-      </Pressable>
-      <Pressable 
-        style={styles.button}
-        onPress={() => navigation.navigate('Home', { screen: 'Notifications' })}
-      >
-        <View style={styles.profileOptions}>
-        <Entypo name="chat" size={24} color={theme.text} />
-        <Text style={[styles.buttonText, {color: theme.text}]}>My Notifications</Text>
-        </View>
-        
-      </Pressable>
-    </View>
+        </Pressable>
+        <Pressable 
+          style={styles.button}
+          onPress={() => navigation.navigate('Home', { screen: 'MyAddresses' })}
+        >
+          <View style={styles.profileOptions}>
+          <FontAwesome6 name="location-dot" size={20} color={theme.text} />
+          <Text style={[styles.buttonText, {color: theme.text}]}>Edit My Addresses</Text>
+          </View>
+          
+        </Pressable>
+        <Pressable 
+          style={styles.button}
+          onPress={() => navigation.navigate('Home', { screen: 'Notifications' })}
+        >
+          <View style={styles.profileOptions}>
+          <Entypo name="chat" size={24} color={theme.text} />
+          <Text style={[styles.buttonText, {color: theme.text}]}>My Notifications</Text>
+          </View>
+          
+        </Pressable>
+      </View>
+    </SafeAreaView>
   );
 }
 

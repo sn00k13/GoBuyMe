@@ -8,6 +8,9 @@ import {
 	StyleSheet,
 	TextInput,
 	Alert,
+	SafeAreaView,
+	KeyboardAvoidingView,
+	Platform
 } from 'react-native';
 import { useStoreCart } from '../app/StoreCartContext';
 import { useTheme } from '../../utils/ThemeContext';
@@ -103,9 +106,15 @@ function EMartCartDetails({ navigation, route }) {
 		// Make sure the global cart is updated before proceeding
 		updateCart(storeId, cartItemsState);
 
+		const discountApplied = appliedDiscountCode === 'EMART10';
+		const discountValue = discountApplied ? total - getDiscountedTotal() : 0;
+
 		navigation.navigate('Confirmation', {
 			cartItems: cartItemsState,
 			totalAmount: getDiscountedTotal(),
+			originalTotal: total,
+			discountApplied,
+			discountValue,
 			storeId,
 		});
 	};
@@ -142,79 +151,86 @@ function EMartCartDetails({ navigation, route }) {
 	);
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
-			<Text style={styles.header}>My Basket</Text>
-			<FlatList
-				data={cartItemsState}
-				renderItem={renderCartItem}
-				keyExtractor={(item, idx) => item.name + idx}
-				contentContainerStyle={{ paddingBottom: 24 }}
-				ListEmptyComponent={
-					<Text style={{ textAlign: 'center', color: '#aaa', marginTop: 24 }}>
-						Your cart is empty.
-					</Text>
-				}
-			/>
-			<View style={{ marginVertical: 16 }}>
-				<Text style={[{ fontSize: 15, marginBottom: 6 }, {color: theme.text}]}>Discount Code</Text>
-				<TextInput
-					style={[{
-						borderWidth: 1,
-						borderColor: '#FF521B',
-						borderRadius: 4,
-						padding: 8,
-						backgroundColor: '#fff',
-						fontSize: 15,
-					}, {borderColor: theme.accent}]}
-					
-					placeholder="Enter discount code."
-					value={discountCode}
-					onChangeText={setDiscountCode}
-					autoCapitalize="characters"
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+			<View style={[styles.container, { backgroundColor: theme.background }]}>
+				<Text style={[styles.header, {color: theme.primary}]}>My Basket</Text>
+				<FlatList
+					data={cartItemsState}
+					renderItem={renderCartItem}
+					keyExtractor={(item, idx) => item.name + idx}
+					contentContainerStyle={{ paddingBottom: 24 }}
+					ListEmptyComponent={
+						<Text style={{ textAlign: 'center', color: '#aaa', marginTop: 24 }}>
+							Your cart is empty.
+						</Text>
+					}
 				/>
-				{discountMessage ? (
-					<Text style={{ color: '#21A179', marginTop: 6 }}>
-						{discountMessage}
+				<KeyboardAvoidingView
+  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+>
+				<View style={{ marginVertical: 16 }}>
+					<Text style={[{ fontSize: 15, marginBottom: 6 }, {color: theme.text}]}>Discount Code</Text>
+					<TextInput
+						style={[{
+							borderWidth: 1,
+							borderColor: '#FF521B',
+							borderRadius: 4,
+							padding: 8,
+							backgroundColor: '#fff',
+							fontSize: 15,
+						}, {borderColor: theme.accent}]}
+						
+						placeholder="Enter discount code."
+						value={discountCode}
+						onChangeText={setDiscountCode}
+						autoCapitalize="characters"
+					/>
+					{discountMessage ? (
+						<Text style={{ color: '#21A179', marginTop: 6 }}>
+							{discountMessage}
+						</Text>
+					) : null}
+					{discountError ? (
+						<Text style={{ color: '#E14E1F', marginTop: 6 }}>
+							{discountError}
+						</Text>
+					) : null}
+					<Pressable
+						style={{
+							backgroundColor: '#FF521B',
+							borderRadius: 4,
+							paddingVertical: 8,
+							alignItems: 'center',
+							marginTop: 8,
+						}}
+						onPress={handleApplyDiscount}
+					>
+						<Text style={{ color: '#fff' }}>Apply</Text>
+					</Pressable>
+				</View>
+				</KeyboardAvoidingView>
+				<View style={styles.summary}>
+					<Text style={[styles.totalLabel, {color: theme.text}]}>Total:</Text>
+					<Text style={styles.totalValue}>
+						₦
+						{getDiscountedTotal().toLocaleString(undefined, {
+							maximumFractionDigits: 2,
+						})}
 					</Text>
-				) : null}
-				{discountError ? (
-					<Text style={{ color: '#E14E1F', marginTop: 6 }}>
-						{discountError}
-					</Text>
-				) : null}
+				</View>
+
 				<Pressable
-					style={{
-						backgroundColor: '#FF521B',
-						borderRadius: 4,
-						paddingVertical: 8,
-						alignItems: 'center',
-						marginTop: 8,
-					}}
-					onPress={handleApplyDiscount}
+					style={styles.checkoutButton}
+					onPress={() => navigation.goBack()}
 				>
-					<Text style={{ color: '#fff' }}>Apply</Text>
+					<Text style={styles.checkoutText}>Continue Shopping</Text>
+				</Pressable>
+				<Pressable style={styles.checkoutButton2} onPress={handleCheckout}>
+					<Text style={styles.checkoutText}>Proceed to Checkout</Text>
 				</Pressable>
 			</View>
-			<View style={styles.summary}>
-				<Text style={[styles.totalLabel, {color: theme.text}]}>Total:</Text>
-				<Text style={styles.totalValue}>
-					₦
-					{getDiscountedTotal().toLocaleString(undefined, {
-						maximumFractionDigits: 2,
-					})}
-				</Text>
-			</View>
-
-			<Pressable
-				style={styles.checkoutButton}
-				onPress={() => navigation.goBack()}
-			>
-				<Text style={styles.checkoutText}>Continue Shopping</Text>
-			</Pressable>
-			<Pressable style={styles.checkoutButton2} onPress={handleCheckout}>
-				<Text style={styles.checkoutText}>Proceed to Checkout</Text>
-			</Pressable>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -225,11 +241,9 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		fontSize: 18,
-		// fontWeight: 'bold',
 		color: '#FF521B',
 		marginBottom: 16,
 		textAlign: 'center',
-		marginTop: 40,
 	},
 	cartItem: {
 		flexDirection: 'row',

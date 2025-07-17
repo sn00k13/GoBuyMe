@@ -7,6 +7,7 @@ import {
 	ScrollView,
 	Pressable,
 	FlatList,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
@@ -229,7 +230,7 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			{/* Header */}
 			<View style={styles.header}>
 				<Pressable onPress={() => navigation.goBack()}>
@@ -321,7 +322,7 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 					</View>
 				)}
 			</Pressable>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -341,7 +342,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
 	},
 	headerText: {
 		fontSize: 18,

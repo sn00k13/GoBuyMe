@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, SafeAreaView } from 'react-native';
 
 export default function ResetPasswordSuccessScreen({ navigation }) {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Email Sent!</Text>
       <Text style={styles.message}>
         We've sent a password reset link to your email address.
@@ -14,7 +14,7 @@ export default function ResetPasswordSuccessScreen({ navigation }) {
       >
         <Text style={styles.buttonText}>Return to Login</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 

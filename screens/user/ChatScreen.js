@@ -10,6 +10,7 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 	ActivityIndicator,
+	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -130,70 +131,72 @@ const ChatScreen = ({ navigation }) => {
 	);
 
 	return (
-		<KeyboardAvoidingView
-			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-			style={[styles.container, { backgroundColor: theme.background }]}
-			keyboardVerticalOffset={90}
-		>
-			<Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-				<MaterialIcons name="arrow-back" size={24} color={theme.text} />
-			</Pressable>
-			<View style={[styles.header, { backgroundColor: theme.cards }]}>
-				<Text style={styles.headerTitle}>Customer Support</Text>
-				<View style={styles.connectionStatus}>
-					<View
-						style={[
-							styles.statusIndicator,
-							isConnected ? styles.connected : styles.disconnected,
-						]}
-					/>
-					<Text style={styles.statusText}>
-						{isConnected ? 'Online' : 'Offline'}
-					</Text>
-				</View>
-			</View>
-
-			{!isConnected && (
-				<View style={styles.connectionMessage}>
-					<ActivityIndicator size="small" color="#FF521B" />
-					<Text style={styles.connectionText}>Connecting to support...</Text>
-				</View>
-			)}
-
-			<FlatList
-				ref={flatListRef}
-				data={messages}
-				renderItem={renderMessage}
-				keyExtractor={(item) => item.id}
-				contentContainerStyle={styles.messagesContainer}
-				onContentSizeChange={() =>
-					flatListRef.current?.scrollToEnd({ animated: true })
-				}
-			/>
-
-			<View style={[styles.inputContainer, { backgroundColor: theme.cards, borderColor: theme.border }]}>
-				<TextInput
-					style={styles.input}
-					value={newMessage}
-					onChangeText={setNewMessage}
-					placeholder="Type your message..."
-					placeholderTextColor="#999"
-					multiline
-					editable={isConnected}
-				/>
-				<Pressable
-					style={styles.sendButton}
-					onPress={handleSend}
-					disabled={!isConnected}
-				>
-					<MaterialIcons
-						name="send"
-						size={24}
-						color={isConnected ? '#FF521B' : '#CCC'}
-					/>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+			<KeyboardAvoidingView
+				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+				style={[styles.container, { backgroundColor: theme.background }]}
+				keyboardVerticalOffset={90}
+			>
+				<Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
-			</View>
-		</KeyboardAvoidingView>
+				<View style={[styles.header, { backgroundColor: theme.cards }]}>
+					<Text style={styles.headerTitle}>Customer Support</Text>
+					<View style={styles.connectionStatus}>
+						<View
+							style={[
+								styles.statusIndicator,
+								isConnected ? styles.connected : styles.disconnected,
+							]}
+						/>
+						<Text style={styles.statusText}>
+							{isConnected ? 'Online' : 'Offline'}
+						</Text>
+					</View>
+				</View>
+
+				{!isConnected && (
+					<View style={styles.connectionMessage}>
+						<ActivityIndicator size="small" color="#FF521B" />
+						<Text style={styles.connectionText}>Connecting to support...</Text>
+					</View>
+				)}
+
+				<FlatList
+					ref={flatListRef}
+					data={messages}
+					renderItem={renderMessage}
+					keyExtractor={(item) => item.id}
+					contentContainerStyle={styles.messagesContainer}
+					onContentSizeChange={() =>
+						flatListRef.current?.scrollToEnd({ animated: true })
+					}
+				/>
+
+				<View style={[styles.inputContainer, { backgroundColor: theme.cards, borderColor: theme.border }]}>
+					<TextInput
+						style={styles.input}
+						value={newMessage}
+						onChangeText={setNewMessage}
+						placeholder="Type your message..."
+						placeholderTextColor="#999"
+						multiline
+						editable={isConnected}
+					/>
+					<Pressable
+						style={styles.sendButton}
+						onPress={handleSend}
+						disabled={!isConnected}
+					>
+						<MaterialIcons
+							name="send"
+							size={24}
+							color={isConnected ? '#FF521B' : '#CCC'}
+						/>
+					</Pressable>
+				</View>
+			</KeyboardAvoidingView>
+		</SafeAreaView>
 	);
 };
 
@@ -215,7 +218,6 @@ const styles = StyleSheet.create({
 		color: '#FF521B',
 	},
 	backButton: {
-		marginTop: 40,
 		padding: 16,
 	},
 	backButtonText: {
@@ -255,7 +257,7 @@ const styles = StyleSheet.create({
 	},
 	messagesContainer: {
 		padding: 16,
-		paddingBottom: 80,
+		// paddingBottom: 80,
 	},
 	messageContainer: {
 		maxWidth: '80%',
@@ -290,7 +292,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		padding: 12,
-		borderTopWidth: 1,
 
 	},
 	input: {
@@ -303,6 +304,7 @@ const styles = StyleSheet.create({
 		borderRadius: 25,
 		fontSize: 16,
 		color: '#2A324B',
+		alignItems: 'center'
 	},
 	sendButton: {
 		marginLeft: 12,

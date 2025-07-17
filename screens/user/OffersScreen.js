@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Pressable, FlatList, SafeAreaView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../../utils/ThemeContext';
 
@@ -27,7 +27,7 @@ const offers = [
 export default function OffersScreen({ navigation }) {
 	const { theme, mode, setMode } = useTheme();
 	return (
-		<View style={[styles.container, { backgroundColor: theme.background }]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			{/* Back Button */}
 			<Pressable
 				style={styles.backButton}
@@ -56,7 +56,7 @@ export default function OffersScreen({ navigation }) {
 					</View>
 				}
 			/>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -65,7 +65,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		padding: 16,
 		backgroundColor: '#FFF0EB',
-		paddingTop: 40,
 	},
 	backButton: {
 		flexDirection: 'row',
