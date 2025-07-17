@@ -1,6 +1,13 @@
 // LandingScreen.js
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, SafeAreaView } from 'react-native';
+import {
+	View,
+	Text,
+	TouchableOpacity,
+	Image,
+	StyleSheet,
+	SafeAreaView,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const LandingScreen = () => {
@@ -11,9 +18,14 @@ const LandingScreen = () => {
 			<View style={styles.container}>
 				{/* App Logo/Title Section */}
 				<View style={styles.header}>
-					<Image source={require('../../assets/logo.png')} style={styles.logo} />
+					<Image
+						source={require('../../assets/logo.png')}
+						style={styles.logo}
+					/>
 					<Text style={styles.title}>GoBuyMe</Text>
-					<Text style={styles.subtitle}>Your favorite meals, delivered fast</Text>
+					<Text style={styles.subtitle}>
+						Your favorite meals, delivered fast
+					</Text>
 				</View>
 
 				{/* Action Buttons */}
@@ -39,11 +51,15 @@ const LandingScreen = () => {
 				<View style={styles.footer}>
 					<Text style={styles.footerText}>By continuing, you agree to our</Text>
 					<View style={styles.linksContainer}>
-						<TouchableOpacity onPress={() => navigation.navigate('TermsService')}>
+						<TouchableOpacity
+							onPress={() => navigation.navigate('TermsService')}
+						>
 							<Text style={styles.linkText}>Terms of Service</Text>
 						</TouchableOpacity>
 						<Text style={styles.footerText}> and </Text>
-						<TouchableOpacity onPress={() => navigation.navigate('Permissions')}>
+						<TouchableOpacity
+							onPress={() => navigation.navigate('Permissions')}
+						>
 							<Text style={styles.linkText}>Privacy Policy</Text>
 						</TouchableOpacity>
 					</View>

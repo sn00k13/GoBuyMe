@@ -40,9 +40,11 @@ export default function AboutScreen({ navigation }) {
 
 				{/* App Info */}
 				<View style={[styles.section, { backgroundColor: theme.cards }]}>
-					<Text style={[styles.appName, {color: theme.secondary}]}>GoBuyMe</Text>
+					<Text style={[styles.appName, { color: theme.secondary }]}>
+						GoBuyMe
+					</Text>
 					<Text style={styles.version}>Version 1.0.0</Text>
-					<Text style={[styles.description, {color: theme.text}]}>
+					<Text style={[styles.description, { color: theme.text }]}>
 						GoBuyMe is your trusted shopping companion. Discover amazing deals,
 						order with ease, and enjoy fast delivery. Our mission is to make
 						shopping simple, secure, and rewarding for everyone.
@@ -51,7 +53,9 @@ export default function AboutScreen({ navigation }) {
 
 				{/* Contact & Links */}
 				<View style={[styles.section, { backgroundColor: theme.cards }]}>
-					<Text style={[styles.sectionTitle, {color: theme.text}]}>Contact & Support</Text>
+					<Text style={[styles.sectionTitle, { color: theme.text }]}>
+						Contact & Support
+					</Text>
 					<Pressable
 						onPress={() => Linking.openURL('mailto:support@gobuyme.shop')}
 					>
@@ -64,13 +68,17 @@ export default function AboutScreen({ navigation }) {
 
 				{/* Legal */}
 				<View style={[styles.section, { backgroundColor: theme.cards }]}>
-					<Text style={[styles.sectionTitle, {color: theme.text}]}>Legal</Text>
+					<Text style={[styles.sectionTitle, { color: theme.text }]}>
+						Legal
+					</Text>
 					<Pressable
 						onPress={() => Linking.openURL('https://gobuyme.shop/privacy')}
 					>
 						<Text style={styles.link}>Privacy Policy</Text>
 					</Pressable>
-					<Pressable onPress={() => Linking.openURL('https://gobuyme.shop/terms')}>
+					<Pressable
+						onPress={() => Linking.openURL('https://gobuyme.shop/terms')}
+					>
 						<Text style={styles.link}>Terms of Service</Text>
 					</Pressable>
 				</View>

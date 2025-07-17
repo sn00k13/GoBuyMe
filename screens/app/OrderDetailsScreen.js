@@ -87,14 +87,18 @@ export default function OrderDetailsScreen({ navigation, route }) {
 				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
-				<Text style={[styles.headerText, {color: theme.primary}]}>Order Details</Text>
+				<Text style={[styles.headerText, { color: theme.primary }]}>
+					Order Details
+				</Text>
 				<View style={{ width: 24 }} />
 			</View>
 
 			<ScrollView style={styles.content}>
-				<View style={[styles.section, {backgroundColor: theme.cards}]}>
+				<View style={[styles.section, { backgroundColor: theme.cards }]}>
 					<View style={styles.orderHeader}>
-						<Text style={[styles.orderId, {color: theme.text}]}>Order #{order.id.slice(-6)}</Text>
+						<Text style={[styles.orderId, { color: theme.text }]}>
+							Order #{order.id.slice(-6)}
+						</Text>
 						<View
 							style={[
 								styles.statusBadge,
@@ -107,20 +111,26 @@ export default function OrderDetailsScreen({ navigation, route }) {
 							</Text>
 						</View>
 					</View>
-					<Text style={[styles.dateText, {color: theme.text}]}>{formatDate(order.createdAt)}</Text>
+					<Text style={[styles.dateText, { color: theme.text }]}>
+						{formatDate(order.createdAt)}
+					</Text>
 				</View>
 
-				<View style={[styles.section, {backgroundColor: theme.cards}]}>
-					<Text style={[styles.sectionTitle, {color: theme.text}]}>Items</Text>
+				<View style={[styles.section, { backgroundColor: theme.cards }]}>
+					<Text style={[styles.sectionTitle, { color: theme.text }]}>
+						Items
+					</Text>
 					{order.items.map((item, index) => (
 						<View key={index} style={styles.itemRow}>
 							<View style={styles.itemInfo}>
-								<Text style={[styles.itemName, {color: theme.text}]}>{item.name}</Text>
-								<Text style={[styles.itemQuantity, {color: theme.text}]}>
+								<Text style={[styles.itemName, { color: theme.text }]}>
+									{item.name}
+								</Text>
+								<Text style={[styles.itemQuantity, { color: theme.text }]}>
 									Quantity: {item.quantity}
 								</Text>
 							</View>
-							<Text style={[styles.itemPrice, {color: theme.primary}]}>
+							<Text style={[styles.itemPrice, { color: theme.primary }]}>
 								₦
 								{(
 									parseFloat(item.price) * parseInt(item.quantity, 10)
@@ -135,28 +145,34 @@ export default function OrderDetailsScreen({ navigation, route }) {
 							marginTop: 8,
 						}}
 					>
-						<Text style={[{ fontWeight: 'bold' }, {color: theme.secondary}]}>
+						<Text style={[{ fontWeight: 'bold' }, { color: theme.secondary }]}>
 							Discount
 						</Text>
-						<Text style={[{ fontWeight: 'bold' }, {color: theme.secondary}]}>
+						<Text style={[{ fontWeight: 'bold' }, { color: theme.secondary }]}>
 							{order.discountAmount && order.discountAmount > 0
 								? `-₦${order.discountAmount.toLocaleString()}`
 								: '₦0'}
 						</Text>
 					</View>
 					<View style={styles.totalRow}>
-						<Text style={[styles.totalLabel, {color: theme.text}]}>Total Amount</Text>
-						<Text style={[styles.totalAmount, {color: theme.primary}]}>
+						<Text style={[styles.totalLabel, { color: theme.text }]}>
+							Total Amount
+						</Text>
+						<Text style={[styles.totalAmount, { color: theme.primary }]}>
 							₦{(order.totalAmount || 0).toLocaleString()}
 						</Text>
 					</View>
 				</View>
 
-				<View style={[styles.section, {backgroundColor: theme.cards}]}>
-					<Text style={[styles.sectionTitle, {color: theme.text}]}>Payment Information</Text>
+				<View style={[styles.section, { backgroundColor: theme.cards }]}>
+					<Text style={[styles.sectionTitle, { color: theme.text }]}>
+						Payment Information
+					</Text>
 					<View style={styles.infoRow}>
-						<Text style={[styles.infoLabel, {color: theme.text}]}>Method</Text>
-						<Text style={[styles.infoValue, {color: theme.text}]}>
+						<Text style={[styles.infoLabel, { color: theme.text }]}>
+							Method
+						</Text>
+						<Text style={[styles.infoValue, { color: theme.text }]}>
 							{order.paymentMethod === 'cash_on_delivery'
 								? 'Cash on Delivery'
 								: (order.paymentMethod || 'card').charAt(0).toUpperCase() +
@@ -164,38 +180,47 @@ export default function OrderDetailsScreen({ navigation, route }) {
 						</Text>
 					</View>
 					<View style={styles.infoRow}>
-						<Text style={[styles.infoLabel, {color: theme.text}]}>Status</Text>
-						<Text
-							style={[
-								styles.infoValue,
-								{ color: theme.secondary },
-							]}
-						>
+						<Text style={[styles.infoLabel, { color: theme.text }]}>
+							Status
+						</Text>
+						<Text style={[styles.infoValue, { color: theme.secondary }]}>
 							{(order.paymentStatus || 'pending').charAt(0).toUpperCase() +
 								(order.paymentStatus || 'pending').slice(1)}
 						</Text>
 					</View>
 					{order.paymentReference && (
 						<View style={styles.infoRow}>
-							<Text style={[styles.infoLabel, {color: theme.text}]}>Reference</Text>
-							<Text style={[styles.infoValue, {color: theme.text}]}>{order.paymentReference}</Text>
+							<Text style={[styles.infoLabel, { color: theme.text }]}>
+								Reference
+							</Text>
+							<Text style={[styles.infoValue, { color: theme.text }]}>
+								{order.paymentReference}
+							</Text>
 						</View>
 					)}
 				</View>
 
-				<View style={[styles.section, {backgroundColor: theme.cards}]}>
-					<Text style={[styles.sectionTitle, {color: theme.text}]}>Customer Information</Text>
+				<View style={[styles.section, { backgroundColor: theme.cards }]}>
+					<Text style={[styles.sectionTitle, { color: theme.text }]}>
+						Customer Information
+					</Text>
 					<View style={styles.infoRow}>
-						<Text style={[styles.infoLabel, {color: theme.text}]}>Name</Text>
-						<Text style={[styles.infoValue, {color: theme.text}]}>{order.customerName}</Text>
+						<Text style={[styles.infoLabel, { color: theme.text }]}>Name</Text>
+						<Text style={[styles.infoValue, { color: theme.text }]}>
+							{order.customerName}
+						</Text>
 					</View>
 					<View style={styles.infoRow}>
-						<Text style={[styles.infoLabel, {color: theme.text}]}>Phone</Text>
-						<Text style={[styles.infoValue, {color: theme.text}]}>{order.customerPhone}</Text>
+						<Text style={[styles.infoLabel, { color: theme.text }]}>Phone</Text>
+						<Text style={[styles.infoValue, { color: theme.text }]}>
+							{order.customerPhone}
+						</Text>
 					</View>
 					<View style={styles.infoRow}>
-						<Text style={[styles.infoLabel, {color: theme.text}]}>Email</Text>
-						<Text style={[styles.infoValue, {color: theme.text}]}>{order.customerEmail}</Text>
+						<Text style={[styles.infoLabel, { color: theme.text }]}>Email</Text>
+						<Text style={[styles.infoValue, { color: theme.text }]}>
+							{order.customerEmail}
+						</Text>
 					</View>
 				</View>
 

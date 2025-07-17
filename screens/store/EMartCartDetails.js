@@ -10,7 +10,7 @@ import {
 	Alert,
 	SafeAreaView,
 	KeyboardAvoidingView,
-	Platform
+	Platform,
 } from 'react-native';
 import { useStoreCart } from '../app/StoreCartContext';
 import { useTheme } from '../../utils/ThemeContext';
@@ -130,15 +130,21 @@ function EMartCartDetails({ navigation, route }) {
 				style={styles.cartImage}
 			/>
 			<View style={styles.cartDetails}>
-				<Text style={[styles.cartName, {color: theme.text}]}>{item.name}</Text>
-				<Text style={[styles.cartSize, {color: theme.text}]}>{item.size}</Text>
-				<Text style={[styles.cartPrice, {color: theme.primary}]}>
+				<Text style={[styles.cartName, { color: theme.text }]}>
+					{item.name}
+				</Text>
+				<Text style={[styles.cartSize, { color: theme.text }]}>
+					{item.size}
+				</Text>
+				<Text style={[styles.cartPrice, { color: theme.primary }]}>
 					₦{item.price} x {item.quantity}
 				</Text>
 			</View>
 			<View style={styles.delete}>
 				<Pressable onPress={() => handleRemoveFromCart(index)}>
-					<Text style={[styles.deleteText, {color: theme.secondary}]}>Remove from cart</Text>
+					<Text style={[styles.deleteText, { color: theme.secondary }]}>
+						Remove from cart
+					</Text>
 				</Pressable>
 				<Text style={styles.cartItemTotal}>
 					₦
@@ -153,7 +159,7 @@ function EMartCartDetails({ navigation, route }) {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			<View style={[styles.container, { backgroundColor: theme.background }]}>
-				<Text style={[styles.header, {color: theme.primary}]}>My Basket</Text>
+				<Text style={[styles.header, { color: theme.primary }]}>My Basket</Text>
 				<FlatList
 					data={cartItemsState}
 					renderItem={renderCartItem}
@@ -166,52 +172,58 @@ function EMartCartDetails({ navigation, route }) {
 					}
 				/>
 				<KeyboardAvoidingView
-  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-  keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
->
-				<View style={{ marginVertical: 16 }}>
-					<Text style={[{ fontSize: 15, marginBottom: 6 }, {color: theme.text}]}>Discount Code</Text>
-					<TextInput
-						style={[{
-							borderWidth: 1,
-							borderColor: '#FF521B',
-							borderRadius: 4,
-							padding: 8,
-							backgroundColor: '#fff',
-							fontSize: 15,
-						}, {borderColor: theme.accent}]}
-						
-						placeholder="Enter discount code."
-						value={discountCode}
-						onChangeText={setDiscountCode}
-						autoCapitalize="characters"
-					/>
-					{discountMessage ? (
-						<Text style={{ color: '#21A179', marginTop: 6 }}>
-							{discountMessage}
+					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+					keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+				>
+					<View style={{ marginVertical: 16 }}>
+						<Text
+							style={[{ fontSize: 15, marginBottom: 6 }, { color: theme.text }]}
+						>
+							Discount Code
 						</Text>
-					) : null}
-					{discountError ? (
-						<Text style={{ color: '#E14E1F', marginTop: 6 }}>
-							{discountError}
-						</Text>
-					) : null}
-					<Pressable
-						style={{
-							backgroundColor: '#FF521B',
-							borderRadius: 4,
-							paddingVertical: 8,
-							alignItems: 'center',
-							marginTop: 8,
-						}}
-						onPress={handleApplyDiscount}
-					>
-						<Text style={{ color: '#fff' }}>Apply</Text>
-					</Pressable>
-				</View>
+						<TextInput
+							style={[
+								{
+									borderWidth: 1,
+									borderColor: '#FF521B',
+									borderRadius: 4,
+									padding: 8,
+									backgroundColor: '#fff',
+									fontSize: 15,
+								},
+								{ borderColor: theme.accent },
+							]}
+							placeholder="Enter discount code."
+							value={discountCode}
+							onChangeText={setDiscountCode}
+							autoCapitalize="characters"
+						/>
+						{discountMessage ? (
+							<Text style={{ color: '#21A179', marginTop: 6 }}>
+								{discountMessage}
+							</Text>
+						) : null}
+						{discountError ? (
+							<Text style={{ color: '#E14E1F', marginTop: 6 }}>
+								{discountError}
+							</Text>
+						) : null}
+						<Pressable
+							style={{
+								backgroundColor: '#FF521B',
+								borderRadius: 4,
+								paddingVertical: 8,
+								alignItems: 'center',
+								marginTop: 8,
+							}}
+							onPress={handleApplyDiscount}
+						>
+							<Text style={{ color: '#fff' }}>Apply</Text>
+						</Pressable>
+					</View>
 				</KeyboardAvoidingView>
 				<View style={styles.summary}>
-					<Text style={[styles.totalLabel, {color: theme.text}]}>Total:</Text>
+					<Text style={[styles.totalLabel, { color: theme.text }]}>Total:</Text>
 					<Text style={styles.totalValue}>
 						₦
 						{getDiscountedTotal().toLocaleString(undefined, {

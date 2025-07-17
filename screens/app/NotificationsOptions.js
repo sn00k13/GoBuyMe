@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, Pressable, SafeAreaView } from 'react-native';
+import {
+	View,
+	Text,
+	StyleSheet,
+	Switch,
+	Pressable,
+	SafeAreaView,
+} from 'react-native';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme } from '../../utils/ThemeContext';
 
@@ -22,7 +29,9 @@ export default function NotificationsOptions({ navigation }) {
 
 			{/* Order Updates */}
 			<View style={[styles.section, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.sectionTitle, {color: theme.text}]}>Order Updates</Text>
+				<Text style={[styles.sectionTitle, { color: theme.text }]}>
+					Order Updates
+				</Text>
 				<View style={styles.row}>
 					<Feather name="shopping-bag" size={22} color="#58A4B0" />
 					<Text style={styles.value}>Get notified about your orders</Text>
@@ -37,7 +46,9 @@ export default function NotificationsOptions({ navigation }) {
 
 			{/* Promotions */}
 			<View style={[styles.section, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.sectionTitle, {color: theme.text}]}>Promotions</Text>
+				<Text style={[styles.sectionTitle, { color: theme.text }]}>
+					Promotions
+				</Text>
 				<View style={styles.row}>
 					<MaterialIcons name="local-offer" size={22} color="#58A4B0" />
 					<Text style={styles.value}>Receive special offers & deals</Text>
@@ -52,7 +63,9 @@ export default function NotificationsOptions({ navigation }) {
 
 			{/* App Updates */}
 			<View style={[styles.section, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.sectionTitle, {color: theme.text}]}>App Updates</Text>
+				<Text style={[styles.sectionTitle, { color: theme.text }]}>
+					App Updates
+				</Text>
 				<View style={styles.row}>
 					<MaterialIcons name="update" size={22} color="#58A4B0" />
 					<Text style={styles.value}>Be informed about new features</Text>

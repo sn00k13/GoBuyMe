@@ -166,25 +166,29 @@ export default function VendorListScreen({ navigation }) {
 	);
 
 	// Filter restaurants based on search
-	const filteredRestaurants = restaurants.filter((restaurant) => {
-		const cuisine = String(restaurant.cuisine || '').toLowerCase(); // Handles all cases
-		const name = String(restaurant.name || '').toLowerCase();
-		const searchTerm = restaurantSearch.toLowerCase().trim();
-		return name.includes(searchTerm) || cuisine.includes(searchTerm);
-	})
-	// Sort: open restaurants first, closed last
-	.sort((a, b) => {
-		if (a.isOpen === b.isOpen) return 0;
-		if (a.isOpen) return -1;
-		return 1;
-	});
+	const filteredRestaurants = restaurants
+		.filter((restaurant) => {
+			const cuisine = String(restaurant.cuisine || '').toLowerCase(); // Handles all cases
+			const name = String(restaurant.name || '').toLowerCase();
+			const searchTerm = restaurantSearch.toLowerCase().trim();
+			return name.includes(searchTerm) || cuisine.includes(searchTerm);
+		})
+		// Sort: open restaurants first, closed last
+		.sort((a, b) => {
+			if (a.isOpen === b.isOpen) return 0;
+			if (a.isOpen) return -1;
+			return 1;
+		});
 
 	// Render each restaurant item
 	const renderRestaurantItem = ({ item }) => (
 		<Pressable
 			style={[
 				styles.restaurantCard,
-				{ backgroundColor: theme.cards, opacity: item.isOpen === false ? 0.5 : 1 },
+				{
+					backgroundColor: theme.cards,
+					opacity: item.isOpen === false ? 0.5 : 1,
+				},
 			]}
 			onPress={() => {
 				if (item.isOpen === false) {
@@ -293,7 +297,10 @@ export default function VendorListScreen({ navigation }) {
 					</Pressable>
 
 					<Pressable
-						style={[styles.tabButton, activeTab === 'meals' && styles.activeTab]}
+						style={[
+							styles.tabButton,
+							activeTab === 'meals' && styles.activeTab,
+						]}
 						onPress={() => setActiveTab('meals')}
 					>
 						<Text

@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, FlatList, SafeAreaView } from 'react-native';
+import {
+	View,
+	Text,
+	StyleSheet,
+	Pressable,
+	FlatList,
+	SafeAreaView,
+} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../../utils/ThemeContext';
 
@@ -35,15 +42,21 @@ export default function OffersScreen({ navigation }) {
 			>
 				<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 			</Pressable>
-			<Text style={[styles.title, {color: theme.primary}]}>Available Offers</Text>
+			<Text style={[styles.title, { color: theme.primary }]}>
+				Available Offers
+			</Text>
 			<FlatList
 				data={offers}
 				keyExtractor={(item) => item.id}
 				contentContainerStyle={{ paddingBottom: 32 }}
 				renderItem={({ item }) => (
 					<View style={[styles.offerCard, { backgroundColor: theme.cards }]}>
-						<Text style={[styles.offerTitle, {color: theme.secondary}]}>{item.title}</Text>
-						<Text style={[styles.offerDesc, {color: theme.text}]}>{item.description}</Text>
+						<Text style={[styles.offerTitle, { color: theme.secondary }]}>
+							{item.title}
+						</Text>
+						<Text style={[styles.offerDesc, { color: theme.text }]}>
+							{item.description}
+						</Text>
 						<Text style={styles.offerValid}>{item.validTill}</Text>
 					</View>
 				)}

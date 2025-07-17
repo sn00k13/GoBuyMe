@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator, SafeAreaView } from 'react-native';
+import {
+	View,
+	Text,
+	StyleSheet,
+	Image,
+	ActivityIndicator,
+	SafeAreaView,
+} from 'react-native';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 

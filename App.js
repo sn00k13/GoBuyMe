@@ -131,7 +131,7 @@ function HomeStack() {
 }
 
 function DrawerNavigator() {
-  const { theme, mode, setMode } = useTheme();
+	const { theme, mode, setMode } = useTheme();
 	return (
 		<Drawer.Navigator
 			drawerContent={(props) => <CustomDrawerContent {...props} />}

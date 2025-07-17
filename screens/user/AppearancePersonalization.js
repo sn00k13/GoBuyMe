@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, Pressable, SafeAreaView } from 'react-native';
+import {
+	View,
+	Text,
+	StyleSheet,
+	Switch,
+	Pressable,
+	SafeAreaView,
+} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { useTheme } from '../../utils/ThemeContext';
@@ -23,7 +30,9 @@ export default function AppearancePersonalization({ navigation }) {
 				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={28} color={theme.text} />
 				</Pressable>
-				<Text style={[styles.title, {color: theme.primary}]}>Appearance & Personalization</Text>
+				<Text style={[styles.title, { color: theme.primary }]}>
+					Appearance & Personalization
+				</Text>
 				<View style={{ width: 28 }} />
 			</View>
 			{/* Preview */}
@@ -59,7 +68,9 @@ export default function AppearancePersonalization({ navigation }) {
 
 			{/* Accent Color */}
 			<View style={[styles.section, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.sectionTitle, {color: theme.text}]}>Accent Color</Text>
+				<Text style={[styles.sectionTitle, { color: theme.text }]}>
+					Accent Color
+				</Text>
 				<View style={styles.colorRow}>
 					{ACCENT_COLORS.map((item) => (
 						<Pressable

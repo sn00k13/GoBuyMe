@@ -137,7 +137,10 @@ const ChatScreen = ({ navigation }) => {
 				style={[styles.container, { backgroundColor: theme.background }]}
 				keyboardVerticalOffset={90}
 			>
-				<Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+				<Pressable
+					style={styles.backButton}
+					onPress={() => navigation.goBack()}
+				>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
 				<View style={[styles.header, { backgroundColor: theme.cards }]}>
@@ -173,7 +176,12 @@ const ChatScreen = ({ navigation }) => {
 					}
 				/>
 
-				<View style={[styles.inputContainer, { backgroundColor: theme.cards, borderColor: theme.border }]}>
+				<View
+					style={[
+						styles.inputContainer,
+						{ backgroundColor: theme.cards, borderColor: theme.border },
+					]}
+				>
 					<TextInput
 						style={styles.input}
 						value={newMessage}
@@ -292,7 +300,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		padding: 12,
-
 	},
 	input: {
 		flex: 1,
@@ -304,7 +311,7 @@ const styles = StyleSheet.create({
 		borderRadius: 25,
 		fontSize: 16,
 		color: '#2A324B',
-		alignItems: 'center'
+		alignItems: 'center',
 	},
 	sendButton: {
 		marginLeft: 12,

@@ -7,7 +7,10 @@ export default function FavoritesScreen({ navigation }) {
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#FFF9F7' }}>
 			<View style={styles.container}>
 				{/* Back Button */}
-				<Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+				<Pressable
+					style={styles.backButton}
+					onPress={() => navigation.goBack()}
+				>
 					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
 				</Pressable>
 				<Text style={styles.title}>Favorite Items You like ordering</Text>

@@ -35,7 +35,7 @@ function SelectProductScreen({ navigation, route }) {
 		const cartItems = getCart(storeId);
 		if (cartItems.length > 0) {
 			const initialQuantities = {};
-			cartItems.forEach(item => {
+			cartItems.forEach((item) => {
 				initialQuantities[item.name] = item.quantity;
 			});
 			setQuantities(initialQuantities);
@@ -48,7 +48,7 @@ function SelectProductScreen({ navigation, route }) {
 		React.useCallback(() => {
 			const cartItems = getCart(storeId);
 			const newQuantities = {};
-			cartItems.forEach(item => {
+			cartItems.forEach((item) => {
 				newQuantities[item.name] = item.quantity;
 			});
 			setQuantities(newQuantities);
@@ -72,15 +72,17 @@ function SelectProductScreen({ navigation, route }) {
 		};
 		setQuantities(newQuantities);
 		updateCartCount(newQuantities);
-		
+
 		// Find the product in the current category
-		const product = products.find(item => item.name === key);
+		const product = products.find((item) => item.name === key);
 		if (product) {
 			// Update cart with the changed item
-			updateCart(storeId, [{
-				...product,
-				quantity: newQuantities[key]
-			}]);
+			updateCart(storeId, [
+				{
+					...product,
+					quantity: newQuantities[key],
+				},
+			]);
 		}
 	};
 
@@ -229,11 +231,17 @@ function SelectProductScreen({ navigation, route }) {
 					style={styles.productImage}
 					resizeMode="cover"
 				/>
-				<Text style={[styles.productName, {color: theme.secondary}]}>{item.name}</Text>
+				<Text style={[styles.productName, { color: theme.secondary }]}>
+					{item.name}
+				</Text>
 			</View>
 			<View style={styles.pricenSize}>
-				<Text style={[styles.productSize, {color: theme.text}]}>{item.size}</Text>
-				<Text style={[styles.productPrice, {color: theme.text}]}>₦{item.price}</Text>
+				<Text style={[styles.productSize, { color: theme.text }]}>
+					{item.size}
+				</Text>
+				<Text style={[styles.productPrice, { color: theme.text }]}>
+					₦{item.price}
+				</Text>
 			</View>
 			<View style={styles.addToCartAlt}>
 				<Pressable
@@ -242,8 +250,13 @@ function SelectProductScreen({ navigation, route }) {
 				>
 					<Text style={styles.cartButtonText}>-</Text>
 				</Pressable>
-				<View style={[styles.quantityBox, {backgroundColor: theme.background, borderColor: theme.accent	}]}>
-					<Text style={[styles.quantityText, {color: theme.text}]}>
+				<View
+					style={[
+						styles.quantityBox,
+						{ backgroundColor: theme.background, borderColor: theme.accent },
+					]}
+				>
+					<Text style={[styles.quantityText, { color: theme.text }]}>
 						{quantities[item.name] || '0'}
 					</Text>
 				</View>
@@ -260,11 +273,13 @@ function SelectProductScreen({ navigation, route }) {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			{/* Header */}
-			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.border }]}>
-				<Pressable
-					onPress={() => navigation.goBack()}
-					
-				>
+			<View
+				style={[
+					styles.header,
+					{ backgroundColor: theme.cards, borderBottomColor: theme.border },
+				]}
+			>
+				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
 				<Text style={styles.locationText}>Select Products</Text>
@@ -307,25 +322,27 @@ function SelectProductScreen({ navigation, route }) {
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={styles.productsContainer}
 				ListEmptyComponent={
-					<Text style={styles.emptyText}>
-						No available products found.
-					</Text>
+					<Text style={styles.emptyText}>No available products found.</Text>
 				}
 			/>
 			<View style={styles.cartFab}>
 				<Pressable
 					style={styles.cartButtonFab}
-					onPress={() => navigation.navigate('EMartCartDetails', { 
-						cartItems: getCart(storeId),
-						storeId 
-					})}
+					onPress={() =>
+						navigation.navigate('EMartCartDetails', {
+							cartItems: getCart(storeId),
+							storeId,
+						})
+					}
 				>
-					<MaterialIcons name="shopping-cart" size={28} color={theme.background} />
+					<MaterialIcons
+						name="shopping-cart"
+						size={28}
+						color={theme.background}
+					/>
 					{cartItemCount > 0 && (
 						<View style={styles.cartCounter}>
-							<Text style={styles.cartCounterText}>
-								{cartItemCount}
-							</Text>
+							<Text style={styles.cartCounterText}>{cartItemCount}</Text>
 						</View>
 					)}
 				</Pressable>

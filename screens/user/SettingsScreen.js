@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView } from 'react-native';
+import {
+	View,
+	Text,
+	StyleSheet,
+	Pressable,
+	ScrollView,
+	SafeAreaView,
+} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -130,7 +137,6 @@ const SettingsScreen = ({ navigation }) => {
 						<MaterialIcons name="support-agent" size={24} color={theme.text} />
 						<Text style={[{ color: theme.text }]}>Live support</Text>
 					</Pressable>
-					
 				</View>
 				<View style={styles.generalSettings}>
 					<View>

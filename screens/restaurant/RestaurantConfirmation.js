@@ -480,9 +480,7 @@ export default function RestaurantConfirmation({ navigation, route }) {
 				onPress={handleProceedToPayment}
 				disabled={!defaultAddress || !cartItems.length}
 			>
-				<Text style={styles.proceedButtonText}>
-					Proceed to Payment
-				</Text>
+				<Text style={styles.proceedButtonText}>Proceed to Payment</Text>
 			</Pressable>
 		</SafeAreaView>
 	);

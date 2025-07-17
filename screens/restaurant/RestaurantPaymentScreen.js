@@ -11,7 +11,13 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Paystack } from 'react-native-paystack-webview';
-import { doc, setDoc, serverTimestamp, addDoc, collection } from 'firebase/firestore';
+import {
+	doc,
+	setDoc,
+	serverTimestamp,
+	addDoc,
+	collection,
+} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { useCart } from '../app/CartContext';
@@ -157,9 +163,7 @@ export default function PaymentScreen({ navigation, route }) {
 							marginTop: 8,
 						}}
 					>
-						<Text style={styles.discountText2}>
-							Discount
-						</Text>
+						<Text style={styles.discountText2}>Discount</Text>
 						<Text style={styles.discountText2}>
 							{discountApplied && discountAmount > 0
 								? `- ₦${discountAmount.toLocaleString()}`
@@ -259,9 +263,7 @@ export default function PaymentScreen({ navigation, route }) {
 					style={styles.payButton}
 					onPress={() => paystackWebViewRef.current?.startTransaction()}
 				>
-					<Text style={styles.payButtonText}>
-						Pay Now
-					</Text>
+					<Text style={styles.payButtonText}>Pay Now</Text>
 				</TouchableOpacity>
 			</ScrollView>
 		</SafeAreaView>

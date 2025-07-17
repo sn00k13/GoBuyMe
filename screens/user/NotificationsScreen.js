@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Pressable, SafeAreaView } from 'react-native';
+import {
+	View,
+	Text,
+	FlatList,
+	StyleSheet,
+	Pressable,
+	SafeAreaView,
+} from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';

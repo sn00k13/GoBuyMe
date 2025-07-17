@@ -102,9 +102,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		padding: 20,
-		maxWidth: 350,           // Add this line
-		alignSelf: 'center',     // Add this line
-		width: '100%',           // Ensure it shrinks on small screens
+		maxWidth: 350, // Add this line
+		alignSelf: 'center', // Add this line
+		width: '100%', // Ensure it shrinks on small screens
 	},
 	title: {
 		fontSize: 24,

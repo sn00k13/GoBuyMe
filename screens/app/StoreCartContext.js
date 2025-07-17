@@ -4,68 +4,69 @@ import { SafeAreaView } from 'react-native';
 const StoreCartContext = createContext();
 
 export const StoreCartProvider = ({ children }) => {
-  // { [storeId]: [cartItems] }
-  const [storeCarts, setStoreCarts] = useState({});
+	// { [storeId]: [cartItems] }
+	const [storeCarts, setStoreCarts] = useState({});
 
-  // Get cart for a store
-  const getCart = (storeId) => storeCarts[storeId] || [];
+	// Get cart for a store
+	const getCart = (storeId) => storeCarts[storeId] || [];
 
-  // Add or update items in cart
-  const updateCart = (storeId, newItems) => {
-    setStoreCarts(prev => {
-      const currentCart = prev[storeId] || [];
-      
-      // Create a map of existing items by name for quick lookup
-      const existingItemsMap = {};
-      currentCart.forEach(item => {
-        existingItemsMap[item.name] = item;
-      });
+	// Add or update items in cart
+	const updateCart = (storeId, newItems) => {
+		setStoreCarts((prev) => {
+			const currentCart = prev[storeId] || [];
 
-      // Update quantities for existing items and add new items
-      newItems.forEach(newItem => {
-        if (existingItemsMap[newItem.name]) {
-          existingItemsMap[newItem.name].quantity = newItem.quantity;
-        } else {
-          existingItemsMap[newItem.name] = newItem;
-        }
-      });
+			// Create a map of existing items by name for quick lookup
+			const existingItemsMap = {};
+			currentCart.forEach((item) => {
+				existingItemsMap[item.name] = item;
+			});
 
-      // Convert back to array and filter out items with quantity 0
-      const updatedCart = Object.values(existingItemsMap)
-        .filter(item => parseInt(item.quantity, 10) > 0);
+			// Update quantities for existing items and add new items
+			newItems.forEach((newItem) => {
+				if (existingItemsMap[newItem.name]) {
+					existingItemsMap[newItem.name].quantity = newItem.quantity;
+				} else {
+					existingItemsMap[newItem.name] = newItem;
+				}
+			});
 
-      return {
-        ...prev,
-        [storeId]: updatedCart
-      };
-    });
-  };
+			// Convert back to array and filter out items with quantity 0
+			const updatedCart = Object.values(existingItemsMap).filter(
+				(item) => parseInt(item.quantity, 10) > 0
+			);
 
-  // Remove item by index
-  const removeFromCart = (storeId, index) => {
-    setStoreCarts(prev => {
-      const prevCart = prev[storeId] || [];
-      const newCart = prevCart.filter((_, i) => i !== index);
-      return { ...prev, [storeId]: newCart };
-    });
-  };
+			return {
+				...prev,
+				[storeId]: updatedCart,
+			};
+		});
+	};
 
-  // Clear cart for a store
-  const clearCart = (storeId) => {
-    setStoreCarts(prev => {
-      const newCarts = { ...prev };
-      delete newCarts[storeId];
-      return newCarts;
-    });
-  };
+	// Remove item by index
+	const removeFromCart = (storeId, index) => {
+		setStoreCarts((prev) => {
+			const prevCart = prev[storeId] || [];
+			const newCart = prevCart.filter((_, i) => i !== index);
+			return { ...prev, [storeId]: newCart };
+		});
+	};
 
-  return (
-    <StoreCartContext.Provider value={{ getCart, updateCart, removeFromCart, clearCart }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        {children}
-      </SafeAreaView>
-    </StoreCartContext.Provider>
-  );
+	// Clear cart for a store
+	const clearCart = (storeId) => {
+		setStoreCarts((prev) => {
+			const newCarts = { ...prev };
+			delete newCarts[storeId];
+			return newCarts;
+		});
+	};
+
+	return (
+		<StoreCartContext.Provider
+			value={{ getCart, updateCart, removeFromCart, clearCart }}
+		>
+			<SafeAreaView style={{ flex: 1 }}>{children}</SafeAreaView>
+		</StoreCartContext.Provider>
+	);
 };
 
 export const useStoreCart = () => useContext(StoreCartContext);

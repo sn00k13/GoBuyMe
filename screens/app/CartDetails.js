@@ -121,33 +121,36 @@ export default function CartDetails({ route, navigation }) {
 				/>
 				{/* Discount code section */}
 				<KeyboardAvoidingView>
-				<View style={{ padding: 16 }}>
-					<Text style={{ fontSize: 15, marginBottom: 6 }}>Discount Code</Text>
-					<View style={styles.discountSection}>
-						<View>
-							<TextInput
-								style={styles.discountText}
-								placeholder="Enter discount code"
-								value={discountCode}
-								onChangeText={setDiscountCode}
-								autoCapitalize="characters"
-							/>
+					<View style={{ padding: 16 }}>
+						<Text style={{ fontSize: 15, marginBottom: 6 }}>Discount Code</Text>
+						<View style={styles.discountSection}>
+							<View>
+								<TextInput
+									style={styles.discountText}
+									placeholder="Enter discount code"
+									value={discountCode}
+									onChangeText={setDiscountCode}
+									autoCapitalize="characters"
+								/>
+							</View>
+							{discountApplied && (
+								<Text style={{ color: '#21A179', marginTop: 6 }}>
+									Discount applied! 10% off.
+								</Text>
+							)}
+							{discountError ? (
+								<Text style={{ color: '#E14E1F', marginTop: 6 }}>
+									{discountError}
+								</Text>
+							) : null}
+							<Pressable
+								style={styles.applyDiscount}
+								onPress={handleApplyDiscount}
+							>
+								<Text style={styles.proceedCheckoutText}>Apply</Text>
+							</Pressable>
 						</View>
-						{discountApplied && (
-							<Text style={{ color: '#21A179', marginTop: 6 }}>
-								Discount applied! 10% off.
-							</Text>
-						)}
-						{discountError ? (
-							<Text style={{ color: '#E14E1F', marginTop: 6 }}>
-								{discountError}
-							</Text>
-						) : null}
-						<Pressable style={styles.applyDiscount} onPress={handleApplyDiscount}>
-							<Text style={styles.proceedCheckoutText}>Apply</Text>
-						</Pressable>
 					</View>
-				</View>
 				</KeyboardAvoidingView>
 				{/* Total */}
 				<View style={styles.orderTotal}>
@@ -167,7 +170,6 @@ export default function CartDetails({ route, navigation }) {
 					</Pressable>
 				</View>
 			</View>
-			
 		</SafeAreaView>
 	);
 }

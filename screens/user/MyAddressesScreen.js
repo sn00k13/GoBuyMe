@@ -204,24 +204,34 @@ export default function MyAddressesScreen({ navigation }) {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			{/* Header */}
-			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.border }]}>
+			<View
+				style={[
+					styles.header,
+					{ backgroundColor: theme.cards, borderBottomColor: theme.border },
+				]}
+			>
 				<Pressable
 					style={styles.backButton}
 					onPress={() => navigation.toggleDrawer()}
 				>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
-				<Text style={[styles.locationText, {color: theme.primary}]}>Choose a delivery location</Text>
+				<Text style={[styles.locationText, { color: theme.primary }]}>
+					Choose a delivery location
+				</Text>
 				<View style={{ width: 24 }} />
 			</View>
 
 			<Text
-				style={[{					
-					fontStyle: 'italic',
-					paddingVertical: 8,
-					paddingHorizontal: 16,
-					marginBottom: 0,
-				}, { color: theme.text }]}
+				style={[
+					{
+						fontStyle: 'italic',
+						paddingVertical: 8,
+						paddingHorizontal: 16,
+						marginBottom: 0,
+					},
+					{ color: theme.text },
+				]}
 			>
 				Select a default address for your orders. You can add or edit addresses
 				as needed.
@@ -237,16 +247,24 @@ export default function MyAddressesScreen({ navigation }) {
 							{address.isDefault && <View style={styles.checkboxChecked} />}
 						</View>
 						<View style={{ flex: 1, padding: 8 }}>
-							<Text style={[styles.addressText, {color: theme.text}]}>{address.street}</Text>
-							<Text style={[styles.addressText, {color: theme.text}]}>
+							<Text style={[styles.addressText, { color: theme.text }]}>
+								{address.street}
+							</Text>
+							<Text style={[styles.addressText, { color: theme.text }]}>
 								{address.city}, {address.state}, {address.zipCode}
 							</Text>
-							<Text style={[styles.addressText, {color: theme.text}]}>{address.country}</Text>
+							<Text style={[styles.addressText, { color: theme.text }]}>
+								{address.country}
+							</Text>
 							{address.landmark && (
-								<Text style={[styles.addressText, {color: theme.text}]}>{address.landmark}</Text>
+								<Text style={[styles.addressText, { color: theme.text }]}>
+									{address.landmark}
+								</Text>
 							)}
 							{address.district && (
-								<Text style={[styles.addressText, {color: theme.text}]}>{address.district}</Text>
+								<Text style={[styles.addressText, { color: theme.text }]}>
+									{address.district}
+								</Text>
 							)}
 						</View>
 						{/* Edit Button */}
@@ -267,102 +285,113 @@ export default function MyAddressesScreen({ navigation }) {
 				))}
 			</ScrollView>
 
-			{isAddingNew ? (
-				<View style={styles.newAddressForm}>
-					<TextInput
-						style={styles.input}
-						placeholder="Street"
-						value={newAddress.street}
-						onChangeText={(text) =>
-							setNewAddress({ ...newAddress, street: text })
-						}
-					/>
-					<TextInput
-						style={styles.input}
-						placeholder="City"
-						value={newAddress.city}
-						onChangeText={(text) =>
-							setNewAddress({ ...newAddress, city: text })
-						}
-					/>
-					<TextInput
-						style={styles.input}
-						placeholder="State"
-						value={newAddress.state}
-						onChangeText={(text) =>
-							setNewAddress({ ...newAddress, state: text })
-						}
-					/>
-					<TextInput
-						style={styles.input}
-						placeholder="Zip Code"
-						value={newAddress.zipCode}
-						onChangeText={(text) =>
-							setNewAddress({ ...newAddress, zipCode: text })
-						}
-					/>
-					<TextInput
-						style={styles.input}
-						placeholder="Country"
-						value={newAddress.country}
-						onChangeText={(text) =>
-							setNewAddress({ ...newAddress, country: text })
-						}
-					/>
-					<TextInput
-						style={styles.input}
-						placeholder="Landmark (Optional)"
-						value={newAddress.landmark}
-						onChangeText={(text) =>
-							setNewAddress({ ...newAddress, landmark: text })
-						}
-					/>
-					<View style={styles.pickerContainer}>
-						<Text style={styles.pickerLabel}>District *</Text>
-						<Picker
-							selectedValue={newAddress.district}
-							onValueChange={(itemValue) =>
-								setNewAddress({ ...newAddress, district: itemValue })
+			<ScrollView>
+				{isAddingNew ? (
+					<View style={styles.newAddressForm}>
+						<TextInput
+							style={styles.input}
+							placeholder="Street"
+							value={newAddress.street}
+							onChangeText={(text) =>
+								setNewAddress({ ...newAddress, street: text })
 							}
-							style={styles.picker}
-							mode="dropdown"
-						>
-							<Picker.Item label="Select district" value="" />
-							{districts.map((district) => (
-								<Picker.Item key={district} label={district} value={district} />
-							))}
-						</Picker>
-					</View>
-					<Pressable
-						style={styles.checkboxContainer}
-						onPress={() =>
-							setNewAddress({ ...newAddress, isDefault: !newAddress.isDefault })
-						}
-					>
-						<View style={styles.checkbox}>
-							{newAddress.isDefault && <View style={styles.checkboxChecked} />}
+						/>
+						<TextInput
+							style={styles.input}
+							placeholder="City"
+							value={newAddress.city}
+							onChangeText={(text) =>
+								setNewAddress({ ...newAddress, city: text })
+							}
+						/>
+						<TextInput
+							style={styles.input}
+							placeholder="State"
+							value={newAddress.state}
+							onChangeText={(text) =>
+								setNewAddress({ ...newAddress, state: text })
+							}
+						/>
+						<TextInput
+							style={styles.input}
+							placeholder="Zip Code"
+							value={newAddress.zipCode}
+							onChangeText={(text) =>
+								setNewAddress({ ...newAddress, zipCode: text })
+							}
+						/>
+						<TextInput
+							style={styles.input}
+							placeholder="Country"
+							value={newAddress.country}
+							onChangeText={(text) =>
+								setNewAddress({ ...newAddress, country: text })
+							}
+						/>
+						<TextInput
+							style={styles.input}
+							placeholder="Landmark (Optional)"
+							value={newAddress.landmark}
+							onChangeText={(text) =>
+								setNewAddress({ ...newAddress, landmark: text })
+							}
+						/>
+						<View style={styles.pickerContainer}>
+							<Text style={styles.pickerLabel}>District *</Text>
+							<Picker
+								selectedValue={newAddress.district}
+								onValueChange={(itemValue) =>
+									setNewAddress({ ...newAddress, district: itemValue })
+								}
+								style={styles.picker}
+								mode="dropdown"
+							>
+								<Picker.Item label="Select district" value="" />
+								{districts.map((district) => (
+									<Picker.Item
+										key={district}
+										label={district}
+										value={district}
+									/>
+								))}
+							</Picker>
 						</View>
-						<Text style={styles.checkboxLabel}>Set as default address</Text>
-					</Pressable>
-					<Pressable style={styles.addButton} onPress={handleAddNewAddress}>
-						<Text style={styles.addButtonText}>Add Address</Text>
-					</Pressable>
-					{/* Cancel Button */}
+						<Pressable
+							style={styles.checkboxContainer}
+							onPress={() =>
+								setNewAddress({
+									...newAddress,
+									isDefault: !newAddress.isDefault,
+								})
+							}
+						>
+							<View style={styles.checkbox}>
+								{newAddress.isDefault && (
+									<View style={styles.checkboxChecked} />
+								)}
+							</View>
+							<Text style={styles.checkboxLabel}>Set as default address</Text>
+						</Pressable>
+						<Pressable style={styles.addButton} onPress={handleAddNewAddress}>
+							<Text style={styles.addButtonText}>Add Address</Text>
+						</Pressable>
+						{/* Cancel Button */}
+						<Pressable
+							style={styles.cancelButton}
+							onPress={() => setIsAddingNew(false)}
+						>
+							<Text style={styles.cancelButtonText}>Cancel</Text>
+						</Pressable>
+					</View>
+				) : (
 					<Pressable
-						style={styles.cancelButton}
-						onPress={() => setIsAddingNew(false)}
+						style={styles.addButton}
+						onPress={() => setIsAddingNew(true)}
 					>
-						<Text style={styles.cancelButtonText}>Cancel</Text>
+						<Text style={styles.addButtonText}>Add New Address</Text>
 					</Pressable>
-				</View>
-			) : (
-				<Pressable
-					style={styles.addButton}
-					onPress={() => setIsAddingNew(true)}
-				>
-					<Text style={styles.addButtonText}>Add New Address</Text>
-				</Pressable>
-			)}
+				)}
+			</ScrollView>
 		</SafeAreaView>
 	);
 }

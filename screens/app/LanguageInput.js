@@ -45,10 +45,14 @@ export default function LanguageInput({ navigation }) {
 
 			{/* Language Setting */}
 			<View style={[styles.section, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.sectionTitle, {color: theme.secondary}]}>App Language</Text>
+				<Text style={[styles.sectionTitle, { color: theme.secondary }]}>
+					App Language
+				</Text>
 				<Pressable style={styles.row} onPress={() => setLangModal(true)}>
 					<FontAwesome name="language" size={22} color={theme.text} />
-					<Text style={[styles.value, {color: theme.text}]}>{language.label}</Text>
+					<Text style={[styles.value, { color: theme.text }]}>
+						{language.label}
+					</Text>
 					<MaterialIcons
 						name="keyboard-arrow-right"
 						size={24}
@@ -59,10 +63,14 @@ export default function LanguageInput({ navigation }) {
 
 			{/* Input Method Setting */}
 			<View style={[styles.section, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.sectionTitle, {color: theme.secondary}]}>Input Method</Text>
+				<Text style={[styles.sectionTitle, { color: theme.secondary }]}>
+					Input Method
+				</Text>
 				<Pressable style={styles.row} onPress={() => setInputModal(true)}>
 					<MaterialIcons name="keyboard" size={22} color={theme.text} />
-					<Text style={[styles.value, {color: theme.text}]}>{inputMethod.label}</Text>
+					<Text style={[styles.value, { color: theme.text }]}>
+						{inputMethod.label}
+					</Text>
 					<MaterialIcons
 						name="keyboard-arrow-right"
 						size={24}

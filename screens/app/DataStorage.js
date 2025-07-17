@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, Pressable, Alert, SafeAreaView } from 'react-native';
+import {
+	View,
+	Text,
+	StyleSheet,
+	Switch,
+	Pressable,
+	Alert,
+	SafeAreaView,
+} from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { useTheme } from '../../utils/ThemeContext';
-
 
 export default function DataStorage({ navigation }) {
 	const [saveData, setSaveData] = useState(true);
@@ -39,7 +46,9 @@ export default function DataStorage({ navigation }) {
 
 			{/* Save Data */}
 			<View style={[styles.section, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.sectionTitle, {color: theme.text}]}>Save Data</Text>
+				<Text style={[styles.sectionTitle, { color: theme.text }]}>
+					Save Data
+				</Text>
 				<View style={styles.row}>
 					<FontAwesome name="database" size={22} color="#58A4B0" />
 					<Text style={styles.value}>Reduce data usage</Text>
@@ -54,7 +63,9 @@ export default function DataStorage({ navigation }) {
 
 			{/* Auto Download */}
 			<View style={[styles.section, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.sectionTitle, {color: theme.text}]}>Auto Download Media</Text>
+				<Text style={[styles.sectionTitle, { color: theme.text }]}>
+					Auto Download Media
+				</Text>
 				<View style={styles.row}>
 					<MaterialIcons name="file-download" size={22} color="#58A4B0" />
 					<Text style={styles.value}>Download images automatically</Text>
@@ -69,7 +80,9 @@ export default function DataStorage({ navigation }) {
 
 			{/* Clear Cache */}
 			<View style={[styles.section, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.sectionTitle, {color: theme.text}]}>Storage</Text>
+				<Text style={[styles.sectionTitle, { color: theme.text }]}>
+					Storage
+				</Text>
 				<Pressable style={styles.row} onPress={handleClearCache}>
 					<MaterialIcons name="delete-sweep" size={22} color="#FF521B" />
 					<Text style={[styles.value, { color: '#FF521B' }]}>Clear Cache</Text>

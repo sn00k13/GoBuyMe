@@ -18,7 +18,6 @@ import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { useTheme } from '../../utils/ThemeContext';
 
-
 export default function HomeScreen({ navigation }) {
 	const [defaultAddress, setDefaultAddress] = useState(null);
 	const { theme, mode, setMode } = useTheme();
@@ -64,7 +63,15 @@ export default function HomeScreen({ navigation }) {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			{/* Header */}
-			<View style={[styles.header, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}>
+			<View
+				style={[
+					styles.header,
+					{
+						backgroundColor: theme.cards,
+						borderBottomColor: theme.borderBottom,
+					},
+				]}
+			>
 				<Pressable onPress={() => navigation.toggleDrawer()}>
 					<MaterialIcons name="menu" size={28} color={theme.text} />
 				</Pressable>
@@ -88,22 +95,31 @@ export default function HomeScreen({ navigation }) {
 				{/* Address Section */}
 				<Pressable
 					onPress={() => navigation.navigate('Address')}
-					style={[styles.addressContainer, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}
+					style={[
+						styles.addressContainer,
+						{
+							backgroundColor: theme.cards,
+							borderBottomColor: theme.borderBottom,
+						},
+					]}
 				>
 					<View style={styles.addressContent}>
 						<FontAwesome6 name="location-dot" size={24} color="red" />
 						<View style={styles.addressTextContainer}>
 							{defaultAddress ? (
 								<>
-									<Text style={[styles.addressText, { color: theme.secondary }]}>
+									<Text
+										style={[styles.addressText, { color: theme.secondary }]}
+									>
 										{defaultAddress.street.length > 30
 											? defaultAddress.street.slice(0, 30) + '...'
 											: defaultAddress.street}
 									</Text>
-									
 								</>
 							) : (
-								<Text style={[styles.addressText, {color: theme.text}]}>No default address set</Text>
+								<Text style={[styles.addressText, { color: theme.text }]}>
+									No default address set
+								</Text>
 							)}
 						</View>
 					</View>
@@ -121,42 +137,66 @@ export default function HomeScreen({ navigation }) {
 
 			{/* Other Menu Options */}
 			<Pressable
-				style={[styles.menuContainer, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}
+				style={[
+					styles.menuContainer,
+					{
+						backgroundColor: theme.cards,
+						borderBottomColor: theme.borderBottom,
+					},
+				]}
 				onPress={() => navigation.navigate('Chat')}
 			>
 				<View style={styles.menuContent}>
 					<Entypo name="chat" size={24} color={theme.text} />
-					<Text style={[{color: theme.text}]}>Chat with us</Text>
+					<Text style={[{ color: theme.text }]}>Chat with us</Text>
 				</View>
 				<FontAwesome name="angle-right" size={24} color={theme.text} />
 			</Pressable>
 			<Pressable
-				style={[styles.menuContainer, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}
+				style={[
+					styles.menuContainer,
+					{
+						backgroundColor: theme.cards,
+						borderBottomColor: theme.borderBottom,
+					},
+				]}
 				onPress={() => navigation.navigate('Cart')}
 			>
 				<View style={styles.menuContent}>
 					<FontAwesome name="shopping-basket" size={24} color={theme.text} />
-					<Text style={[{color: theme.text}]}>My Basket</Text>
+					<Text style={[{ color: theme.text }]}>My Basket</Text>
 				</View>
 				<FontAwesome name="angle-right" size={24} color={theme.text} />
 			</Pressable>
 			<Pressable
-				style={[styles.menuContainer, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}
+				style={[
+					styles.menuContainer,
+					{
+						backgroundColor: theme.cards,
+						borderBottomColor: theme.borderBottom,
+					},
+				]}
 				onPress={() => navigation.navigate('Favorites')}
 			>
 				<View style={styles.menuContent}>
 					<AntDesign name="like1" size={24} color={theme.text} />
-					<Text style={[{color: theme.text}]}>My Favorites</Text>
+					<Text style={[{ color: theme.text }]}>My Favorites</Text>
 				</View>
 				<FontAwesome name="angle-right" size={24} color={theme.text} />
 			</Pressable>
 			<Pressable
-				style={[styles.menuContainer, { backgroundColor: theme.cards, borderBottomColor: theme.borderBottom }]}
+				style={[
+					styles.menuContainer,
+					{
+						backgroundColor: theme.cards,
+						borderBottomColor: theme.borderBottom,
+					},
+				]}
 				onPress={() => navigation.navigate('Orders')}
 			>
 				<View style={styles.menuContent}>
 					<Feather name="list" size={24} color={theme.text} />
-					<Text style={[{color: theme.text}]}>My Order History</Text>
+					<Text style={[{ color: theme.text }]}>My Order History</Text>
 				</View>
 				<FontAwesome name="angle-right" size={24} color={theme.text} />
 			</Pressable>

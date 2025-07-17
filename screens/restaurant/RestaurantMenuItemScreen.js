@@ -32,7 +32,7 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
 			name: menuItem.name,
 			price: parseFloat(menuItem.price),
 			quantity: quantity,
-      imageUrl: menuItem.imageUrl || null,
+			imageUrl: menuItem.imageUrl || null,
 		};
 		addToCart(restaurantId, meal);
 		// No need to manually update cart count/total here

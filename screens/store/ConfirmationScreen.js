@@ -209,20 +209,30 @@ export default function ConfirmationScreen({ navigation, route }) {
 				<Pressable onPress={() => navigation.goBack()}>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
-				<Text style={[styles.locationText, {color: theme.primary}]}>Address and Billing</Text>
+				<Text style={[styles.locationText, { color: theme.primary }]}>
+					Address and Billing
+				</Text>
 				<View style={{ width: 24 }} />
 			</View>
 
 			<View
-				style={[{
-					backgroundColor: 'white',
-					margin: 16,
-					borderRadius: 4,
-					padding: 16,
-					elevation: 1,
-				}, { backgroundColor: theme.cards }]}
+				style={[
+					{
+						backgroundColor: 'white',
+						margin: 16,
+						borderRadius: 4,
+						padding: 16,
+						elevation: 1,
+					},
+					{ backgroundColor: theme.cards },
+				]}
 			>
-				<Text style={[{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }, {color: theme.text}]}>
+				<Text
+					style={[
+						{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 },
+						{ color: theme.text },
+					]}
+				>
 					Cart Items
 				</Text>
 				{Array.isArray(cartItems) && cartItems.length > 0 ? (
@@ -230,16 +240,19 @@ export default function ConfirmationScreen({ navigation, route }) {
 						{cartItems.map((item, idx) => (
 							<View
 								key={item.id || item.name + idx}
-								style={[{
-									flexDirection: 'row',
-									justifyContent: 'space-between',
-									marginBottom: 6,
-								}, {color: theme.text}]}
+								style={[
+									{
+										flexDirection: 'row',
+										justifyContent: 'space-between',
+										marginBottom: 6,
+									},
+									{ color: theme.text },
+								]}
 							>
-								<Text style={[{ fontSize: 15 }, {color: theme.text}]}>
+								<Text style={[{ fontSize: 15 }, { color: theme.text }]}>
 									{item.name} x {item.quantity}
 								</Text>
-								<Text style={[{ fontSize: 15 }, {color: theme.primary}]}>
+								<Text style={[{ fontSize: 15 }, { color: theme.primary }]}>
 									₦
 									{(
 										parseFloat(item.price) * (parseInt(item.quantity, 10) || 0)
@@ -265,31 +278,53 @@ export default function ConfirmationScreen({ navigation, route }) {
 								justifyContent: 'space-between',
 							}}
 						>
-							<Text style={[{ fontWeight: 'bold', fontSize: 16 }, {color: theme.text}]}>Total:</Text>
-							<Text style={[{ fontWeight: 'bold', fontSize: 16 }, {color: theme.text}]}>
+							<Text
+								style={[
+									{ fontWeight: 'bold', fontSize: 16 },
+									{ color: theme.text },
+								]}
+							>
+								Total:
+							</Text>
+							<Text
+								style={[
+									{ fontWeight: 'bold', fontSize: 16 },
+									{ color: theme.text },
+								]}
+							>
 								₦{totalAmount.toLocaleString()}
 							</Text>
 						</View>
 					</>
 				) : (
-					<Text style={[{color: theme.text}]}>Your cart is empty.</Text>
+					<Text style={[{ color: theme.text }]}>Your cart is empty.</Text>
 				)}
 			</View>
 
 			<View style={[styles.deliveryAddress, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.addressHeader, {color: theme.text}]}>Delivery Address</Text>
+				<Text style={[styles.addressHeader, { color: theme.text }]}>
+					Delivery Address
+				</Text>
 				{defaultAddress ? (
 					<>
-						<Text style={[styles.addressText, {color: theme.text}]}>{defaultAddress.street}</Text>
-						<Text style={[styles.addressText, {color: theme.text}]}>
+						<Text style={[styles.addressText, { color: theme.text }]}>
+							{defaultAddress.street}
+						</Text>
+						<Text style={[styles.addressText, { color: theme.text }]}>
 							{defaultAddress.city}, {defaultAddress.state},{' '}
 							{defaultAddress.country}
 						</Text>
-						<Text style={[styles.addressText, {color: theme.text}]}>Landmark: {defaultAddress.landmark}</Text>
-						<Text style={[styles.addressText, {color: theme.text}]}>District: {defaultAddress.district}</Text>
+						<Text style={[styles.addressText, { color: theme.text }]}>
+							Landmark: {defaultAddress.landmark}
+						</Text>
+						<Text style={[styles.addressText, { color: theme.text }]}>
+							District: {defaultAddress.district}
+						</Text>
 					</>
 				) : (
-					<Text style={[styles.addressText, {color: theme.text}]}>No default address set</Text>
+					<Text style={[styles.addressText, { color: theme.text }]}>
+						No default address set
+					</Text>
 				)}
 				<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 					<Pressable
@@ -305,12 +340,16 @@ export default function ConfirmationScreen({ navigation, route }) {
 						onPress={() => setShowAddAddressModal(true)}
 						style={{ marginTop: 10 }}
 					>
-						<Text style={[{ color: theme.primary }]}>Add New Delivery Address</Text>
+						<Text style={[{ color: theme.primary }]}>
+							Add New Delivery Address
+						</Text>
 					</Pressable>
 				</View>
 				<Modal visible={showAddressesModal} animationType="slide" transparent>
 					<View style={styles.modalOverlay}>
-						<View style={[styles.modalContent, { backgroundColor: theme.cards }]}>
+						<View
+							style={[styles.modalContent, { backgroundColor: theme.cards }]}
+						>
 							<Pressable
 								onPress={() => setShowAddressesModal(false)}
 								style={{
@@ -324,12 +363,15 @@ export default function ConfirmationScreen({ navigation, route }) {
 								<MaterialIcons name="close" size={24} color={theme.text} />
 							</Pressable>
 							<Text
-								style={[{
-									fontWeight: 'bold',
-									fontSize: 16,
-									marginBottom: 8,
-									textAlign: 'center',
-								}, {color: theme.text}]}
+								style={[
+									{
+										fontWeight: 'bold',
+										fontSize: 16,
+										marginBottom: 8,
+										textAlign: 'center',
+									},
+									{ color: theme.text },
+								]}
 							>
 								My Addresses
 							</Text>
@@ -356,7 +398,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 											}}
 											color="#FF521B"
 										/>
-										<Text style={[{ marginLeft: 8 }, {color: theme.text}]}>
+										<Text style={[{ marginLeft: 8 }, { color: theme.text }]}>
 											{item.street?.slice(0, 10) +
 												(item.street?.length > 10 ? '...' : '')}
 										</Text>
@@ -368,7 +410,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 									</Pressable>
 								)}
 								ListEmptyComponent={
-									<Text style={[{ marginVertical: 8 }, {color: theme.text}]}>
+									<Text style={[{ marginVertical: 8 }, { color: theme.text }]}>
 										No addresses found.
 									</Text>
 								}
@@ -379,9 +421,14 @@ export default function ConfirmationScreen({ navigation, route }) {
 				</Modal>
 				<Modal visible={showAddAddressModal} animationType="slide" transparent>
 					<View style={styles.modalOverlay}>
-						<View style={[styles.modalContent, { backgroundColor: theme.cards }]}>
+						<View
+							style={[styles.modalContent, { backgroundColor: theme.cards }]}
+						>
 							<Text
-								style={[{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }, {color: theme.text}]}
+								style={[
+									{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 },
+									{ color: theme.text },
+								]}
 							>
 								Add New Address
 							</Text>
@@ -399,16 +446,24 @@ export default function ConfirmationScreen({ navigation, route }) {
 								)
 							)}
 							<View style={styles.pickerContainer}>
-								<Text style={[styles.pickerLabel, {color: theme.text}]}>District *</Text>
+								<Text style={[styles.pickerLabel, { color: theme.text }]}>
+									District *
+								</Text>
 								<Picker
 									selectedValue={form.district}
-									onValueChange={(itemValue) => setForm((f) => ({ ...f, district: itemValue }))}
+									onValueChange={(itemValue) =>
+										setForm((f) => ({ ...f, district: itemValue }))
+									}
 									style={styles.picker}
 									mode="dropdown"
 								>
 									<Picker.Item label="Select district" value="" />
 									{districts.map((district) => (
-										<Picker.Item key={district} label={district} value={district} />
+										<Picker.Item
+											key={district}
+											label={district}
+											value={district}
+										/>
 									))}
 								</Picker>
 							</View>
@@ -426,7 +481,9 @@ export default function ConfirmationScreen({ navigation, route }) {
 									}
 									color="#FF521B"
 								/>
-								<Text style={[{ marginLeft: 8 }, {color: theme.text}]}>Set as default address</Text>
+								<Text style={[{ marginLeft: 8 }, { color: theme.text }]}>
+									Set as default address
+								</Text>
 							</View>
 							<View
 								style={{
@@ -444,7 +501,10 @@ export default function ConfirmationScreen({ navigation, route }) {
 											!form.country ||
 											!form.district
 										) {
-											Alert.alert('Missing Fields', 'Please fill in all required fields.');
+											Alert.alert(
+												'Missing Fields',
+												'Please fill in all required fields.'
+											);
 											return;
 										}
 										const userDocRef = doc(db, 'users', auth.currentUser.uid);
