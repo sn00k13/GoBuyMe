@@ -1,4 +1,11 @@
 require('dotenv').config();
+const admin = require('firebase-admin');
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(require('./serviceAccountKey.json')),
+  });
+}
 const express = require('express');
 const cors = require('cors');
 const webhookRoutes = require('./routes/webhooks');
@@ -19,7 +26,7 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); 

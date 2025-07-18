@@ -12,7 +12,7 @@ export default function SplashScreen({ navigation }) {
 	}, 5000);
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View style={styles.container}>
 			<ImageBackground
 				source={require('../../assets/platter.jpg')}
 				style={styles.backgroundImage}
@@ -29,7 +29,7 @@ export default function SplashScreen({ navigation }) {
 					</Text>
 				</View>
 			</ImageBackground>
-		</SafeAreaView>
+		</View>
 	);
 }
 

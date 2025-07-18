@@ -1,7 +1,8 @@
 import 'react-native-gesture-handler';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
+import { useEffect } from 'react';
 import HomeScreen from './screens/app/HomeScreen';
 import ProfileScreen from './screens/user/ProfileScreen';
 import SettingsScreen from './screens/user/SettingsScreen';
@@ -49,6 +50,7 @@ import { StoreCartProvider } from './screens/app/StoreCartContext';
 import { MaterialIcons, FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import { ThemeProvider } from './utils/ThemeContext';
 import { useTheme } from './utils/ThemeContext';
+import PushNotificationService from './utils/PushNotificationService';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -217,9 +219,16 @@ function DrawerNavigator() {
 }
 
 export default function App() {
+	const navigationRef = useNavigationContainerRef();
+
+	useEffect(() => {
+		const cleanup = PushNotificationService.setupNotificationListeners(navigationRef);
+		return cleanup;
+	}, []);
+
 	return (
 		<ThemeProvider>
-			<NavigationContainer>
+			<NavigationContainer ref={navigationRef}>
 				<Stack.Navigator
 					screenOptions={{
 						headerShown: false,

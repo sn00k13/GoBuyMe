@@ -10,6 +10,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "firebase-admin": "^13.4.0",
+    "node-fetch": "^3.3.2",
     "react-native-paystack-webview": "^4.0.1"
   }
 }

@@ -73,7 +73,7 @@ export default function PaymentScreen({ navigation, route }) {
 				userId: auth.currentUser.uid,
 				items: cartItems,
 				totalAmount,
-				status: 'pending',
+				status: 'Pending',
 				paymentStatus: selectedMethod === 'bank' ? 'pending' : 'paid',
 				paymentReference: response.transactionRef.reference,
 				paymentMethod: selectedMethod,
