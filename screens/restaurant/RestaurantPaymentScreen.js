@@ -17,6 +17,7 @@ import {
 	serverTimestamp,
 	addDoc,
 	collection,
+	getDoc,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
@@ -69,6 +70,19 @@ export default function PaymentScreen({ navigation, route }) {
 		try {
 			setProcessing(true);
 
+			// Fetch restaurant district from Firestore
+			let restaurantDistrict = '';
+			try {
+				const restaurantRef = doc(db, 'restaurants', restaurantId);
+				const restaurantSnap = await getDoc(restaurantRef);
+				if (restaurantSnap.exists()) {
+					const restaurantData = restaurantSnap.data();
+					restaurantDistrict = restaurantData.address?.district || '';
+				}
+			} catch (e) {
+				console.warn('Could not fetch restaurant district:', e);
+			}
+
 			// Create order document
 			const orderRef = doc(db, 'orders', response.transactionRef.reference);
 			const orderData = {
@@ -76,6 +90,8 @@ export default function PaymentScreen({ navigation, route }) {
 				items: cartItems,
 				totalAmount,
 				status: 'Pending',
+				dropOffLocation: userData.address.district,
+				pickUpLocation: restaurantDistrict, // <-- set from restaurant address
 				paymentStatus: selectedMethod === 'bank' ? 'pending' : 'paid',
 				paymentReference: response.transactionRef.reference,
 				customerName: userData.name,
@@ -292,6 +308,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		marginTop: 40,
 	},
 	headerTitle: {
 		fontSize: 18,

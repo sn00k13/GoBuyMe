@@ -260,7 +260,7 @@ export default function RestaurantConfirmation({ navigation, route }) {
 							{defaultAddress.city}, {defaultAddress.state},{' '}
 							{defaultAddress.zip}
 						</Text>
-						<Text style={styles.addressText}>{defaultAddress.country}</Text>
+						<Text style={styles.addressText}>{defaultAddress.district}</Text>
 					</>
 				) : (
 					<Text style={styles.addressText}>No default address set</Text>
@@ -503,6 +503,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,

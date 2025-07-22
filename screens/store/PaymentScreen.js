@@ -17,6 +17,7 @@ import {
 	serverTimestamp,
 	addDoc,
 	collection,
+	getDoc,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
@@ -68,6 +69,18 @@ export default function PaymentScreen({ navigation, route }) {
 		try {
 			setProcessing(true);
 
+			let storeDistrict = '';
+			try {
+				const storeRef = doc(db, 'stores', storeId);
+				const storeSnap = await getDoc(storeRef);
+				if (storeSnap.exists()) {
+					const storeData = storeSnap.data();
+					storeDistrict = storeData.address?.district || '';
+				}
+			} catch (e) {
+				console.warn('Could not fetch store district:', e);
+			}
+
 			// Build order data, only include storeId if defined
 			const orderData = {
 				userId: auth.currentUser.uid,
@@ -81,6 +94,8 @@ export default function PaymentScreen({ navigation, route }) {
 				customerPhone: userData.phone,
 				customerEmail: userData.email,
 				deliveryAddress: userData.address,
+				dropOffLocation: userData.address.district,
+				pickUpLocation: storeDistrict,
 				createdAt: serverTimestamp(),
 				...(storeId ? { storeId } : {}),
 			};
