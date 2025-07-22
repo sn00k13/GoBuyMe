@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { useStoreCart } from '../app/StoreCartContext';
 import { useTheme } from '../../utils/ThemeContext';
+import { MaterialIcons } from '@expo/vector-icons';
 
 function EMartCartDetails({ navigation, route }) {
 	// Provide default storeId if not passed in route params
@@ -159,6 +160,11 @@ function EMartCartDetails({ navigation, route }) {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			<View style={[styles.container, { backgroundColor: theme.background }]}>
+				<Pressable
+					onPress={() => navigation.goBack()}
+				>
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
+				</Pressable>
 				<Text style={[styles.header, { color: theme.primary }]}>My Basket</Text>
 				<FlatList
 					data={cartItemsState}
@@ -250,6 +256,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 16,
+		marginTop: 40
 	},
 	header: {
 		fontSize: 18,

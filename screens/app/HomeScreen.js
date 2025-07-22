@@ -160,7 +160,7 @@ export default function HomeScreen({ navigation }) {
 						borderBottomColor: theme.borderBottom,
 					},
 				]}
-				onPress={() => navigation.navigate('Cart')}
+				onPress={() => navigation.navigate('EMartCartDetails')}
 			>
 				<View style={styles.menuContent}>
 					<FontAwesome name="shopping-basket" size={24} color={theme.text} />
@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		padding: 16,
+		marginTop: 40
 	},
 	logoText: {
 		fontSize: 20,
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	imageContainer: {
-		height: 300, // Fixed height for image
+		height: 350, // Fixed height for image
 		width: '100%',
 	},
 	image: {
@@ -237,8 +238,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		padding: 16,
 		backgroundColor: '#FFF',
-		borderBottomWidth: 1,
-		borderTopWidth: 1,
 	},
 	addressContent: {
 		flexDirection: 'row',

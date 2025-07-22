@@ -35,16 +35,14 @@ export default function OffersScreen({ navigation }) {
 	const { theme, mode, setMode } = useTheme();
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
-			{/* Back Button */}
-			<Pressable
-				style={styles.backButton}
-				onPress={() => navigation.toggleDrawer()}
-			>
-				<MaterialIcons name="arrow-back" size={24} color={theme.text} />
-			</Pressable>
-			<Text style={[styles.title, { color: theme.primary }]}>
-				Available Offers
-			</Text>
+			<View style={styles.header}>
+				{/* Back Button */}
+				<Pressable onPress={() => navigation.goBack()}>
+					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
+				</Pressable>
+				<Text style={styles.title}>Available Offers</Text>
+				<View></View>
+			</View>
 			<FlatList
 				data={offers}
 				keyExtractor={(item) => item.id}
@@ -79,27 +77,28 @@ const styles = StyleSheet.create({
 		padding: 16,
 		backgroundColor: '#FFF0EB',
 	},
-	backButton: {
+	header: {
 		flexDirection: 'row',
+		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginBottom: 12,
-	},
-	backButtonText: {
-		color: '#0B3948',
-		fontSize: 16,
-		marginLeft: 4,
+		padding: 16,
+		backgroundColor: 'white',
+		marginTop: 40,
+		borderBottomWidth: 1,
+		borderBottomColor: '#F0F0F0',
+		marginBottom: 16,
 	},
 	title: {
-		fontSize: 24,
+		fontSize: 18,
 		fontWeight: 'bold',
 		color: '#FF521B',
-		marginBottom: 18,
 	},
 	offerCard: {
 		backgroundColor: '#FFF',
 		borderRadius: 4,
 		padding: 18,
-		marginBottom: 18,
+		margin: 16,
+		marginTop: 0,
 		shadowColor: '#000',
 		shadowOpacity: 0.04,
 		shadowRadius: 4,

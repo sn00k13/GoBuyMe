@@ -85,6 +85,38 @@ const ChatScreen = ({ navigation }) => {
 		initSocket();
 	}, []);
 
+	// --- PERSIST CHAT HISTORY ---
+	useEffect(() => {
+		const loadMessages = async () => {
+			try {
+				const saved = await AsyncStorage.getItem('supportChatHistory');
+				if (saved) setMessages(JSON.parse(saved));
+			} catch (e) {
+				console.error('Failed to load chat history:', e);
+			}
+		};
+		loadMessages();
+	}, []);
+
+	useEffect(() => {
+		AsyncStorage.setItem('supportChatHistory', JSON.stringify(messages));
+	}, [messages]);
+
+	const clearChatHistory = async () => {
+		await AsyncStorage.removeItem('supportChatHistory');
+		setMessages([
+			{
+				id: '1',
+				text: 'Hello! How can we help you today?',
+				sender: 'support',
+				time: new Date().toLocaleTimeString([], {
+					hour: '2-digit',
+					minute: '2-digit',
+				}),
+			},
+		]);
+	};
+
 	const handleSend = () => {
 		if (newMessage.trim() === '' || !socket || !isConnected) return;
 
@@ -137,13 +169,14 @@ const ChatScreen = ({ navigation }) => {
 				style={[styles.container, { backgroundColor: theme.background }]}
 				keyboardVerticalOffset={90}
 			>
+				
+				<View style={[styles.header, { backgroundColor: theme.cards }]}>
 				<Pressable
 					style={styles.backButton}
 					onPress={() => navigation.goBack()}
 				>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
-				<View style={[styles.header, { backgroundColor: theme.cards }]}>
 					<Text style={styles.headerTitle}>Customer Support</Text>
 					<View style={styles.connectionStatus}>
 						<View
@@ -164,6 +197,23 @@ const ChatScreen = ({ navigation }) => {
 						<Text style={styles.connectionText}>Connecting to support...</Text>
 					</View>
 				)}
+
+				{/* --- CLOSE SUPPORT BUTTON --- */}
+				<Pressable
+					style={{
+						alignSelf: 'flex-end',
+						margin: 12,
+						backgroundColor: '#F44336',
+						paddingHorizontal: 16,
+						paddingVertical: 8,
+						borderRadius: 20,
+					}}
+					onPress={clearChatHistory}
+				>
+					<Text style={{ color: 'white', fontWeight: 'bold' }}>
+						End Session
+					</Text>
+				</Pressable>
 
 				<FlatList
 					ref={flatListRef}
@@ -214,22 +264,15 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		padding: 16,
-		borderBottomWidth: 1,
 		backgroundColor: '#FFF',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
+		marginTop: 40
 	},
 	headerTitle: {
 		fontSize: 20,
 		fontWeight: 'bold',
-		color: '#FF521B',
-	},
-	backButton: {
-		padding: 16,
-	},
-	backButtonText: {
-		fontSize: 16,
 		color: '#FF521B',
 	},
 	connectionStatus: {

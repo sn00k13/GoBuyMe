@@ -86,6 +86,26 @@ export function CartProvider({ children }) {
 		return restaurantCart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 	};
 
+	// New: Update quantity for a cart item
+    const updateCartItemQuantity = (restaurantId, itemId, newQuantity) => {
+        if (!restaurantId || !itemId) return;
+        setCart((prevCarts) => {
+            const cart = prevCarts[restaurantId];
+            if (!cart) return prevCarts;
+            const updatedItems = cart.items.map((item) =>
+                item.id === itemId ? { ...item, quantity: Math.max(1, newQuantity) } : item
+            );
+            const updatedTotal = updatedItems.reduce(
+                (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
+                0
+            );
+            return {
+                ...prevCarts,
+                [restaurantId]: { total: updatedTotal, items: updatedItems },
+            };
+        });
+    };
+
 	return (
 		<CartContext.Provider
 			value={{
@@ -95,6 +115,7 @@ export function CartProvider({ children }) {
 				clearCart,
 				getCartItemCount,
 				getCartTotal,
+				updateCartItemQuantity,
 			}}
 		>
 			<SafeAreaView style={{ flex: 1 }}>{children}</SafeAreaView>

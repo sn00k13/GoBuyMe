@@ -15,7 +15,13 @@ import { useCart } from '../app/CartContext';
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function CartDetails({ route, navigation }) {
-	const { cart, getCartTotal, getCartItemCount, removeFromCart } = useCart();
+	const {
+		cart,
+		getCartTotal,
+		getCartItemCount,
+		removeFromCart,
+		updateCartItemQuantity,
+	} = useCart();
 	const { restaurantId, restaurantName } = route.params;
 	const cartItems = cart[restaurantId]?.items || [];
 
@@ -44,7 +50,7 @@ export default function CartDetails({ route, navigation }) {
 				padding: 12,
 				backgroundColor: '#fff',
 				marginBottom: 8,
-				borderRadius: 8,
+				borderRadius: 4,
 			}}
 		>
 			<Image
@@ -53,7 +59,7 @@ export default function CartDetails({ route, navigation }) {
 						? { uri: item.imageUrl }
 						: require('../../assets/placeholder.jpg')
 				}
-				style={{ width: 60, height: 60, borderRadius: 8, marginRight: 12 }}
+				style={{ width: 60, height: 60, borderRadius: 4, marginRight: 12 }}
 			/>
 			<View style={{ flex: 1 }}>
 				<Text style={{ fontWeight: 'bold', fontSize: 16, color: '#0B3948' }}>
@@ -69,6 +75,63 @@ export default function CartDetails({ route, navigation }) {
 						Remove from cart
 					</Text>
 				</Pressable>
+				<View
+					style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}
+				>
+					<Pressable
+						onPress={() =>
+							updateCartItemQuantity(
+								restaurantId,
+								item.id,
+								Math.max(1, item.quantity - 1)
+							)
+						}
+						style={{
+							width: 32,
+							height: 32,
+							borderRadius: 16,
+							backgroundColor: '#F0F0F0',
+							alignItems: 'center',
+							justifyContent: 'center',
+							marginRight: 8,
+						}}
+					>
+						<Text
+							style={{ fontSize: 20, color: '#FF521B', fontWeight: 'bold' }}
+						>
+							-
+						</Text>
+					</Pressable>
+					<Text
+						style={{ fontSize: 16, fontWeight: 'bold', marginHorizontal: 8 }}
+					>
+						{item.quantity}
+					</Text>
+					<Pressable
+						onPress={() =>
+							updateCartItemQuantity(
+								restaurantId,
+								item.id,
+								item.quantity + 1
+							)
+						}
+						style={{
+							width: 32,
+							height: 32,
+							borderRadius: 16,
+							backgroundColor: '#F0F0F0',
+							alignItems: 'center',
+							justifyContent: 'center',
+							marginLeft: 8,
+						}}
+					>
+						<Text
+							style={{ fontSize: 20, color: '#FF521B', fontWeight: 'bold' }}
+						>
+							+
+						</Text>
+					</Pressable>
+				</View>
 				<Text style={{ fontWeight: 'bold', color: '#FF521B' }}>
 					₦{(item.price * item.quantity).toLocaleString()}
 				</Text>
@@ -186,6 +249,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		marginTop: 40,
 	},
 	headerText: {
 		fontSize: 18,

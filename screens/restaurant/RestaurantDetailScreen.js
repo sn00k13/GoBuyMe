@@ -10,8 +10,17 @@ import {
 	SafeAreaView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
+import {
+	doc,
+	getDoc,
+	collection,
+	getDocs,
+	setDoc,
+	updateDoc,
+	arrayUnion,
+	arrayRemove,
+} from 'firebase/firestore';
+import { db, auth } from '../../firebase';
 import { useCart } from '../app/CartContext';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -23,6 +32,8 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 	const [menuItems, setMenuItems] = useState([]);
 	const [selectedCategory, setSelectedCategory] = useState(null);
 	const [categories, setCategories] = useState([]);
+	const [isFavorite, setIsFavorite] = useState(false);
+	const [favLoading, setFavLoading] = useState(false);
 
 	useEffect(() => {
 		const fetchRestaurant = async () => {
@@ -63,6 +74,21 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 				console.error('Error fetching menu:', error);
 			}
 		};
+
+		const checkFavorite = async () => {
+			const user = getAuth().currentUser;
+			if (!user || !restaurantId) return;
+			try {
+				const favDoc = await getDoc(
+					doc(db, 'users', user.uid, 'favorites', 'vendors')
+				);
+				const ids = favDoc.exists() ? favDoc.data().ids || [] : [];
+				setIsFavorite(ids.includes(restaurantId));
+			} catch (e) {
+				setIsFavorite(false);
+			}
+		};
+		checkFavorite();
 
 		fetchRestaurant();
 		fetchMenu();
@@ -229,6 +255,66 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 		};
 	};
 
+	const toggleFavorite = async () => {
+		setFavLoading(true);
+	  
+		try {
+		  const user = auth.currentUser;
+		  const id = restaurantId;
+	  
+		  if (!user) {
+			console.warn('No authenticated user.');
+			setFavLoading(false);
+			return;
+		  }
+		  if (!id) {
+			console.warn('No restaurantId.');
+			setFavLoading(false);
+			return;
+		  }
+	  
+		  const favRef = doc(db, 'users', user.uid, 'favorites', 'vendors');
+		  let favDoc;
+		  try {
+			favDoc = await getDoc(favRef);
+		  } catch (err) {
+			console.error('Error fetching favorites doc:', err);
+			setFavLoading(false);
+			return;
+		  }
+	  
+		  let currentIds = [];
+		  if (favDoc.exists()) {
+			const data = favDoc.data();
+			currentIds = Array.isArray(data.ids) ? data.ids : [];
+		  }
+	  
+		  let newIds;
+		  if (currentIds.includes(id)) {
+			// Remove favorite
+			newIds = currentIds.filter(favId => favId !== id);
+			console.log('Removing favorite. New ids:', newIds);
+		  } else {
+			// Add favorite
+			newIds = [...currentIds, id];
+			console.log('Adding favorite. New ids:', newIds);
+		  }
+	  
+		  try {
+			await setDoc(favRef, { ids: newIds }, { merge: true });
+			setIsFavorite(newIds.includes(id));
+			console.log('Favorite updated successfully');
+		  } catch (err) {
+			console.error('Error updating favorites:', err);
+			alert('Failed to update favorites: ' + err.message);
+		  }
+		} catch (error) {
+		  console.error('Unexpected error in toggleFavorite:', error);
+		} finally {
+		  setFavLoading(false);
+		}
+	  };
+
 	return (
 		<SafeAreaView style={styles.container}>
 			{/* Header */}
@@ -237,7 +323,13 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
 				</Pressable>
 				<Text style={styles.headerText}>{restaurant.name}</Text>
-				<MaterialIcons name="favorite-border" size={24} color="#FF521B" />
+				<Pressable onPress={toggleFavorite} disabled={favLoading}>
+					<MaterialIcons
+						name={isFavorite ? 'favorite' : 'favorite-border'}
+						size={24}
+						color="#FF521B"
+					/>
+				</Pressable>
 			</View>
 
 			{/* Restaurant Info */}
@@ -342,6 +434,9 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		marginTop: 40,
+		borderBottomWidth: 1,
+		borderBottomColor: '#F0F0F0',
 	},
 	headerText: {
 		fontSize: 18,

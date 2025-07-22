@@ -11,7 +11,6 @@ import AddressScreen from './screens/user/AddressScreen';
 import ChatScreen from './screens/user/ChatScreen';
 import CartDetails from './screens/app/CartDetails';
 import FavoritesScreen from './screens/user/FavoritesScreen';
-import OrderHistoryScreen from './screens/user/OrderHistoryScreen';
 import OffersScreen from './screens/user/OffersScreen';
 import MealCardScreen from './screens/MealCardScreen';
 import VendorListScreen from './screens/app/VendorListScreen';
@@ -93,7 +92,6 @@ function HomeStack() {
 						component={RestaurantConfirmation}
 					/>
 					<Stack.Screen name="Favorites" component={FavoritesScreen} />
-					<Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
 					<Stack.Screen name="Settings" component={SettingsScreen} />
 					<Stack.Screen name="TermsService" component={TermsService} />
 					<Stack.Screen name="Permissions" component={Permissions} />
