@@ -37,7 +37,7 @@ export default function OffersScreen({ navigation }) {
 		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			<View style={styles.header}>
 				{/* Back Button */}
-				<Pressable onPress={() => navigation.goBack()}>
+				<Pressable onPress={() => navigation.toggleDrawer()}>
 					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
 				</Pressable>
 				<Text style={styles.title}>Available Offers</Text>

@@ -582,7 +582,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 				onPress={handleProceedToPayment}
 				disabled={!defaultAddress || !cartItems.length}
 			>
-				<Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>
+				<Text style={{ color: '#fff', fontSize: 16, textAlign: 'center' }}>
 					Proceed to Payment
 				</Text>
 			</Pressable>
@@ -605,6 +605,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,

@@ -20,8 +20,10 @@ function EMartCartDetails({ navigation, route }) {
 	// Provide default storeId if not passed in route params
 	const storeId = route?.params?.storeId || 'J3GO05mnhnoccDG9Bchc';
 	const initialCartItems = route?.params?.cartItems || [];
-	const { getCart, updateCart, removeFromCart } = useStoreCart();
-	const [cartItemsState, setCartItemsState] = React.useState(initialCartItems);
+	const { getCart, updateCart, removeFromCart, updateCartItemQuantity } =
+		useStoreCart();
+	// Remove local cartItemsState; always use context
+	// const [cartItemsState, setCartItemsState] = React.useState(initialCartItems);
 	const [discountCode, setDiscountCode] = React.useState('');
 	const [discountMessage, setDiscountMessage] = React.useState('');
 	const [discountError, setDiscountError] = React.useState('');
@@ -31,21 +33,21 @@ function EMartCartDetails({ navigation, route }) {
 	// Sync with global cart state when component mounts
 	useEffect(() => {
 		const globalCart = getCart(storeId);
-		if (globalCart && globalCart.length > 0) {
-			setCartItemsState(globalCart);
-		} else if (initialCartItems.length > 0) {
+		if (
+			(!globalCart || globalCart.length === 0) &&
+			initialCartItems.length > 0
+		) {
 			// If we have initial cart items but no global cart, update global cart
 			updateCart(storeId, initialCartItems);
 		}
 	}, [storeId, initialCartItems]);
 
-	const total =
-		cartItemsState?.reduce(
-			(sum, item) =>
-				sum +
-				parseFloat(item?.price || 0) * (parseInt(item?.quantity, 10) || 0),
-			0
-		) || 0;
+	const cartItems = getCart(storeId) || [];
+	const total = cartItems.reduce(
+		(sum, item) =>
+			sum + parseFloat(item?.price || 0) * (parseInt(item?.quantity, 10) || 0),
+		0
+	);
 
 	// Calculates 10% discount if discount code is applied
 	const getDiscountedTotal = () => {
@@ -73,15 +75,9 @@ function EMartCartDetails({ navigation, route }) {
 	};
 
 	const handleRemoveFromCart = (index) => {
-		// Update local state
-		const newCartItems = cartItemsState.filter((_, i) => i !== index);
-		setCartItemsState(newCartItems);
-
-		// Update global state
 		removeFromCart(storeId, index);
-
-		// If cart becomes empty, show message
-		if (newCartItems.length === 0) {
+		const updatedCart = getCart(storeId) || [];
+		if (updatedCart.length === 0) {
 			Alert.alert('Cart Empty', 'Your cart is now empty. Continue shopping?', [
 				{
 					text: 'Yes',
@@ -96,7 +92,7 @@ function EMartCartDetails({ navigation, route }) {
 	};
 
 	const handleCheckout = () => {
-		if (!cartItemsState || cartItemsState.length === 0) {
+		if (!cartItems || cartItems.length === 0) {
 			Alert.alert(
 				'Empty Cart',
 				'Please add items to your cart before proceeding to checkout.'
@@ -105,13 +101,13 @@ function EMartCartDetails({ navigation, route }) {
 		}
 
 		// Make sure the global cart is updated before proceeding
-		updateCart(storeId, cartItemsState);
+		updateCart(storeId, cartItems);
 
 		const discountApplied = appliedDiscountCode === 'EMART10';
 		const discountValue = discountApplied ? total - getDiscountedTotal() : 0;
 
 		navigation.navigate('Confirmation', {
-			cartItems: cartItemsState,
+			cartItems: cartItems,
 			totalAmount: getDiscountedTotal(),
 			originalTotal: total,
 			discountApplied,
@@ -138,7 +134,7 @@ function EMartCartDetails({ navigation, route }) {
 					{item.size}
 				</Text>
 				<Text style={[styles.cartPrice, { color: theme.primary }]}>
-					₦{item.price} x {item.quantity}
+					₦{item.price} x {Number(item.quantity)}
 				</Text>
 			</View>
 			<View style={styles.delete}>
@@ -147,6 +143,63 @@ function EMartCartDetails({ navigation, route }) {
 						Remove from cart
 					</Text>
 				</Pressable>
+				<View
+					style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}
+				>
+					<Pressable
+						onPress={() =>
+							updateCartItemQuantity(
+								storeId,
+								item.id,
+								Math.max(1, Number(item.quantity) - 1)
+							)
+						}
+						style={{
+							width: 28,
+							height: 28,
+							borderRadius: 16,
+							backgroundColor: '#F0F0F0',
+							alignItems: 'center',
+							justifyContent: 'center',
+							marginRight: 8,
+						}}
+					>
+						<Text
+							style={{ fontSize: 18, color: '#FF521B', fontWeight: 'bold' }}
+						>
+							-
+						</Text>
+					</Pressable>
+					<Text
+						style={{ fontSize: 16, fontWeight: 'semi-bold', marginHorizontal: 8 }}
+					>
+						{Number(item.quantity)}
+					</Text>
+					<Pressable
+						onPress={() =>
+							updateCartItemQuantity(
+								storeId,
+								item.id,
+								Number(item.quantity) + 1
+							)
+						}
+						style={{
+							width: 28,
+							height: 28,
+							borderRadius: 16,
+							backgroundColor: '#F0F0F0',
+							alignItems: 'center',
+							justifyContent: 'center',
+							marginLeft: 8,
+						}}
+					>
+						<Text
+							style={{ fontSize: 18, color: '#FF521B', fontWeight: 'bold' }}
+						>
+							+
+						</Text>
+					</Pressable>
+				</View>
 				<Text style={styles.cartItemTotal}>
 					₦
 					{(
@@ -160,14 +213,19 @@ function EMartCartDetails({ navigation, route }) {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
 			<View style={[styles.container, { backgroundColor: theme.background }]}>
-				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
-				</Pressable>
-				<Text style={[styles.header, { color: theme.primary }]}>My Basket</Text>
+				<View style={styles.header}>
+					<Pressable onPress={() => navigation.goBack()}>
+						<MaterialIcons name="arrow-back" size={24} color={theme.text} />
+					</Pressable>
+					<Text style={[styles.locationText, { color: theme.primary }]}>
+						My Basket
+					</Text>
+					<View></View>
+				</View>
 				<FlatList
-					data={cartItemsState}
+					data={cartItems}
 					renderItem={renderCartItem}
-					keyExtractor={(item, idx) => item.name + idx}
+					keyExtractor={(item) => item.id?.toString()}
 					contentContainerStyle={{ paddingBottom: 24 }}
 					ListEmptyComponent={
 						<Text style={{ textAlign: 'center', color: '#aaa', marginTop: 24 }}>
@@ -179,7 +237,7 @@ function EMartCartDetails({ navigation, route }) {
 					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 					keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
 				>
-					<View style={{ marginVertical: 16 }}>
+					<View style={{ marginHorizontal: 16 }}>
 						<Text
 							style={[{ fontSize: 15, marginBottom: 6 }, { color: theme.text }]}
 						>
@@ -188,12 +246,13 @@ function EMartCartDetails({ navigation, route }) {
 						<TextInput
 							style={[
 								{
-									borderWidth: 1,
-									borderColor: '#FF521B',
 									borderRadius: 4,
+									// borderWidth: 1,
+									borderColor: '#F0F0F0',
 									padding: 8,
 									backgroundColor: '#fff',
 									fontSize: 15,
+									elevation: 1
 								},
 								{ borderColor: theme.accent },
 							]}
@@ -253,14 +312,19 @@ function EMartCartDetails({ navigation, route }) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		padding: 16,
-		marginTop: 40,
 	},
 	header: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		padding: 16,
+		backgroundColor: 'white',
+		marginTop: 40,
+	},
+	locationText: {
 		fontSize: 18,
+		fontWeight: 'bold',
 		color: '#FF521B',
-		marginBottom: 16,
-		textAlign: 'center',
 	},
 	cartItem: {
 		flexDirection: 'row',
@@ -268,8 +332,10 @@ const styles = StyleSheet.create({
 		backgroundColor: '#FFF',
 		borderRadius: 4,
 		padding: 12,
-		marginBottom: 10,
+		marginHorizontal: 16,
+		marginTop: 10,
 		elevation: 1,
+		paddingVertical: 16,
 	},
 	cartImage: {
 		width: 54,
@@ -299,14 +365,14 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 		fontWeight: 'bold',
 		color: '#FF521B',
-		marginLeft: 10,
+		marginTop: 10,
 	},
 	summary: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		marginTop: 16,
-		paddingVertical: 12,
+		paddingHorizontal: 16,
 		borderTopWidth: 1,
 		borderColor: '#eee',
 	},
@@ -327,6 +393,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 8,
 		alignItems: 'center',
 		marginTop: 12,
+		marginHorizontal: 16,
 	},
 	checkoutButton2: {
 		backgroundColor: '#21A179',
@@ -335,6 +402,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 8,
 		alignItems: 'center',
 		marginTop: 12,
+		marginHorizontal: 16,
 	},
 	checkoutText: {
 		color: '#fff',
@@ -345,7 +413,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 	},
 	delete: {
-		height: 60,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
 		// backgroundColor: 'grey',

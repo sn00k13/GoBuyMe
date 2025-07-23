@@ -15,18 +15,31 @@ export const StoreCartProvider = ({ children }) => {
 		setStoreCarts((prev) => {
 			const currentCart = prev[storeId] || [];
 
-			// Create a map of existing items by name for quick lookup
+			// Create a map of existing items by id for quick lookup
 			const existingItemsMap = {};
 			currentCart.forEach((item) => {
-				existingItemsMap[item.name] = item;
+				if (!item.id) {
+					item.id = `${item.name}-${
+						item.size || ''
+					}-${Date.now()}-${Math.random()}`;
+				}
+				existingItemsMap[item.id] = item;
 			});
 
 			// Update quantities for existing items and add new items
 			newItems.forEach((newItem) => {
-				if (existingItemsMap[newItem.name]) {
-					existingItemsMap[newItem.name].quantity = newItem.quantity;
+				// Ensure every new item has a unique id
+				if (!newItem.id) {
+					newItem.id = `${newItem.name}-${
+						newItem.size || ''
+					}-${Date.now()}-${Math.random()}`;
+				}
+				if (existingItemsMap[newItem.id]) {
+					existingItemsMap[newItem.id].quantity = newItem.quantity;
 				} else {
-					existingItemsMap[newItem.name] = newItem;
+					// Always store quantity as a number
+newItem.quantity = Number(newItem.quantity);
+existingItemsMap[newItem.id] = newItem;
 				}
 			});
 
@@ -60,9 +73,57 @@ export const StoreCartProvider = ({ children }) => {
 		});
 	};
 
+	// New: Update quantity for a cart item
+	const updateCartItemQuantity = (restaurantId, itemId, newQuantity) => {
+		if (!restaurantId || !itemId) return;
+		setStoreCarts((prevCarts) => {
+			const cart = prevCarts[restaurantId];
+			if (!cart) return prevCarts;
+			const updatedItems = cart.map((item) =>
+				item.id === itemId
+					? { ...item, quantity: Math.max(1, Number(newQuantity)) }
+					: item
+			).filter((item) => item.quantity > 0);
+			return {
+				...prevCarts,
+				[restaurantId]: updatedItems,
+			};
+		});
+	};
+
+	const addToCart = (storeId, product) => {
+	if (!storeId || !product) return;
+	setStoreCarts((prev) => {
+		const currentCart = prev[storeId] || [];
+		const exists = currentCart.find((item) => item.id === product.id);
+		if (exists) {
+			return {
+				...prev,
+				[storeId]: currentCart.map((item) =>
+					item.id === product.id
+						? { ...item, quantity: item.quantity + 1 }
+						: item
+				),
+			};
+		} else {
+			return {
+				...prev,
+				[storeId]: [...currentCart, { ...product, quantity: 1 }],
+			};
+		}
+	});
+};
+
 	return (
 		<StoreCartContext.Provider
-			value={{ getCart, updateCart, removeFromCart, clearCart }}
+			value={{
+				getCart,
+				updateCart,
+				removeFromCart,
+				clearCart,
+				updateCartItemQuantity,
+				addToCart,
+			}}
 		>
 			<SafeAreaView style={{ flex: 1 }}>{children}</SafeAreaView>
 		</StoreCartContext.Provider>

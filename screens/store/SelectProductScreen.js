@@ -17,84 +17,44 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../utils/ThemeContext';
 
 function SelectProductScreen({ navigation, route }) {
-	const [categories, setCategories] = useState([]);
-	const { theme, mode, setMode } = useTheme();
 	const [activeCategory, setActiveCategory] = useState(
 		route?.params?.selectedCategory
 	);
 	const [activeSubcategory, setActiveSubcategory] = useState(null);
-	const [quantities, setQuantities] = useState({});
-	const { getCart, updateCart } = useStoreCart();
+	const { theme, mode, setMode } = useTheme();
+	const { getCart, updateCartItemQuantity, addToCart } = useStoreCart();
+	const [categories, setCategories] = useState([]);
 	const [cartItemCount, setCartItemCount] = useState(0);
 
 	// Get storeId from navigation params or fallback to a default
 	const storeId = route?.params?.storeId || 'J3GO05mnhnoccDG9Bchc';
 
-	// Initialize quantities from cart when component mounts and update cart count
-	useEffect(() => {
+	const cartItems = getCart(storeId);
+	const cartCount = cartItems.reduce((sum, item) => sum + (parseInt(item.quantity) || 0), 0);
+
+	const getProductQuantity = (productId) => {
 		const cartItems = getCart(storeId);
-		if (cartItems.length > 0) {
-			const initialQuantities = {};
-			cartItems.forEach((item) => {
-				initialQuantities[item.name] = item.quantity;
-			});
-			setQuantities(initialQuantities);
-			updateCartCount(initialQuantities);
-		}
-	}, [storeId]);
-
-	// Update quantities and cart count when screen comes into focus
-	useFocusEffect(
-		React.useCallback(() => {
-			const cartItems = getCart(storeId);
-			const newQuantities = {};
-			cartItems.forEach((item) => {
-				newQuantities[item.name] = item.quantity;
-			});
-			setQuantities(newQuantities);
-			updateCartCount(newQuantities);
-		}, [storeId, getCart])
-	);
-
-	// Update cart count whenever quantities change
-	const updateCartCount = (newQuantities) => {
-		const count = Object.values(newQuantities).reduce(
-			(sum, q) => sum + (parseInt(q, 10) || 0),
-			0
-		);
-		setCartItemCount(count);
+		const cartItem = cartItems.find((ci) => ci.id === productId);
+		return Number(cartItem?.quantity || 0);
 	};
 
-	const handleQuantityChange = (key, value) => {
-		const newQuantities = {
-			...quantities,
-			[key]: value.replace(/[^0-9]/g, ''), // Only allow numbers
-		};
-		setQuantities(newQuantities);
-		updateCartCount(newQuantities);
-
-		// Find the product in the current category
-		const product = products.find((item) => item.name === key);
-		if (product) {
-			// Update cart with the changed item
-			updateCart(storeId, [
-				{
-					...product,
-					quantity: newQuantities[key],
-				},
-			]);
+	const increment = (productId, productObj) => {
+		const qty = getProductQuantity(productId);
+		if (qty > 0) {
+			updateCartItemQuantity(storeId, productId, qty + 1);
+		} else {
+			if (typeof addToCart === 'function') {
+				addToCart(storeId, { ...productObj, id: productId, quantity: 1 });
+			} else {
+				updateCartItemQuantity(storeId, productId, 1);
+			}
 		}
 	};
 
-	const increment = (key) => {
-		const currentQty = parseInt(quantities[key] || '0', 10);
-		handleQuantityChange(key, String(currentQty + 1));
-	};
-
-	const decrement = (key) => {
-		const currentQty = parseInt(quantities[key] || '0', 10);
-		if (currentQty > 0) {
-			handleQuantityChange(key, String(currentQty - 1));
+	const decrement = (productId) => {
+		const qty = getProductQuantity(productId);
+		if (qty > 0) {
+			updateCartItemQuantity(storeId, productId, qty - 1);
 		}
 	};
 
@@ -208,16 +168,14 @@ function SelectProductScreen({ navigation, route }) {
 	// If products are stored as a map (e.g., beer1, beer2, ...), convert to array
 	const products =
 		activeSubcategoryObj && typeof activeSubcategoryObj === 'object'
-			? Object.values(activeSubcategoryObj).filter(
-					(item) => typeof item === 'object' && item.name // filter out non-product fields
-			  )
+			? Object.values(activeSubcategoryObj)
+				.filter((item) => typeof item === 'object' && item.name) // filter out non-product fields
+				.map((item) => ({
+					...item,
+					id: item.id || `${item.name}_${item.size || ''}` // assign stable id if missing
+				}))
 			: [];
-	const cartItems = products
-		.filter((item) => parseInt(quantities[item.name], 10) > 0)
-		.map((item) => ({
-			...item,
-			quantity: quantities[item.name],
-		}));
+
 	// Render each product card
 	const renderProductCard = ({ item }) => (
 		<View style={[styles.productCard, { backgroundColor: theme.cards }]}>
@@ -246,7 +204,7 @@ function SelectProductScreen({ navigation, route }) {
 			<View style={styles.addToCartAlt}>
 				<Pressable
 					style={styles.cartButton}
-					onPress={() => decrement(item.name)}
+					onPress={() => decrement(item.id)}
 				>
 					<Text style={styles.cartButtonText}>-</Text>
 				</Pressable>
@@ -257,12 +215,12 @@ function SelectProductScreen({ navigation, route }) {
 					]}
 				>
 					<Text style={[styles.quantityText, { color: theme.text }]}>
-						{quantities[item.name] || '0'}
+						{getProductQuantity(item.id)}
 					</Text>
 				</View>
 				<Pressable
 					style={styles.cartButton}
-					onPress={() => increment(item.name)}
+					onPress={() => increment(item.id, item)}
 				>
 					<Text style={styles.cartButtonText}>+</Text>
 				</Pressable>
@@ -340,9 +298,9 @@ function SelectProductScreen({ navigation, route }) {
 						size={28}
 						color={theme.background}
 					/>
-					{cartItemCount > 0 && (
+					{cartCount > 0 && (
 						<View style={styles.cartCounter}>
-							<Text style={styles.cartCounterText}>{cartItemCount}</Text>
+							<Text style={styles.cartCounterText}>{cartCount}</Text>
 						</View>
 					)}
 				</Pressable>
@@ -362,6 +320,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,
