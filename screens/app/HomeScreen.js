@@ -7,6 +7,7 @@ import {
 	Image,
 	Linking,
 	SafeAreaView,
+	FlatList,
 } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -18,7 +19,28 @@ import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { useTheme } from '../../utils/ThemeContext';
 
+const images = [
+	require('../../assets/burger-deal.jpg'),
+	require('../../assets/slider1.jpg'),
+	require('../../assets/slider2.jpg'),
+	require('../../assets/slider3.jpg'),
+	require('../../assets/slider4.jpg'),
+];
+
+import { useRef } from 'react';
+
 export default function HomeScreen({ navigation }) {
+	const [currentIndex, setCurrentIndex] = useState(0);
+	const sliderRef = useRef(null);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			let nextIndex = (currentIndex + 1) % images.length;
+			sliderRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+			setCurrentIndex(nextIndex);
+		}, 3000);
+		return () => clearInterval(interval);
+	}, [currentIndex]);
 	const [defaultAddress, setDefaultAddress] = useState(null);
 	const { theme, mode, setMode } = useTheme();
 
@@ -85,11 +107,42 @@ export default function HomeScreen({ navigation }) {
 			<View style={styles.imageAddressContainer}>
 				{/* Image Content */}
 				<View style={styles.imageContainer}>
-					<Image
-						source={require('../../assets/burger-deal.jpg')}
-						style={styles.image}
-						resizeMode="cover"
+					<FlatList
+						data={images}
+						horizontal
+						pagingEnabled
+						showsHorizontalScrollIndicator={false}
+						ref={sliderRef}
+						onMomentumScrollEnd={e => {
+							const index = Math.round(
+								e.nativeEvent.contentOffset.x /
+								e.nativeEvent.layoutMeasurement.width
+							);
+							setCurrentIndex(index);
+						}}
+						renderItem={({ item }) => (
+							<Image
+								source={item}
+								style={{ width: 410, height: 340 }}
+								resizeMode="cover"
+							/>
+						)}
+						keyExtractor={(_, idx) => idx.toString()}
 					/>
+					<View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8 }}>
+						{images.map((_, idx) => (
+							<View
+								key={idx}
+								style={{
+									width: 8,
+									height: 8,
+									borderRadius: 4,
+									marginHorizontal: 4,
+									backgroundColor: idx === currentIndex ? '#FF521B' : '#eee',
+								}}
+							/>
+						))}
+					</View>
 				</View>
 
 				{/* Address Section */}
@@ -227,6 +280,7 @@ const styles = StyleSheet.create({
 	imageContainer: {
 		height: 350, // Fixed height for image
 		width: '100%',
+		paddingBottom: 10
 	},
 	image: {
 		width: '100%',
