@@ -236,10 +236,11 @@ function EMartCartDetails({ navigation, route }) {
 				<KeyboardAvoidingView
 					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 					keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+					style={{ marginHorizontal: 16 }}
 				>
-					<View style={{ marginHorizontal: 16 }}>
+					<View>
 						<Text
-							style={[{ fontSize: 15, marginBottom: 6 }, { color: theme.text }]}
+							style={[{ fontSize: 15, marginBottom: 10, marginTop: 10 }, { color: theme.text }]}
 						>
 							Discount Code
 						</Text>
@@ -249,7 +250,7 @@ function EMartCartDetails({ navigation, route }) {
 									borderRadius: 4,
 									// borderWidth: 1,
 									borderColor: '#F0F0F0',
-									padding: 8,
+									padding: 16,
 									backgroundColor: '#fff',
 									fontSize: 15,
 									elevation: 1
@@ -262,12 +263,12 @@ function EMartCartDetails({ navigation, route }) {
 							autoCapitalize="characters"
 						/>
 						{discountMessage ? (
-							<Text style={{ color: '#21A179', marginTop: 6 }}>
+							<Text style={{ color: '#21A179', marginTop: 10 }}>
 								{discountMessage}
 							</Text>
 						) : null}
 						{discountError ? (
-							<Text style={{ color: '#E14E1F', marginTop: 6 }}>
+							<Text style={{ color: '#E14E1F', marginTop: 10 }}>
 								{discountError}
 							</Text>
 						) : null}
@@ -275,7 +276,7 @@ function EMartCartDetails({ navigation, route }) {
 							style={{
 								backgroundColor: '#FF521B',
 								borderRadius: 4,
-								paddingVertical: 8,
+								paddingVertical: 16,
 								alignItems: 'center',
 								marginTop: 8,
 							}}
@@ -319,7 +320,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
 	checkoutButton: {
 		backgroundColor: '#00b2ca',
 		borderRadius: 4,
-		paddingVertical: 8,
+		paddingVertical: 16,
 		paddingHorizontal: 8,
 		alignItems: 'center',
 		marginTop: 12,
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
 	checkoutButton2: {
 		backgroundColor: '#21A179',
 		borderRadius: 4,
-		paddingVertical: 8,
+		paddingVertical: 16,
 		paddingHorizontal: 8,
 		alignItems: 'center',
 		marginTop: 12,

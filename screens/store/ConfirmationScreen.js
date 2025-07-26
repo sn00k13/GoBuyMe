@@ -605,7 +605,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,
@@ -671,7 +670,6 @@ const styles = StyleSheet.create({
 	proceedButton: {
 		backgroundColor: '#FF521B',
 		padding: 16,
-		paddingVertical: 14,
 		alignItems: 'center',
 		marginHorizontal: 16,
 		borderRadius: 4,

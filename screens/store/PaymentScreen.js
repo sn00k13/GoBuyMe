@@ -325,7 +325,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
 	},
 	headerTitle: {
 		fontSize: 18,
@@ -419,7 +418,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#FF521B',
 		borderRadius: 4,
 		padding: 16,
-		paddingVertical: 14,
 		alignItems: 'center',
 		alignItems: 'center',
 		marginTop: 24,

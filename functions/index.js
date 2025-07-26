@@ -55,7 +55,7 @@ exports.notifyOrderStatusUpdate = onDocumentUpdated("orders/{orderId}", async (e
       to: expoPushToken,
       sound: 'default',
       title: 'Order Status Updated',
-      body: `Your order status has been updated to "${after.status}"`,
+      body: `Order ${orderId} status has been updated to "${after.status}".\n ${after.status === 'Delivered' ? 'If you have not received your order, please contact us immediately.' : ''}`,
       data: { orderId, status: after.status },
     };
 

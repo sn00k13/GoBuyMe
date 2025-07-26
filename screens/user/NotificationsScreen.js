@@ -46,7 +46,6 @@ export default function NotificationsScreen({ navigation }) {
 		const q = query(
 			notificationsRef,
 			where('userId', '==', user.uid)
-			// orderBy('createdAt', 'desc') // Temporarily removed to debug field issues
 		);
 
 		const unsubscribe = onSnapshot(

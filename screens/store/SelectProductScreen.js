@@ -320,7 +320,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
 	},
 	locationText: {
 		fontSize: 18,

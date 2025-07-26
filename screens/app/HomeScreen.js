@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		padding: 16,
-		marginTop: 40
+		// marginTop: 40
 	},
 	logoText: {
 		fontSize: 20,
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	imageContainer: {
-		height: 350, // Fixed height for image
+		height: 320, // Fixed height for image
 		width: '100%',
 		paddingBottom: 10
 	},
@@ -322,6 +322,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		padding: 16,
+		paddingBottom: 10,
 		borderBottomWidth: 1,
 	},
 	menuContent: {
