@@ -48,7 +48,7 @@ const ChatScreen = ({ navigation }) => {
 			setUserId(storedUserId);
 
 			// Connect to socket server
-			const socketInstance = io('http://192.168.0.187:3001', {
+			const socketInstance = io('http://localhost:3001', {
 				transports: ['websocket'],
 				reconnectionAttempts: 5,
 			});
