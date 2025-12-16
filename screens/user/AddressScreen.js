@@ -8,6 +8,7 @@ import {
 	TextInput,
 	Alert,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
@@ -372,6 +373,7 @@ export default function AddressesScreen({ navigation }) {
 					</Pressable>
 				)}
 			</ScrollView>
+			<View style={{ padding: 20 }}></View>
 		</SafeAreaView>
 	);
 }
@@ -387,6 +389,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			  },
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			  },
+		  }),
 	},
 	locationText: {
 		fontSize: 18,

@@ -7,6 +7,7 @@ import {
 	Animated,
 	Easing,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../../utils/ThemeContext';
@@ -128,6 +129,7 @@ export default function OrderConfirmation({ navigation, route }) {
 					<Text style={styles.secondaryButtonText}>Continue Shopping</Text>
 				</TouchableOpacity>
 			</View>
+			<View style={styles.bottomPad}></View>
 		</SafeAreaView>
 	);
 }
@@ -159,6 +161,18 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: '#0B3948',
 		marginBottom: 16,
+	},
+	bottomPad: {
+		...Platform.select({
+			ios: {
+				paddingBottom: 0,
+				// iOS specific styles
+			  },
+			android: {
+				paddingBottom: 40,
+				// Android specific styles
+			  },
+		  }),
 	},
 	message: {
 		fontSize: 16,

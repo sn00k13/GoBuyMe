@@ -8,6 +8,7 @@ import {
 	Image,
 	TextInput,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
@@ -17,6 +18,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../utils/ThemeContext';
 
 function SelectProductScreen({ navigation, route }) {
+	const { store } = route.params;
 	const [activeCategory, setActiveCategory] = useState(
 		route?.params?.selectedCategory
 	);
@@ -59,29 +61,15 @@ function SelectProductScreen({ navigation, route }) {
 	};
 
 	useEffect(() => {
-		const fetchStore = async () => {
-			try {
-				const storeRef = doc(db, 'stores', storeId);
-				const storeSnap = await getDoc(storeRef);
-				if (storeSnap.exists()) {
-					const storeData = storeSnap.data();
-					let categoriesArray = [];
-					if (
-						storeData.categories &&
-						typeof storeData.categories === 'object'
-					) {
-						categoriesArray = Object.values(storeData.categories);
-					}
-					setCategories(categoriesArray);
-				} else {
-					setCategories([]);
-				}
-			} catch (err) {
-				console.log('Error fetching store:', err);
-				setCategories([]);
+		if (store && store.categories) {
+			let categoriesArray = [];
+			if (typeof store.categories === 'object') {
+				categoriesArray = Object.values(store.categories);
 			}
-		};
-		fetchStore();
+			setCategories(categoriesArray);
+		} else {
+			setCategories([]);
+		}
 	}, [storeId]);
 
 	const sortedCategories = categories
@@ -290,6 +278,7 @@ function SelectProductScreen({ navigation, route }) {
 						navigation.navigate('EMartCartDetails', {
 							cartItems: getCart(storeId),
 							storeId,
+							store,
 						})
 					}
 				>
@@ -320,6 +309,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			  },
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			  },
+		  }),
 	},
 	locationText: {
 		fontSize: 18,

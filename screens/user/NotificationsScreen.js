@@ -7,6 +7,7 @@ import {
 	Pressable,
 	SafeAreaView,
 	RefreshControl,
+	Platform,
 } from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
@@ -187,9 +188,10 @@ export default function NotificationsScreen({ navigation }) {
 					}
 				/>
 			)}
-			<Pressable onPress={() => setMode(mode === 'light' ? 'dark' : 'light')}>
+			{/* <Pressable onPress={() => setMode(mode === 'light' ? 'dark' : 'light')}>
 				<ColorText color="accent">Toggle Theme</ColorText>
-			</Pressable>
+			</Pressable> */}
+			<View style={{ padding: 20 }}></View>
 		</SafeAreaView>
 	);
 }
@@ -204,7 +206,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			  },
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			  },
+		  }),
 		marginBottom: 16,
 	},
 	title: {

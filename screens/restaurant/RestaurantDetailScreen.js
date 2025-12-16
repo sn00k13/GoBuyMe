@@ -4,21 +4,20 @@ import {
 	Text,
 	StyleSheet,
 	Image,
-	ScrollView,
 	Pressable,
 	FlatList,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import {
 	doc,
-	getDoc,
 	collection,
 	getDocs,
 	setDoc,
+	onSnapshot,
 	updateDoc,
-	arrayUnion,
-	arrayRemove,
+	getDoc,
 } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 import { useCart } from '../app/CartContext';
@@ -75,23 +74,36 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 			}
 		};
 
-		const checkFavorite = async () => {
-			const user = getAuth().currentUser;
+		// Set up real-time listener for favorites
+		const setupFavoriteListener = () => {
+			const user = auth.currentUser;
 			if (!user || !restaurantId) return;
-			try {
-				const favDoc = await getDoc(
-					doc(db, 'users', user.uid, 'favorites', 'vendors')
-				);
-				const ids = favDoc.exists() ? favDoc.data().ids || [] : [];
-				setIsFavorite(ids.includes(restaurantId));
-			} catch (e) {
-				setIsFavorite(false);
-			}
+			
+			const favRef = doc(db, 'users', user.uid, 'favorites', 'vendors');
+			
+			// Set up real-time listener
+			const unsubscribe = onSnapshot(favRef, (doc) => {
+				if (doc.exists()) {
+					const favorites = doc.data().ids || [];
+					setIsFavorite(favorites.includes(restaurantId));
+				} else {
+					setIsFavorite(false);
+				}
+			}, (error) => {
+				console.error('Error listening to favorites:', error);
+			});
+			
+			return unsubscribe;
 		};
-		checkFavorite();
 
 		fetchRestaurant();
 		fetchMenu();
+		const unsubscribe = setupFavoriteListener();
+		
+		// Clean up the listener on unmount
+		return () => {
+			if (unsubscribe) unsubscribe();
+		};
 	}, [restaurantId]);
 
 	useFocusEffect(
@@ -128,6 +140,9 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 				onPress={() =>
 					navigation.navigate('RestaurantMenuItem', {
 						restaurantId,
+						restaurantName: restaurant?.name || '',
+						restaurantAddress: restaurant?.address || '',
+						restaurantLocation: restaurant?.address || null,
 						menuItem: {
 							id: item.id,
 							name: item.name || '',
@@ -135,7 +150,6 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 							price: item.price || 0,
 							imageUrl: item.imageUrl || null,
 						},
-						restaurantName: restaurant?.name || '',
 					})
 				}
 			>
@@ -274,40 +288,30 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 		  }
 	  
 		  const favRef = doc(db, 'users', user.uid, 'favorites', 'vendors');
-		  let favDoc;
-		  try {
-			favDoc = await getDoc(favRef);
-		  } catch (err) {
-			console.error('Error fetching favorites doc:', err);
-			setFavLoading(false);
-			return;
-		  }
-	  
+		  
+		  // Get current favorites
+		  const favDoc = await getDoc(favRef);
 		  let currentIds = [];
+		  
 		  if (favDoc.exists()) {
 			const data = favDoc.data();
 			currentIds = Array.isArray(data.ids) ? data.ids : [];
 		  }
 	  
+		  // Toggle the favorite status
 		  let newIds;
 		  if (currentIds.includes(id)) {
-			// Remove favorite
+			// Remove from favorites
 			newIds = currentIds.filter(favId => favId !== id);
-			console.log('Removing favorite. New ids:', newIds);
 		  } else {
-			// Add favorite
+			// Add to favorites
 			newIds = [...currentIds, id];
-			console.log('Adding favorite. New ids:', newIds);
 		  }
 	  
-		  try {
-			await setDoc(favRef, { ids: newIds }, { merge: true });
-			setIsFavorite(newIds.includes(id));
-			console.log('Favorite updated successfully');
-		  } catch (err) {
-			console.error('Error updating favorites:', err);
-			alert('Failed to update favorites: ' + err.message);
-		  }
+		  // Update the document
+		  await setDoc(favRef, { ids: newIds }, { merge: true });
+		  
+		  // No need to manually setIsFavorite as the listener will handle it
 		} catch (error) {
 		  console.error('Unexpected error in toggleFavorite:', error);
 		} finally {
@@ -434,7 +438,14 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+			},
+			android: {
+				marginTop: 40,
+			},
+		  }),
 		borderBottomWidth: 1,
 		borderBottomColor: '#F0F0F0',
 	},

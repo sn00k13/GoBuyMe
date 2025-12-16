@@ -1,68 +1,83 @@
+import React, { useEffect, useRef } from 'react';
 import {
-	View,
-	Text,
-	StyleSheet,
-	ImageBackground,
-	SafeAreaView,
+  View,
+  StyleSheet,
+  ImageBackground,
+  Animated,
+  Image
 } from 'react-native';
 
 export default function SplashScreen({ navigation }) {
-	setTimeout(() => {
-		navigation.replace('Landing');
-	}, 5000);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
-	return (
-		<View style={styles.container}>
-			<ImageBackground
-				source={require('../../assets/platter.jpg')}
-				style={styles.backgroundImage}
-				resizeMode="cover"
-			>
-				{/* Dark overlay */}
-				<View style={styles.overlay} />
+  useEffect(() => {
+    // Fade in and scale up animation
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true
+      })
+    ]).start();
 
-				{/* Content */}
-				<View style={styles.content}>
-					<Text style={styles.title}>GoBuyMe</Text>
-					<Text style={styles.subtitle}>
-						..battle that hunger! ..avoid the stress!
-					</Text>
-				</View>
-			</ImageBackground>
-		</View>
-	);
+    // Navigate after 2 seconds
+    const timer = setTimeout(() => {
+      navigation.replace('Landing');
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const logoStyle = {
+    opacity: fadeAnim,
+    transform: [{ scale: scaleAnim }],
+    width: 180,
+    height: 180,
+  };
+
+  return (
+    <ImageBackground
+      source={require('../../assets/platter.jpg')}
+      style={styles.container}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay}>
+        <Animated.View style={[styles.logoContainer, logoStyle]}>
+          <Image
+            source={require('../../assets/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </Animated.View>
+      </View>
+    </ImageBackground>
+  );
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-	backgroundImage: {
-		flex: 1,
-		justifyContent: 'center',
-	},
-	overlay: {
-		...StyleSheet.absoluteFillObject,
-		backgroundColor: 'rgba(0, 0, 0, 0.3)', // Adjust opacity (0.3 = 30% dark tint)
-	},
-	content: {
-		alignItems: 'center',
-	},
-	title: {
-		fontSize: 48,
-		fontWeight: 'bold',
-		color: '#FF521B',
-		textShadowColor: 'rgba(0, 0, 0, 0.5)',
-		textShadowOffset: { width: 1, height: 1 },
-		textShadowRadius: 2,
-	},
-	subtitle: {
-		fontSize: 22,
-		color: '#E9F7CA',
-		marginTop: 10,
-		fontWeight: '600',
-		textShadowColor: 'rgba(0, 0, 0, 0.8)',
-		textShadowOffset: { width: 1, height: 1 },
-		textShadowRadius: 2,
-	},
+  container: {
+    flex: 1,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(187, 185, 185, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoContainer: {
+    width: 180,
+    height: 180,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    width: '100%',
+    height: '100%',
+  }
 });

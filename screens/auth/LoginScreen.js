@@ -7,23 +7,43 @@ import {
 	StyleSheet,
 	Alert,
 	ImageBackground,
-	SafeAreaView,
 } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { MaterialIcons } from '@expo/vector-icons';
+import { validate, validators } from '../../utils/validation';
 
 export default function LoginScreen({ navigation }) {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
+	const [errors, setErrors] = useState({});
+
+	const validateField = (field, value) => {
+		const rules = {
+			email: [validators.required, validators.email],
+			password: [validators.required, validators.minLength(6)],
+		};
+
+		const error = validate(value, rules[field] || []);
+		setErrors(prev => ({ ...prev, [field]: error === true ? '' : error }));
+		return error === true;
+	};
 
 	const handleLogin = async () => {
+		// Validate all fields
+		const isEmailValid = validateField('email', email);
+		const isPasswordValid = validateField('password', password);
+
+		if (!isEmailValid || !isPasswordValid) {
+			return;
+		}
+
 		try {
 			await signInWithEmailAndPassword(auth, email, password);
 			navigation.replace('HomeMain'); // Navigate to Home screen on successful login
 		} catch (error) {
-			Alert.alert('Login Error', error.message);
+			Alert.alert('Login Error', 'User or password is incorrect');
 		}
 	};
 
@@ -40,17 +60,32 @@ export default function LoginScreen({ navigation }) {
 					<TextInput
 						placeholder="Email"
 						value={email}
-						onChangeText={setEmail}
-						style={styles.input}
+						onChangeText={(value) => {
+							setEmail(value);
+							if (errors.email) {
+								validateField('email', value);
+							}
+						}}
+						onBlur={() => validateField('email', email)}
+						keyboardType="email-address"
+						autoCapitalize="none"
+						style={[styles.input, errors.email && styles.inputError]}
 					/>
+					{errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
 					<View style={styles.passwordContainer}>
 						<TextInput
 							placeholder="Password"
 							secureTextEntry={!showPassword}
 							value={password}
-							onChangeText={setPassword}
-							style={[styles.input, styles.passwordInput]}
+							onChangeText={(value) => {
+								setPassword(value);
+								if (errors.password) {
+									validateField('password', value);
+								}
+							}}
+							onBlur={() => validateField('password', password)}
+							style={[styles.input, styles.passwordInput, errors.password && styles.inputError]}
 						/>
 						<Pressable
 							onPress={() => setShowPassword(!showPassword)}
@@ -63,6 +98,7 @@ export default function LoginScreen({ navigation }) {
 							/>
 						</Pressable>
 					</View>
+					{errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
 					<Pressable
 						onPress={handleLogin}
@@ -79,7 +115,7 @@ export default function LoginScreen({ navigation }) {
 							<Text style={styles.link}>Forgot Password?</Text>
 						</Pressable>
 						<Pressable onPress={() => navigation.navigate('Register')}>
-							<Text style={styles.link}>Don't have an account? Register</Text>
+							<Text style={styles.link}>Register</Text>
 						</Pressable>
 					</View>
 				</View>
@@ -156,5 +192,15 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		padding: 10,
+	},
+	errorText: {
+		color: '#ff4444',
+		fontSize: 12,
+		marginTop: -10,
+		marginBottom: 10,
+		marginLeft: 5,
+	},
+	inputError: {
+		borderColor: '#ff4444',
 	},
 });

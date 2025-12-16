@@ -8,6 +8,7 @@ import {
 	RefreshControl,
 	ActivityIndicator,
 	SafeAreaView,
+	Platform
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { getAuth } from 'firebase/auth';
@@ -55,14 +56,18 @@ export default function OrdersScreen({ navigation }) {
 
 	const getStatusColor = (status) => {
 		switch (status) {
-			case 'pending':
+			case 'Pending':
 				return '#FF9800';
-			case 'processing':
+			case 'Processing':
 				return '#2196F3';
-			case 'delivered':
+			case 'Delivered':
 				return '#4CAF50';
-			case 'cancelled':
-				return '#F44336';
+			case 'Cancelled':
+				return '#FF0000';
+			case 'On Transit':
+				return '#1B9AAA';
+			case 'Reported':
+				return '#6A2E35';
 			default:
 				return '#757575';
 		}
@@ -70,17 +75,46 @@ export default function OrdersScreen({ navigation }) {
 
 	const getStatusIcon = (status) => {
 		switch (status) {
-			case 'pending':
-				return 'pending';
-			case 'processing':
-				return 'local-shipping';
-			case 'delivered':
-				return 'check-circle';
-			case 'cancelled':
-				return 'cancel';
+			case 'Pending':
+				return 'hourglass-empty'; // Simple clock icon
+			case 'Processing':
+				return 'local-shipping'; // Truck icon
+			case 'Delivered':
+				return 'check-circle'; // Checkmark in circle
+			case 'Cancelled':
+				return 'cancel'; // X icon
+			case 'On Transit':
+				return 'local-shipping'; // Same as processing
+			case 'Reported':
+				return 'report'; // Report icon
 			default:
-				return 'help';
+				return 'help-outline'; // Help icon with outline
 		}
+	};
+
+	const renderOrderStatus = (status) => {
+		// Log the status to see what we're working with
+		console.log('Status:', status);
+
+		// Simple mapping of status to known working icons
+		const iconMap = {
+			Pending: 'schedule',
+			Processing: 'local-shipping',
+			Delivered: 'check-circle',
+			Cancelled: 'cancel',
+			'On Transit': 'local-shipping',
+			Reported: 'report',
+		};
+
+		const iconName = iconMap[status] || 'help-outline';
+		return (
+			<MaterialIcons
+				name={iconName}
+				size={16}
+				color="white"
+				style={styles.statusIcon}
+			/>
+		);
 	};
 
 	const formatDate = (timestamp) => {
@@ -97,7 +131,7 @@ export default function OrdersScreen({ navigation }) {
 
 	const renderOrder = ({ item }) => (
 		<Pressable
-			style={[styles.orderCard, { backgroundColor: theme.cards }]}
+			style={styles.orderCard}
 			onPress={() => navigation.navigate('OrderDetails', { orderId: item.id })}
 		>
 			<View style={styles.orderHeader}>
@@ -110,12 +144,7 @@ export default function OrdersScreen({ navigation }) {
 						{ backgroundColor: getStatusColor(item.status) },
 					]}
 				>
-					<MaterialIcons
-						name={getStatusIcon(item.status)}
-						size={16}
-						color="white"
-						style={styles.statusIcon}
-					/>
+					{renderOrderStatus(item.status)}
 					<Text style={styles.statusText}>
 						{(item.status || 'pending').charAt(0).toUpperCase() +
 							(item.status || 'pending').slice(1)}
@@ -201,6 +230,7 @@ export default function OrdersScreen({ navigation }) {
 					</View>
 				}
 			/>
+			<View style={{ padding: 30 }}></View>
 		</SafeAreaView>
 	);
 }
@@ -216,7 +246,16 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		marginTop: 40,
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			  },
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			  },
+		  }),
 	},
 	headerText: {
 		fontSize: 18,
@@ -233,7 +272,7 @@ const styles = StyleSheet.create({
 		padding: 16,
 	},
 	orderCard: {
-		backgroundColor: 'white',
+		backgroundColor: '#EAE0D5',
 		borderRadius: 4,
 		padding: 16,
 		marginBottom: 12,

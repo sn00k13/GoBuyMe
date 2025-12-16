@@ -10,6 +10,7 @@ import {
 	Alert,
 	SafeAreaView,
 	KeyboardAvoidingView,
+	Platform,
 } from 'react-native';
 import { useCart } from '../app/CartContext';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -22,7 +23,7 @@ export default function CartDetails({ route, navigation }) {
 		removeFromCart,
 		updateCartItemQuantity,
 	} = useCart();
-	const { restaurantId, restaurantName } = route.params;
+	const { restaurantId, restaurantName, restaurantAddress, restaurantLocation } = route.params;
 	const cartItems = cart[restaurantId]?.items || [];
 
 	const [discountCode, setDiscountCode] = React.useState('');
@@ -153,6 +154,8 @@ export default function CartDetails({ route, navigation }) {
 			totalAmount: discountedTotal, // pass the discounted total
 			restaurantId,
 			restaurantName,
+			restaurantAddress,
+			restaurantLocation,
 			discountApplied, // pass this if you want to show a message
 			discountAmount: total - discountedTotal, // pass the discount value if needed
 		});
@@ -223,7 +226,7 @@ export default function CartDetails({ route, navigation }) {
 					</Text>
 				</View>
 				<View style={styles.proceedCheckout}>
-					<Pressable onPress={() => navigation.navigate('RestaurantMenuItem')}>
+					<Pressable onPress={() => navigation.goBack()}>
 						<Text style={styles.proceedCheckoutText}>Continue Shopping</Text>
 					</Pressable>
 				</View>
@@ -233,6 +236,7 @@ export default function CartDetails({ route, navigation }) {
 					</Pressable>
 				</View>
 			</View>
+			<View style={styles.bottomPad}></View>
 		</SafeAreaView>
 	);
 }
@@ -249,7 +253,28 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			  },
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			  },
+		  }),
+	},
+	bottomPad: {
+		...Platform.select({
+			ios: {
+			  paddingBottom: 0,
+			  // iOS specific styles
+			},
+			android: {
+			  paddingBottom: 40,
+			  // Android specific styles
+			},
+		  }),
 	},
 	headerText: {
 		fontSize: 18,

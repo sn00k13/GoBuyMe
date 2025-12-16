@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
 		fontSize: 24,
 		fontWeight: 'bold',
 		marginBottom: 10,
-		color: '#FF6B6B',
+		color: '#FF521B',
 	},
 	subtitle: {
 		fontSize: 16,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 	},
 	button: {
-		backgroundColor: '#FF6B6B',
+		backgroundColor: '#FF521B',
 		padding: 15,
 		borderRadius: 8,
 		alignItems: 'center',
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 	},
 	link: {
-		color: '#FF6B6B',
+		color: '#FF521B',
 		textAlign: 'center',
 	},
 });

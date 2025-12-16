@@ -8,6 +8,7 @@ import {
 	Linking,
 	SafeAreaView,
 	FlatList,
+	Platform,
 } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -18,6 +19,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { useTheme } from '../../utils/ThemeContext';
+
 
 const images = [
 	require('../../assets/burger-deal.jpg'),
@@ -98,8 +100,9 @@ export default function HomeScreen({ navigation }) {
 					<MaterialIcons name="menu" size={28} color={theme.text} />
 				</Pressable>
 				<Text style={styles.logoText}>GoBuyMe</Text>
-				<Pressable onPress={() => Linking.openURL('tel:08037674195')}>
-					<FontAwesome name="phone" size={24} color={theme.text} />
+				<Pressable onPress={() => Linking.openURL('tel:08037674195') } style={styles.supportButton}>
+					<FontAwesome name="phone" size={14} color={theme.text} />
+					<Text>Support</Text>
 				</Pressable>
 			</View>
 
@@ -113,10 +116,10 @@ export default function HomeScreen({ navigation }) {
 						pagingEnabled
 						showsHorizontalScrollIndicator={false}
 						ref={sliderRef}
-						onMomentumScrollEnd={e => {
+						onMomentumScrollEnd={(e) => {
 							const index = Math.round(
 								e.nativeEvent.contentOffset.x /
-								e.nativeEvent.layoutMeasurement.width
+									e.nativeEvent.layoutMeasurement.width
 							);
 							setCurrentIndex(index);
 						}}
@@ -129,7 +132,13 @@ export default function HomeScreen({ navigation }) {
 						)}
 						keyExtractor={(_, idx) => idx.toString()}
 					/>
-					<View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8 }}>
+					<View
+						style={{
+							flexDirection: 'row',
+							justifyContent: 'center',
+							marginTop: 8,
+						}}
+					>
 						{images.map((_, idx) => (
 							<View
 								key={idx}
@@ -205,7 +214,7 @@ export default function HomeScreen({ navigation }) {
 				</View>
 				<FontAwesome name="angle-right" size={24} color={theme.text} />
 			</Pressable>
-			<Pressable
+			{/* <Pressable
 				style={[
 					styles.menuContainer,
 					{
@@ -220,7 +229,7 @@ export default function HomeScreen({ navigation }) {
 					<Text style={[{ color: theme.text }]}>My Basket</Text>
 				</View>
 				<FontAwesome name="angle-right" size={24} color={theme.text} />
-			</Pressable>
+			</Pressable> */}
 			<Pressable
 				style={[
 					styles.menuContainer,
@@ -253,7 +262,7 @@ export default function HomeScreen({ navigation }) {
 				</View>
 				<FontAwesome name="angle-right" size={24} color={theme.text} />
 			</Pressable>
-			<View style={{ padding: 5 }}></View>
+			<View style={styles.bottomPad}></View>
 		</SafeAreaView>
 	);
 }
@@ -267,7 +276,28 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		padding: 16,
-		// marginTop: 40
+		...Platform.select({
+			ios: {
+			  marginTop: 0,
+			  // iOS specific styles
+			},
+			android: {
+			  marginTop: 40,
+			  // Android specific styles
+			},
+		  }),
+	},
+	bottomPad: {
+		...Platform.select({
+			ios: {
+			  paddingBottom: 0,
+			  // iOS specific styles
+			},
+			android: {
+			  paddingBottom: 40,
+			  // Android specific styles
+			},
+		  }),
 	},
 	logoText: {
 		fontSize: 20,
@@ -280,7 +310,12 @@ const styles = StyleSheet.create({
 	imageContainer: {
 		height: 320, // Fixed height for image
 		width: '100%',
-		paddingBottom: 10
+		paddingBottom: 10,
+	},
+	supportButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 5,
 	},
 	image: {
 		width: '100%',

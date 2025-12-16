@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
 		fontSize: 24,
 		fontWeight: 'bold',
 		marginBottom: 20,
-		color: '#FF6B6B',
+		color: '#FF521B',
 		textAlign: 'center',
 	},
 	message: {
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	button: {
-		backgroundColor: '#FF6B6B',
+		backgroundColor: '#FF521B',
 		padding: 15,
 		borderRadius: 8,
 		alignItems: 'center',

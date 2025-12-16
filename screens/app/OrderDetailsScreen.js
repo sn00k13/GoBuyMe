@@ -7,6 +7,8 @@ import {
 	ActivityIndicator,
 	Pressable,
 	SafeAreaView,
+	Platform,
+	Image,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
@@ -17,7 +19,9 @@ import { useTheme } from '../../utils/ThemeContext';
 export default function OrderDetailsScreen({ navigation, route }) {
 	const { orderId } = route.params;
 	const [order, setOrder] = useState(null);
+	const [agent, setAgent] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [agentLoading, setAgentLoading] = useState(false);
 	const { addToCart } = useCart();
 	const { theme, mode, setMode } = useTheme();
 
@@ -26,7 +30,13 @@ export default function OrderDetailsScreen({ navigation, route }) {
 			try {
 				const orderDoc = await getDoc(doc(db, 'orders', orderId));
 				if (orderDoc.exists()) {
-					setOrder({ id: orderDoc.id, ...orderDoc.data() });
+					const orderData = { id: orderDoc.id, ...orderDoc.data() };
+					setOrder(orderData);
+
+					// If order is delivered and has a modifiedBy field, fetch agent details
+					if (orderData.status === 'Delivered' && orderData.modifiedBy) {
+						fetchAgentDetails(orderData.modifiedBy);
+					}
 				}
 			} catch (error) {
 				console.error('Error fetching order:', error);
@@ -35,19 +45,37 @@ export default function OrderDetailsScreen({ navigation, route }) {
 			}
 		};
 
+		const fetchAgentDetails = async (agentId) => {
+			setAgentLoading(true);
+			try {
+				const agentDoc = await getDoc(doc(db, 'agents', agentId));
+				if (agentDoc.exists()) {
+					setAgent({ id: agentDoc.id, ...agentDoc.data() });
+				}
+			} catch (error) {
+				console.error('Error fetching agent details:', error);
+			} finally {
+				setAgentLoading(false);
+			}
+		};
+
 		fetchOrder();
 	}, [orderId]);
 
 	const getStatusColor = (status) => {
 		switch (status) {
-			case 'pending':
+			case 'Pending':
 				return '#FF9800';
-			case 'processing':
+			case 'Processing':
 				return '#2196F3';
-			case 'delivered':
+			case 'Delivered':
 				return '#4CAF50';
-			case 'cancelled':
+			case 'Cancelled':
 				return '#F44336';
+			case 'On Transit':
+				return '#1B9AAA';
+			case 'Reported':
+				return '#6A2E35';
 			default:
 				return '#757575';
 		}
@@ -106,8 +134,8 @@ export default function OrderDetailsScreen({ navigation, route }) {
 							]}
 						>
 							<Text style={styles.statusText}>
-								{(order.status || 'pending').charAt(0).toUpperCase() +
-									(order.status || 'pending').slice(1)}
+								{(order.status || 'Pending').charAt(0).toUpperCase() +
+									(order.status || 'Pending').slice(1)}
 							</Text>
 						</View>
 					</View>
@@ -115,6 +143,60 @@ export default function OrderDetailsScreen({ navigation, route }) {
 						{formatDate(order.createdAt)}
 					</Text>
 				</View>
+
+				{/* Delivery Agent Section */}
+				{order.status === 'Delivered' && order.modifiedBy && (
+					<View style={[styles.section, { backgroundColor: theme.cards }]}>
+						<Text style={[styles.sectionTitle, { color: theme.text }]}>
+							Delivery Agent
+						</Text>
+						{agentLoading ? (
+							<ActivityIndicator size="small" color="#FF521B" />
+						) : agent ? (
+							<View style={styles.agentContainer}>
+								{agent.profileImage ? (
+									<Image
+										source={{ uri: agent.profileImage }}
+										style={styles.agentImage}
+									/>
+								) : (
+									<View style={styles.agentPlaceholder}>
+										<MaterialIcons name="person" size={32} color="#666" />
+									</View>
+								)}
+								<View style={styles.agentInfo}>
+									<Text style={[styles.agentName, { color: theme.text }]}>
+										{agent.name || 'Delivery Agent'}
+									</Text>
+									{agent.phone && (
+										<Text style={[styles.agentPhone, { color: theme.text }]}>
+											{agent.phone}
+										</Text>
+									)}
+									{agent.averageRating && (
+										<View style={styles.agentRating}>
+											<MaterialIcons name="star" size={16} color="#FFD700" />
+											<Text style={[styles.ratingText, { color: theme.text }]}>
+												{agent.averageRating.toFixed(1)}
+											</Text>
+											{agent.totalDeliveries && (
+												<Text
+													style={[styles.deliveryCount, { color: theme.text }]}
+												>
+													• {agent.totalDeliveries} deliveries
+												</Text>
+											)}
+										</View>
+									)}
+								</View>
+							</View>
+						) : (
+							<Text style={[styles.noAgentText, { color: theme.text }]}>
+								Agent details not available
+							</Text>
+						)}
+					</View>
+				)}
 
 				<View style={[styles.section, { backgroundColor: theme.cards }]}>
 					<Text style={[styles.sectionTitle, { color: theme.text }]}>
@@ -163,7 +245,6 @@ export default function OrderDetailsScreen({ navigation, route }) {
 						</Text>
 					</View>
 				</View>
-
 				<View style={[styles.section, { backgroundColor: theme.cards }]}>
 					<Text style={[styles.sectionTitle, { color: theme.text }]}>
 						Payment Information
@@ -199,7 +280,6 @@ export default function OrderDetailsScreen({ navigation, route }) {
 						</View>
 					)}
 				</View>
-
 				<View style={[styles.section, { backgroundColor: theme.cards }]}>
 					<Text style={[styles.sectionTitle, { color: theme.text }]}>
 						Customer Information
@@ -224,7 +304,28 @@ export default function OrderDetailsScreen({ navigation, route }) {
 					</View>
 				</View>
 
-				{order.status === 'pending' && (
+				<Pressable
+					onPress={() =>
+						navigation.navigate('Ratings', {
+							orderId: order.id,
+							// For restaurant orders
+							restaurantId: order.restaurantId,
+							restaurantName: order.restaurantName,
+							// For store orders
+							storeId: order.storeId,
+							storeName: order.storeName,
+							// Agent information
+							agentId: order.modifiedBy,
+							agentName: agent?.name || 'Delivery Agent',
+							// Determine the type of order
+							orderType: order.restaurantId ? 'restaurant' : 'store',
+						})
+					}
+					style={styles.rateButton}
+				>
+					<Text style={styles.rateButtonText}>Rate Your Experience</Text>
+				</Pressable>
+				{order.status === 'Delivered' && (
 					<Pressable
 						style={[styles.cancelButton, { backgroundColor: theme.primary }]}
 						onPress={async () => {
@@ -272,6 +373,14 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+			},
+			android: {
+				marginTop: 40,
+			},
+		}),
 	},
 	headerText: {
 		fontSize: 18,
@@ -319,6 +428,55 @@ const styles = StyleSheet.create({
 		color: '#0B3948',
 		marginBottom: 12,
 	},
+	// Agent section styles
+	agentContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	agentImage: {
+		width: 50,
+		height: 50,
+		borderRadius: 25,
+		marginRight: 12,
+	},
+	agentPlaceholder: {
+		width: 50,
+		height: 50,
+		borderRadius: 25,
+		backgroundColor: '#F0F0F0',
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginRight: 12,
+	},
+	agentInfo: {
+		flex: 1,
+	},
+	agentName: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		marginBottom: 4,
+	},
+	agentPhone: {
+		fontSize: 14,
+		marginBottom: 4,
+	},
+	agentRating: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	ratingText: {
+		marginLeft: 4,
+		fontSize: 14,
+	},
+	deliveryCount: {
+		marginLeft: 8,
+		fontSize: 14,
+	},
+	noAgentText: {
+		fontSize: 14,
+		fontStyle: 'italic',
+	},
+	// Item styles
 	itemRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
@@ -384,6 +542,18 @@ const styles = StyleSheet.create({
 		padding: 16,
 		alignItems: 'center',
 		marginBottom: 24,
+	},
+	rateButton: {
+		backgroundColor: '#00b2ca',
+		borderRadius: 4,
+		padding: 16,
+		alignItems: 'center',
+		marginBottom: 10,
+	},
+	rateButtonText: {
+		color: 'white',
+		fontSize: 16,
+		fontWeight: 'bold',
 	},
 	cancelButtonText: {
 		color: 'white',

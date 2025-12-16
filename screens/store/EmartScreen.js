@@ -8,11 +8,12 @@ import {
 	Image,
 	FlatList,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import logoImg from '../../assets/logo.png';
+import logoImg from '../../assets/logo-icon.png';
 import { useTheme } from '../../utils/ThemeContext';
 const PLACEHOLDER_IMAGE = require('../../assets/placeholder.jpg');
 
@@ -60,12 +61,14 @@ function EmartScreen({ navigation, route }) {
 	const renderCategory = ({ item }) => (
 		<Pressable
 			style={[styles.productCard, { backgroundColor: theme.cards }]}
-			onPress={() =>
+			onPress={() => {
+				console.log('Store details on press:', store);
 				navigation.navigate('SelectProductScreen', {
+					store, // Pass the full store object
 					categories, // pass the whole categories array
 					selectedCategory: item.name, // or item.id if you have unique ids
-				})
-			}
+				});
+			}}
 		>
 			<Image
 				source={item.imgUrl ? { uri: item.imgUrl } : PLACEHOLDER_IMAGE}
@@ -208,11 +211,14 @@ function EmartScreen({ navigation, route }) {
 				]}
 			>
 				<View style={styles.cardContainer}>
-					<Image
+					<View style={styles.ImageContainer}>
+						<Image
 						style={styles.storeImageContainer}
 						source={logoImg}
 						resizeMode="contain"
 					/>
+					</View>
+					
 					<View style={styles.storeDetails}>
 						<View>
 							<Text style={[styles.emartInfoTitle, { color: theme.text }]}>
@@ -292,6 +298,16 @@ const styles = StyleSheet.create({
 		backgroundColor: 'white',
 		borderBottomWidth: 1,
 		borderBottomColor: '#F0F0F0',
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			  },
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			  },
+		  }),
 	},
 	locationText: {
 		fontSize: 18,
@@ -307,6 +323,11 @@ const styles = StyleSheet.create({
 		borderBottomColor: '#F0F0F0',
 	},
 	storeImageContainer: {
+		width: 100,
+		height: 100,
+		aspectRatio: 1,
+	},
+	ImageContainer: {
 		width: '40%',
 		aspectRatio: 1,
 	},

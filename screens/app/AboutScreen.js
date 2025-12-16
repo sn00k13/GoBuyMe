@@ -8,6 +8,7 @@ import {
 	Linking,
 	ScrollView,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../../utils/ThemeContext';
@@ -98,6 +99,16 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		marginBottom: 24,
 		justifyContent: 'space-between',
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			  },
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			  },
+		  }),
 	},
 	title: {
 		fontSize: 18,

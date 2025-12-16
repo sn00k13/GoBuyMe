@@ -22,9 +22,8 @@ const LandingScreen = () => {
 						source={require('../../assets/logo.png')}
 						style={styles.logo}
 					/>
-					<Text style={styles.title}>GoBuyMe</Text>
 					<Text style={styles.subtitle}>
-						Your favorite meals, delivered fast
+						We run so you don't have to
 					</Text>
 				</View>
 
@@ -81,20 +80,15 @@ const styles = StyleSheet.create({
 		marginTop: 60,
 	},
 	logo: {
-		width: 120,
+		width: 200,
 		height: 120,
-		marginBottom: 20,
 		resizeMode: 'contain',
-	},
-	title: {
-		fontSize: 32,
-		fontWeight: 'bold',
-		color: '#0B3948',
-		marginBottom: 8,
+		marginTop: 60
 	},
 	subtitle: {
 		fontSize: 16,
 		color: '#7F9172',
+		fontStyle: 'italic',
 	},
 	buttonContainer: {
 		marginLeft: 20,

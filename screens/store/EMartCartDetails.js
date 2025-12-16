@@ -17,8 +17,17 @@ import { useTheme } from '../../utils/ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
 
 function EMartCartDetails({ navigation, route }) {
-	// Provide default storeId if not passed in route params
-	const storeId = route?.params?.storeId || 'J3GO05mnhnoccDG9Bchc';
+	// Safely destructure store data with defaults
+	const storeData = route?.params?.store || {
+		id: 'J3GO05mnhnoccDG9Bchc',
+		name: 'Store',
+		address: 'Address not available',
+		location: null
+	};
+	
+	// Store ID is either from params or from the store object
+	const storeId = route?.params?.storeId || storeData.id;
+	const { store } = route.params;
 	const initialCartItems = route?.params?.cartItems || [];
 	const { getCart, updateCart, removeFromCart, updateCartItemQuantity } =
 		useStoreCart();
@@ -52,7 +61,7 @@ function EMartCartDetails({ navigation, route }) {
 	// Calculates 10% discount if discount code is applied
 	const getDiscountedTotal = () => {
 		if (appliedDiscountCode === 'EMART10') {
-			return total * 0.9;
+			return total * 0.5;
 		}
 		return total;
 	};
@@ -113,6 +122,7 @@ function EMartCartDetails({ navigation, route }) {
 			discountApplied,
 			discountValue,
 			storeId,
+			store,
 		});
 	};
 
@@ -306,6 +316,7 @@ function EMartCartDetails({ navigation, route }) {
 					<Text style={styles.checkoutText}>Proceed to Checkout</Text>
 				</Pressable>
 			</View>
+			<View style={styles.bottomPad}></View>
 		</SafeAreaView>
 	);
 }
@@ -320,6 +331,28 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			  },
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			  },
+		  }),
+	},
+	bottomPad: {
+		...Platform.select({
+			ios: {
+			  paddingBottom: 0,
+			  // iOS specific styles
+			},
+			android: {
+			  paddingBottom: 40,
+			  // Android specific styles
+			},
+		  }),
 	},
 	locationText: {
 		fontSize: 18,

@@ -10,11 +10,13 @@ import {
 	Alert,
 	ActivityIndicator,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
+import { geocodeAddress, calculateDistance } from '../../utils/locationUtils';
 
 export default function RestaurantConfirmation({ navigation, route }) {
 	const [addresses, setAddresses] = useState([]);
@@ -40,6 +42,10 @@ export default function RestaurantConfirmation({ navigation, route }) {
 	const { restaurantId, restaurantName } = route.params;
 	const discountApplied = route.params?.discountApplied;
 	const discountAmount = route.params?.discountAmount || 0;
+	const { restaurantLocation } = route.params;
+
+	const [deliveryFee, setDeliveryFee] = useState(0);
+	const [isCalculatingFee, setIsCalculatingFee] = useState(false);
 
 	useEffect(() => {
 		// Check if we have cart items
@@ -99,6 +105,58 @@ export default function RestaurantConfirmation({ navigation, route }) {
 
 		fetchUserData();
 	}, [auth.currentUser, navigation]);
+
+	// In your RestaurantConfirmation component, update the delivery fee calculation
+	useEffect(() => {
+		const calculateAndSetDeliveryFee = async () => {
+			if (!defaultAddress || !restaurantLocation) {
+				return;
+			}
+
+			setIsCalculatingFee(true);
+
+			try {
+				// Check if user has free delivery
+				if (userData?.hasFreeDelivery) {
+					setDeliveryFee(0);
+					setIsCalculatingFee(false);
+					return;
+				}
+
+				const userCoords = await geocodeAddress(defaultAddress);
+				const restaurantCoords = await geocodeAddress(restaurantLocation);
+
+				if (userCoords && restaurantCoords) {
+					const distance = calculateDistance(
+						userCoords.latitude,
+						userCoords.longitude,
+						restaurantCoords.latitude,
+						restaurantCoords.longitude
+					);
+					let fee;
+					if (distance < 1) {
+						fee = 1500; // Flat fee for distances less than 1km
+					} else {
+						fee = Math.round(distance * 650);
+					}
+					setDeliveryFee(fee);
+				} else {
+					setDeliveryFee(0);
+					Alert.alert(
+						'Calculation Error',
+						'Could not calculate delivery fee. Please check addresses.'
+					);
+				}
+			} catch (error) {
+				console.error('Error calculating delivery fee:', error);
+				setDeliveryFee(0);
+			} finally {
+				setIsCalculatingFee(false);
+			}
+		};
+
+		calculateAndSetDeliveryFee();
+	}, [defaultAddress, restaurantLocation, userData?.hasFreeDelivery]);
 
 	const fetchAddresses = async () => {
 		if (!auth.currentUser) return;
@@ -168,7 +226,8 @@ export default function RestaurantConfirmation({ navigation, route }) {
 				...userData,
 				address: defaultAddress,
 			},
-			totalAmount,
+			totalAmount: totalAmount + deliveryFee,
+			deliveryFee,
 			restaurantId,
 			restaurantName,
 			discountApplied, // pass this if you want to show a message
@@ -185,303 +244,337 @@ export default function RestaurantConfirmation({ navigation, route }) {
 	}
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<View style={styles.header}>
-				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
-				</Pressable>
-				<Text style={styles.locationText}>Address and Billing</Text>
-				<View style={{ width: 24 }} />
-			</View>
-
-			<View
-				style={{
-					backgroundColor: 'white',
-					margin: 16,
-					borderRadius: 4,
-					padding: 16,
-					elevation: 1,
-				}}
-			>
-				<View style={styles.cartName}>
-					<Text style={styles.cartNameText}>Cart Items</Text>
-					<Text style={styles.cartNameText2}>
-						{restaurantName || 'No Name'}
-					</Text>
+		<SafeAreaView style={{ flex: 1 }}>
+			<View style={styles.container}>
+				<View style={styles.header}>
+					<Pressable onPress={() => navigation.goBack()}>
+						<MaterialIcons name="arrow-back" size={24} color="#FF521B" />
+					</Pressable>
+					<Text style={styles.locationText}>Address and Billing</Text>
+					<View style={{ width: 24 }} />
 				</View>
-				{Array.isArray(cartItems) && cartItems.length > 0 ? (
-					<>
-						{cartItems.map((item, idx) => (
-							<View
-								key={item.id || item.name + idx}
-								style={{
-									flexDirection: 'row',
-									justifyContent: 'space-between',
-									marginBottom: 6,
-								}}
-							>
-								<Text style={{ fontSize: 15 }}>
-									{item.name} x {item.quantity}
-								</Text>
-								<Text style={{ fontSize: 15 }}>
-									₦
-									{(
-										parseFloat(item.price) * (parseInt(item.quantity, 10) || 0)
-									).toLocaleString()}
-								</Text>
-							</View>
-						))}
-						{discountApplied && (
-							<View style={styles.discountText}>
-								<Text style={styles.discountText2}>Discount Applied:</Text>
-								<Text style={styles.discountText2}>
-									- ₦{discountAmount.toLocaleString()}
-								</Text>
-							</View>
-						)}
-						<View style={styles.totalText}>
-							<Text style={{ fontWeight: 'bold', fontSize: 16 }}>Total:</Text>
-							<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-								₦{totalAmount.toLocaleString()}
+				<View style={styles.deliveryAddress}>
+					<Text style={styles.addressHeader}>Delivery Address</Text>
+					{defaultAddress ? (
+						<>
+							<Text style={styles.addressText}>{defaultAddress.street}</Text>
+							<Text style={styles.addressText}>
+								{defaultAddress.city}, {defaultAddress.state},{' '}
+								{defaultAddress.zip}
 							</Text>
-						</View>
-					</>
-				) : (
-					<Text style={{ color: '#aaa' }}>Your cart is empty.</Text>
-				)}
-			</View>
-
-			<View style={styles.deliveryAddress}>
-				<Text style={styles.addressHeader}>Delivery Address</Text>
-				{defaultAddress ? (
-					<>
-						<Text style={styles.addressText}>{defaultAddress.street}</Text>
+							<Text style={styles.addressText}>{defaultAddress.district}</Text>
+						</>
+					) : (
 						<Text style={styles.addressText}>
-							{defaultAddress.city}, {defaultAddress.state},{' '}
-							{defaultAddress.zip}
+							Please add a delivery address to proceed
 						</Text>
-						<Text style={styles.addressText}>{defaultAddress.district}</Text>
-					</>
-				) : (
-					<Text style={styles.addressText}>No default address set</Text>
-				)}
-				<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-					<Pressable
-						onPress={() => {
-							fetchAddresses();
-							setShowAddressesModal(true);
-						}}
-						style={{ marginTop: 10 }}
+					)}
+					<View
+						style={{ flexDirection: 'row', justifyContent: 'space-between' }}
 					>
-						<Text style={{ color: '#21A179' }}>My Addresses</Text>
-					</Pressable>
-					<Pressable
-						onPress={() => setShowAddAddressModal(true)}
-						style={{ marginTop: 10 }}
-					>
-						<Text style={{ color: '#FF521B' }}>Add New Delivery Address</Text>
-					</Pressable>
-				</View>
-				<Modal visible={showAddressesModal} animationType="slide" transparent>
-					<View style={styles.modalOverlay}>
-						<View style={styles.modalContent}>
-							<Pressable
-								onPress={() => setShowAddressesModal(false)}
-								style={{
-									position: 'absolute',
-									top: 10,
-									right: 10,
-									zIndex: 10,
-									padding: 4,
-								}}
-							>
-								<MaterialIcons name="close" size={24} color="#FF521B" />
-							</Pressable>
-							<Text
-								style={{
-									fontWeight: 'bold',
-									fontSize: 16,
-									marginBottom: 8,
-									textAlign: 'center',
-								}}
-							>
-								My Addresses
-							</Text>
-							<FlatList
-								data={addresses}
-								keyExtractor={(item) => item.id}
-								renderItem={({ item }) => (
-									<Pressable
-										style={{
-											flexDirection: 'row',
-											alignItems: 'center',
-											marginVertical: 4,
-										}}
-										onPress={() => {
-											setDefaultAddress(item);
-											setShowAddressesModal(false);
-										}}
-									>
-										<Checkbox
-											value={defaultAddress?.id === item.id}
-											onValueChange={() => {
+						<Pressable
+							onPress={() => {
+								fetchAddresses();
+								setShowAddressesModal(true);
+							}}
+							style={{ marginTop: 10 }}
+						>
+							<Text style={{ color: '#21A179' }}>My Addresses</Text>
+						</Pressable>
+						<Pressable
+							onPress={() => setShowAddAddressModal(true)}
+							style={{ marginTop: 10 }}
+						>
+							<Text style={{ color: '#FF521B' }}>Add New Delivery Address</Text>
+						</Pressable>
+					</View>
+					<Modal visible={showAddressesModal} animationType="slide" transparent>
+						<View style={styles.modalOverlay}>
+							<View style={styles.modalContent}>
+								<Pressable
+									onPress={() => setShowAddressesModal(false)}
+									style={{
+										position: 'absolute',
+										top: 10,
+										right: 10,
+										zIndex: 10,
+										padding: 4,
+									}}
+								>
+									<MaterialIcons name="close" size={24} color="#FF521B" />
+								</Pressable>
+								<Text
+									style={{
+										fontWeight: 'bold',
+										fontSize: 16,
+										marginBottom: 8,
+										textAlign: 'center',
+									}}
+								>
+									My Addresses
+								</Text>
+								<FlatList
+									data={addresses}
+									keyExtractor={(item) => item.id}
+									renderItem={({ item }) => (
+										<Pressable
+											style={{
+												flexDirection: 'row',
+												alignItems: 'center',
+												marginVertical: 4,
+											}}
+											onPress={() => {
 												setDefaultAddress(item);
 												setShowAddressesModal(false);
 											}}
-											color="#FF521B"
-										/>
-										<Text style={{ marginLeft: 8 }}>
-											{item.street?.slice(0, 10) +
-												(item.street?.length > 10 ? '...' : '')}
-										</Text>
-										{item.isDefault && (
-											<Text style={{ color: '#21A179', marginLeft: 8 }}>
-												(Default)
+										>
+											<Checkbox
+												value={defaultAddress?.id === item.id}
+												onValueChange={() => {
+													setDefaultAddress(item);
+													setShowAddressesModal(false);
+												}}
+												color="#FF521B"
+											/>
+											<Text style={{ marginLeft: 8 }}>
+												{item.street?.slice(0, 10) +
+													(item.street?.length > 10 ? '...' : '')}
 											</Text>
-										)}
-									</Pressable>
-								)}
-								ListEmptyComponent={
-									<Text style={{ color: '#aaa', marginVertical: 8 }}>
-										No addresses found.
-									</Text>
-								}
-								style={{ maxHeight: 180, marginBottom: 12 }}
-							/>
-						</View>
-					</View>
-				</Modal>
-				<Modal visible={showAddAddressModal} animationType="slide" transparent>
-					<View style={styles.modalOverlay}>
-						<View style={styles.modalContent}>
-							<Text
-								style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }}
-							>
-								Add New Address
-							</Text>
-							{['street', 'city', 'state', 'zip', 'country', 'landmark'].map(
-								(field) => (
-									<TextInput
-										key={field}
-										placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-										value={form[field]}
-										onChangeText={(text) =>
-											setForm((f) => ({ ...f, [field]: text }))
-										}
-										style={styles.input}
-									/>
-								)
-							)}
-							<View
-								style={{
-									flexDirection: 'row',
-									alignItems: 'center',
-									marginVertical: 8,
-								}}
-							>
-								<Checkbox
-									value={form.isDefault}
-									onValueChange={(val) =>
-										setForm((f) => ({ ...f, isDefault: val }))
+											{item.isDefault && (
+												<Text style={{ color: '#21A179', marginLeft: 8 }}>
+													(Default)
+												</Text>
+											)}
+										</Pressable>
+									)}
+									ListEmptyComponent={
+										<Text style={{ color: '#aaa', marginVertical: 8 }}>
+											No addresses found.
+										</Text>
 									}
-									color="#FF521B"
+									style={{ maxHeight: 180, marginBottom: 12 }}
 								/>
-								<Text style={{ marginLeft: 8 }}>Set as default address</Text>
 							</View>
-							<View
-								style={{
-									flexDirection: 'row',
-									justifyContent: 'space-between',
-								}}
-							>
-								<Pressable
-									style={[styles.modalButton, { backgroundColor: '#FF521B' }]}
-									onPress={async () => {
-										if (
-											!form.street ||
-											!form.city ||
-											!form.state ||
-											!form.zip ||
-											!form.country
-										)
-											return;
-										const userDocRef = doc(db, 'users', auth.currentUser.uid);
-
-										// Generate a unique id for the address
-										const newId = Date.now().toString();
-										const newAddress = {
-											...form,
-											isDefault: !!form.isDefault,
-										};
-
-										// Fetch current addresses map
-										const userSnap = await getDoc(userDocRef);
-										const data = userSnap.exists() ? userSnap.data() : {};
-										let addressesMap = data.addresses || {};
-
-										// If setting as default, unset previous default
-										if (form.isDefault) {
-											Object.keys(addressesMap).forEach((key) => {
-												addressesMap[key].isDefault = false;
-											});
-										}
-
-										addressesMap[newId] = newAddress;
-
-										await updateDoc(userDocRef, {
-											addresses: addressesMap,
-										});
-
-										await fetchAddresses();
-
-										// Update local state
-										const addressArray = Object.keys(addressesMap).map(
-											(key) => ({
-												...addressesMap[key],
-												id: key,
-											})
-										);
-										setAddresses(addressArray);
-
-										// Always show the newly added address, regardless of isDefault
-										setDefaultAddress({ ...newAddress, id: newId });
-
-										setShowAddAddressModal(false);
-										setForm({
-											street: '',
-											city: '',
-											state: '',
-											zip: '',
-											country: '',
-											landmark: '',
-											isDefault: false,
-										});
+						</View>
+					</Modal>
+					<Modal
+						visible={showAddAddressModal}
+						animationType="slide"
+						transparent
+					>
+						<View style={styles.modalOverlay}>
+							<View style={styles.modalContent}>
+								<Text
+									style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }}
+								>
+									Add New Address
+								</Text>
+								{['street', 'city', 'state', 'zip', 'country', 'landmark'].map(
+									(field) => (
+										<TextInput
+											key={field}
+											placeholder={
+												field.charAt(0).toUpperCase() + field.slice(1)
+											}
+											value={form[field]}
+											onChangeText={(text) =>
+												setForm((f) => ({ ...f, [field]: text }))
+											}
+											style={styles.input}
+										/>
+									)
+								)}
+								<View
+									style={{
+										flexDirection: 'row',
+										alignItems: 'center',
+										marginVertical: 8,
 									}}
 								>
-									<Text style={{ color: '#fff' }}>Save</Text>
-								</Pressable>
-								<Pressable
-									style={[styles.modalButton, { backgroundColor: '#aaa' }]}
-									onPress={() => setShowAddAddressModal(false)}
+									<Checkbox
+										value={form.isDefault}
+										onValueChange={(val) =>
+											setForm((f) => ({ ...f, isDefault: val }))
+										}
+										color="#FF521B"
+									/>
+									<Text style={{ marginLeft: 8 }}>Set as default address</Text>
+								</View>
+								<View
+									style={{
+										flexDirection: 'row',
+										justifyContent: 'space-between',
+									}}
 								>
-									<Text style={{ color: '#fff' }}>Cancel</Text>
-								</Pressable>
+									<Pressable
+										style={[styles.modalButton, { backgroundColor: '#FF521B' }]}
+										onPress={async () => {
+											if (
+												!form.street ||
+												!form.city ||
+												!form.state ||
+												!form.zip ||
+												!form.country
+											)
+												return;
+											const userDocRef = doc(db, 'users', auth.currentUser.uid);
+
+											// Generate a unique id for the address
+											const newId = Date.now().toString();
+											const newAddress = {
+												...form,
+												isDefault: !!form.isDefault,
+											};
+
+											// Fetch current addresses map
+											const userSnap = await getDoc(userDocRef);
+											const data = userSnap.exists() ? userSnap.data() : {};
+											let addressesMap = data.addresses || {};
+
+											// If setting as default, unset previous default
+											if (form.isDefault) {
+												Object.keys(addressesMap).forEach((key) => {
+													addressesMap[key].isDefault = false;
+												});
+											}
+
+											addressesMap[newId] = newAddress;
+
+											await updateDoc(userDocRef, {
+												addresses: addressesMap,
+											});
+
+											await fetchAddresses();
+
+											// Update local state
+											const addressArray = Object.keys(addressesMap).map(
+												(key) => ({
+													...addressesMap[key],
+													id: key,
+												})
+											);
+											setAddresses(addressArray);
+
+											// Always show the newly added address, regardless of isDefault
+											setDefaultAddress({ ...newAddress, id: newId });
+
+											setShowAddAddressModal(false);
+											setForm({
+												street: '',
+												city: '',
+												state: '',
+												zip: '',
+												country: '',
+												landmark: '',
+												isDefault: false,
+											});
+										}}
+									>
+										<Text style={{ color: '#fff' }}>Save</Text>
+									</Pressable>
+									<Pressable
+										style={[styles.modalButton, { backgroundColor: '#aaa' }]}
+										onPress={() => setShowAddAddressModal(false)}
+									>
+										<Text style={{ color: '#fff' }}>Cancel</Text>
+									</Pressable>
+								</View>
 							</View>
 						</View>
+					</Modal>
+				</View>
+				<View
+					style={{
+						backgroundColor: 'white',
+						margin: 16,
+						borderRadius: 4,
+						padding: 16,
+						elevation: 1,
+					}}
+				>
+					<View style={styles.cartName}>
+						<Text style={styles.cartNameText}>Cart Items</Text>
+						<Text style={styles.cartNameText2}>
+							{restaurantName || 'No Name'}
+						</Text>
 					</View>
-				</Modal>
-			</View>
+					{Array.isArray(cartItems) && cartItems.length > 0 ? (
+						<>
+							{cartItems.map((item, idx) => (
+								<View
+									key={item.id || item.name + idx}
+									style={{
+										flexDirection: 'row',
+										justifyContent: 'space-between',
+										marginBottom: 6,
+									}}
+								>
+									<Text style={{ fontSize: 15 }}>
+										{item.name} x {item.quantity}
+									</Text>
+									<Text style={{ fontSize: 15 }}>
+										₦
+										{(
+											parseFloat(item.price) *
+											(parseInt(item.quantity, 10) || 0)
+										).toLocaleString()}
+									</Text>
+								</View>
+							))}
+							{discountApplied && (
+								<View style={styles.discountText}>
+									<Text style={styles.discountText2}>Discount Applied:</Text>
+									<Text style={styles.discountText2}>
+										- ₦{discountAmount.toLocaleString()}
+									</Text>
+								</View>
+							)}
+							<View style={styles.totalText}>
+								<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+									Delivery Fee:
+								</Text>
+								{userData?.hasFreeDelivery ? (
+									<Text
+										style={{
+											fontWeight: 'bold',
+											fontSize: 16,
+											color: '#4CAF50',
+										}}
+									>
+										FREE
+									</Text>
+								) : isCalculatingFee ? (
+									<ActivityIndicator size="small" color="#FF521B" />
+								) : (
+									<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+										₦{deliveryFee.toLocaleString()}
+									</Text>
+								)}
+							</View>
+							<View style={styles.totalText}>
+								<Text style={{ fontWeight: 'bold', fontSize: 16 }}>Total:</Text>
+								<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+									₦{(totalAmount + deliveryFee).toLocaleString()}
+								</Text>
+							</View>
+						</>
+					) : (
+						<Text style={{ color: '#aaa' }}>Your cart is empty.</Text>
+					)}
+				</View>
 
-			<Pressable
-				style={[
-					styles.proceedButton,
-					(!defaultAddress || !cartItems.length) && styles.disabledButton,
-				]}
-				onPress={handleProceedToPayment}
-				disabled={!defaultAddress || !cartItems.length}
-			>
-				<Text style={styles.proceedButtonText}>Proceed to Payment</Text>
-			</Pressable>
+				<Pressable
+					style={[
+						styles.proceedButton,
+						(!defaultAddress || !cartItems.length) && styles.disabledButton,
+					]}
+					onPress={handleProceedToPayment}
+					disabled={!defaultAddress || !cartItems.length}
+				>
+					<Text style={styles.proceedButtonText}>Proceed to Payment</Text>
+				</Pressable>
+			</View>
+			<View style={styles.bottomPad}></View>
 		</SafeAreaView>
 	);
 }
@@ -503,7 +596,28 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			},
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			},
+		}),
+	},
+	bottomPad: {
+		...Platform.select({
+			ios: {
+				paddingBottom: 0,
+				// iOS specific styles
+			},
+			android: {
+				paddingBottom: 40,
+				// Android specific styles
+			},
+		}),
 	},
 	locationText: {
 		fontSize: 18,

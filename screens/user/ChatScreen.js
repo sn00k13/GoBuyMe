@@ -1,5 +1,4 @@
-// SupportScreen.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
 	View,
 	Text,
@@ -11,136 +10,334 @@ import {
 	Platform,
 	ActivityIndicator,
 	SafeAreaView,
+	Alert,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import io from 'socket.io-client';
-import { useTheme } from '../../utils/ThemeContext';
+import {
+	getFirestore,
+	collection,
+	query,
+	orderBy,
+	onSnapshot,
+	addDoc,
+	serverTimestamp,
+	doc,
+	setDoc,
+	getDoc,
+	updateDoc,
+} from 'firebase/firestore';
+import { db, auth } from '../../firebase';
+import { getAuth } from 'firebase/auth';
+import NetInfo from '@react-native-community/netinfo';
 
 const ChatScreen = ({ navigation }) => {
-	const [messages, setMessages] = useState([
-		{
-			id: '1',
-			text: 'Hello! How can we help you today?',
-			sender: 'support',
-			time: new Date().toLocaleTimeString([], {
-				hour: '2-digit',
-				minute: '2-digit',
-			}),
-		},
-	]);
-	const [newMessage, setNewMessage] = useState('');
-	const [socket, setSocket] = useState(null);
-	const [isConnected, setIsConnected] = useState(false);
-	const [userId, setUserId] = useState(null);
 	const flatListRef = useRef(null);
-	const { theme, mode, setMode } = useTheme();
+	const [isConnected, setIsConnected] = useState(true);
+	const [messages, setMessages] = useState([]);
+	const [newMessage, setNewMessage] = useState('');
+	const [chatId, setChatId] = useState(null);
+	const [supportIsTyping, setSupportIsTyping] = useState(false);
+	const [isTyping, setIsTyping] = useState(false);
+	const typingTimeoutRef = useRef(null);
 
-	// Initialize socket connection
-	useEffect(() => {
-		const initSocket = async () => {
-			// Get or create user ID
-			let storedUserId = await AsyncStorage.getItem('supportUserId');
-			if (!storedUserId) {
-				storedUserId = `user_${Date.now()}`;
-				await AsyncStorage.setItem('supportUserId', storedUserId);
+	// Get or create a unique chat ID for the user
+	const getOrCreateChatId = async (isNewSession = false) => {
+		try {
+			// Get the authenticated user's ID
+			const auth = getAuth();
+			const currentUser = auth.currentUser;
+			if (!currentUser) {
+				console.error('No authenticated user found');
+				return null;
 			}
-			setUserId(storedUserId);
 
-			// Connect to socket server
-			const socketInstance = io('http://localhost:3001', {
-				transports: ['websocket'],
-				reconnectionAttempts: 5,
+			// Create a unique storage key for this user's chat ID
+			const storageKey = `userChatId_${currentUser.uid}`;
+
+			let chatId;
+			if (isNewSession) {
+				// For new sessions, create a new chat ID with timestamp
+				chatId = `chat_${currentUser.uid}_${Date.now()}`;
+				await AsyncStorage.setItem(storageKey, chatId);
+			} else {
+				// For existing sessions, get or create a chat ID
+				chatId = await AsyncStorage.getItem(storageKey);
+				if (!chatId) {
+					chatId = `chat_${currentUser.uid}_${Date.now()}`;
+					await AsyncStorage.setItem(storageKey, chatId);
+				}
+			}
+
+			setChatId(chatId);
+			return chatId;
+		} catch (error) {
+			console.error('Error managing chat session:', error);
+			return null;
+		}
+	};
+
+	// Helper function to create welcome message
+	const getWelcomeMessage = () => ({
+		id: 'welcome-1',
+		text: 'Hello! How can we help you today?',
+		sender: 'support',
+		time: new Date().toLocaleTimeString([], {
+			hour: '2-digit',
+			minute: '2-digit',
+		}),
+	});
+
+	// Typing indicator functions
+	const startTyping = useCallback(async () => {
+		if (!chatId) return;
+		
+		try {
+			const chatDocRef = doc(db, 'supportChats', chatId);
+			await updateDoc(chatDocRef, {
+				userIsTyping: true,
+				updated: serverTimestamp()
+			});
+		} catch (error) {
+			console.error("Error setting typing indicator:", error);
+		}
+	}, [chatId]);
+
+	const stopTyping = useCallback(async () => {
+		if (!chatId) return;
+		
+		try {
+			const chatDocRef = doc(db, 'supportChats', chatId);
+			await updateDoc(chatDocRef, {
+				userIsTyping: false,
+				updated: serverTimestamp()
+			});
+		} catch (error) {
+			console.error("Error removing typing indicator:", error);
+		}
+	}, [chatId]);
+
+	const handleInputChange = (text) => {
+		setNewMessage(text);
+		
+		// Start typing indicator if not already active
+		if (!isTyping) {
+			setIsTyping(true);
+			startTyping();
+		}
+		
+		// Reset the typing timeout
+		if (typingTimeoutRef.current) {
+			clearTimeout(typingTimeoutRef.current);
+		}
+		
+		// Set timeout to stop typing indicator after 2 seconds of inactivity
+		typingTimeoutRef.current = setTimeout(() => {
+			setIsTyping(false);
+			stopTyping();
+		}, 2000);
+	};
+
+	// Initialize chat
+	useEffect(() => {
+		// 1. Network connection monitoring
+		const netUnsubscribe = NetInfo.addEventListener((state) => {
+			setIsConnected(state.isConnected);
+		});
+
+		// 2. Load chat history from Firestore
+		const loadChat = async () => {
+			try {
+				// Get or create chat ID for the current user
+				const currentChatId = await getOrCreateChatId();
+				if (!currentChatId) {
+					console.error('Failed to get or create chat ID');
+					return;
+				}
+
+				const chatDocRef = doc(db, 'supportChats', currentChatId);
+				const messagesRef = collection(db, 'supportChats', currentChatId, 'messages');
+
+				// Check if chat exists and is active
+				const chatDoc = await getDoc(chatDocRef);
+				const chatData = chatDoc.data();
+				const isNewChat = !chatDoc.exists() || chatData?.status === 'ended';
+
+				if (isNewChat) {
+					// For new chats, show welcome message in UI
+					setMessages([getWelcomeMessage()]);
+					
+					// Create the chat document
+					await setDoc(chatDocRef, {
+						participants: [auth.currentUser.uid, 'support_team'],
+						status: 'active',
+						userIsTyping: false,
+						supportIsTyping: false,
+						created: serverTimestamp(),
+						updated: serverTimestamp(),
+					});
+					return;
+				}
+
+				// Set up listener for support typing status
+				const chatUnsubscribe = onSnapshot(chatDocRef, (doc) => {
+					if (doc.exists()) {
+						const data = doc.data();
+						setSupportIsTyping(data.supportIsTyping || false);
+					}
+				});
+
+				// For existing chats, load the messages
+				const q = query(messagesRef, orderBy('timestamp', 'asc'));
+				const messagesUnsubscribe = onSnapshot(q, (snapshot) => {
+					const firebaseMessages = snapshot.docs.map((doc) => {
+						const data = doc.data();
+						const timestamp = data.timestamp
+							? data.timestamp.toDate()
+							: new Date();
+						return {
+							id: doc.id,
+							text: data.text || '',
+							sender: data.sender || 'support',
+							time: timestamp.toLocaleTimeString([], {
+								hour: '2-digit',
+								minute: '2-digit',
+							}),
+						};
+					});
+
+					if (firebaseMessages.length > 0) {
+						setMessages(firebaseMessages);
+					}
+				});
+
+				return () => {
+					chatUnsubscribe();
+					messagesUnsubscribe();
+				};
+			} catch (error) {
+				console.error('Error loading chat history:', error);
+			}
+		};
+		loadChat();
+
+		// Cleanup function
+		return () => {
+			netUnsubscribe();
+			if (typingTimeoutRef.current) {
+				clearTimeout(typingTimeoutRef.current);
+			}
+			if (isTyping) {
+				stopTyping();
+			}
+		};
+	}, []);
+
+	const handleSend = async () => {
+		if (!newMessage.trim() || !isConnected || !chatId) return;
+
+		try {
+			// Clear typing indicator
+			if (typingTimeoutRef.current) {
+				clearTimeout(typingTimeoutRef.current);
+			}
+			setIsTyping(false);
+			await stopTyping();
+
+			// Get user data from auth and AsyncStorage
+			const auth = getAuth();
+			const currentUser = auth.currentUser;
+			const [userName, userEmail] = await Promise.all([
+				AsyncStorage.getItem('userName'),
+				AsyncStorage.getItem('userEmail'),
+			]);
+
+			const userData = {
+				userId: currentUser.uid,
+				name: userName || currentUser.displayName || 'User',
+				email: userEmail || currentUser.email || 'No email provided',
+			};
+
+			const chatRef = doc(db, 'supportChats', chatId);
+			const messagesRef = collection(db, 'supportChats', chatId, 'messages');
+
+			// Update the chat document with user info
+			await updateDoc(chatRef, {
+				userInfo: userData,
+				updated: serverTimestamp(),
 			});
 
-			socketInstance.on('connect', () => {
-				console.log('Connected to support server');
-				setIsConnected(true);
-				socketInstance.emit('registerUser', storedUserId);
-			});
+			// Create the user's message
+			const message = {
+				...userData,
+				text: newMessage.trim(),
+				sender: 'user',
+				timestamp: serverTimestamp(),
+				read: false,
+			};
 
-			socketInstance.on('disconnect', () => {
-				console.log('Disconnected from support server');
-				setIsConnected(false);
-			});
+			// Clear input immediately for better UX
+			setNewMessage('');
 
-			socketInstance.on('supportMessage', (message) => {
-				const formattedMessage = {
+			// Add user's message to Firestore
+			await addDoc(messagesRef, message);
+
+			// Update local state with user's message
+			setMessages((prev) => [
+				...prev,
+				{
+					id: Date.now().toString(),
 					...message,
-					time: new Date(message.time).toLocaleTimeString([], {
+					time: new Date().toLocaleTimeString([], {
 						hour: '2-digit',
 						minute: '2-digit',
 					}),
-				};
-				setMessages((prev) => [...prev, formattedMessage]);
-			});
-
-			setSocket(socketInstance);
-
-			return () => {
-				socketInstance.disconnect();
-			};
-		};
-
-		initSocket();
-	}, []);
-
-	// --- PERSIST CHAT HISTORY ---
-	useEffect(() => {
-		const loadMessages = async () => {
-			try {
-				const saved = await AsyncStorage.getItem('supportChatHistory');
-				if (saved) setMessages(JSON.parse(saved));
-			} catch (e) {
-				console.error('Failed to load chat history:', e);
-			}
-		};
-		loadMessages();
-	}, []);
-
-	useEffect(() => {
-		AsyncStorage.setItem('supportChatHistory', JSON.stringify(messages));
-	}, [messages]);
-
-	const clearChatHistory = async () => {
-		await AsyncStorage.removeItem('supportChatHistory');
-		setMessages([
-			{
-				id: '1',
-				text: 'Hello! How can we help you today?',
-				sender: 'support',
-				time: new Date().toLocaleTimeString([], {
-					hour: '2-digit',
-					minute: '2-digit',
-				}),
-			},
-		]);
+				},
+			]);
+		} catch (error) {
+			console.error('Error sending message:', error);
+			Alert.alert('Error', 'Failed to send message. Please try again.');
+			setNewMessage(newMessage); // Restore the message if sending failed
+		}
 	};
 
-	const handleSend = () => {
-		if (newMessage.trim() === '' || !socket || !isConnected) return;
+	const clearChatHistory = async () => {
+		try {
+			if (chatId) {
+				const chatRef = doc(db, 'supportChats', chatId);
+				const messagesRef = collection(db, 'supportChats', chatId, 'messages');
 
-		const message = {
-			id: Date.now().toString(),
-			text: newMessage,
-			sender: 'user',
-			time: new Date().toISOString(),
-		};
+				// Add system message about session end
+				await addDoc(messagesRef, {
+					text: 'Session has been ended by user',
+					sender: 'system',
+					timestamp: serverTimestamp(),
+					read: false,
+					isSystemMessage: true,
+				});
 
-		socket.emit('userMessage', message);
+				// Mark the current chat as ended
+				await updateDoc(chatRef, {
+					status: 'ended',
+					endedAt: serverTimestamp(),
+					updated: serverTimestamp(),
+					userIsTyping: false,
+					supportIsTyping: false,
+				});
 
-		// Add to local state immediately
-		setMessages((prev) => [
-			...prev,
-			{
-				...message,
-				time: new Date().toLocaleTimeString([], {
-					hour: '2-digit',
-					minute: '2-digit',
-				}),
-			},
-		]);
-		setNewMessage('');
+				// Clear the chat ID from storage
+				await AsyncStorage.removeItem(`userChatId_${auth.currentUser.uid}`);
+			}
+
+			// Clear local state and show welcome message
+			setMessages([getWelcomeMessage()]);
+			setChatId(null);
+
+			Alert.alert('Session Ended', 'Your chat session has ended. For any other issues, please contact us.');
+		} catch (error) {
+			console.error('Error managing chat session:', error);
+			Alert.alert('Error', 'Failed to end chat session. Please try again.');
+		}
 	};
 
 	const renderMessage = ({ item }) => (
@@ -162,21 +359,34 @@ const ChatScreen = ({ navigation }) => {
 		</View>
 	);
 
+	const renderTypingIndicator = () => {
+		if (!supportIsTyping) return null;
+		
+		return (
+			<View style={[styles.messageContainer, styles.supportMessage]}>
+				<View style={styles.typingContainer}>
+					<View style={styles.typingDot} />
+					<View style={[styles.typingDot, { marginHorizontal: 4 }]} />
+					<View style={styles.typingDot} />
+				</View>
+			</View>
+		);
+	};
+
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+		<SafeAreaView style={{ flex: 1 }}>
 			<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				style={[styles.container, { backgroundColor: theme.background }]}
+				style={[styles.container]}
 				keyboardVerticalOffset={90}
 			>
-				
-				<View style={[styles.header, { backgroundColor: theme.cards }]}>
-				<Pressable
-					style={styles.backButton}
-					onPress={() => navigation.goBack()}
-				>
-					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
-				</Pressable>
+				<View style={styles.header}>
+					<Pressable
+						style={styles.backButton}
+						onPress={() => navigation.goBack()}
+					>
+						<MaterialIcons name="arrow-back" size={24} color="#333" />
+					</Pressable>
 					<Text style={styles.headerTitle}>Customer Support</Text>
 					<View style={styles.connectionStatus}>
 						<View
@@ -219,6 +429,7 @@ const ChatScreen = ({ navigation }) => {
 					ref={flatListRef}
 					data={messages}
 					renderItem={renderMessage}
+					ListFooterComponent={renderTypingIndicator}
 					keyExtractor={(item) => item.id}
 					contentContainerStyle={styles.messagesContainer}
 					onContentSizeChange={() =>
@@ -226,16 +437,11 @@ const ChatScreen = ({ navigation }) => {
 					}
 				/>
 
-				<View
-					style={[
-						styles.inputContainer,
-						{ backgroundColor: theme.cards, borderColor: theme.border },
-					]}
-				>
+				<View style={styles.inputContainer}>
 					<TextInput
 						style={styles.input}
 						value={newMessage}
-						onChangeText={setNewMessage}
+						onChangeText={handleInputChange}
 						placeholder="Type your message..."
 						placeholderTextColor="#999"
 						multiline
@@ -254,6 +460,7 @@ const ChatScreen = ({ navigation }) => {
 					</Pressable>
 				</View>
 			</KeyboardAvoidingView>
+			<View style={styles.bottomPad}></View>
 		</SafeAreaView>
 	);
 };
@@ -268,7 +475,24 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginTop: 40
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+			},
+			android: {
+				marginTop: 40,
+			},
+		}),
+	},
+	bottomPad: {
+		...Platform.select({
+			ios: {
+				paddingBottom: 0,
+			},
+			android: {
+				paddingBottom: 40,
+			},
+		}),
 	},
 	headerTitle: {
 		fontSize: 20,
@@ -308,7 +532,6 @@ const styles = StyleSheet.create({
 	},
 	messagesContainer: {
 		padding: 16,
-		// paddingBottom: 80,
 	},
 	messageContainer: {
 		maxWidth: '80%',
@@ -338,6 +561,19 @@ const styles = StyleSheet.create({
 		color: '#777',
 		marginTop: 4,
 		alignSelf: 'flex-end',
+	},
+	typingContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		height: 24,
+	},
+	typingDot: {
+		width: 8,
+		height: 8,
+		borderRadius: 4,
+		backgroundColor: '#666',
+		opacity: 0.7,
 	},
 	inputContainer: {
 		flexDirection: 'row',

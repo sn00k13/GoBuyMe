@@ -10,13 +10,21 @@ import {
 	Alert,
 	ActivityIndicator,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import {
+	geocodeAddress,
+	calculateDistance,
+	calculateDeliveryFee,
+} from '../../utils/locationUtils';
 import { useTheme } from '../../utils/ThemeContext';
+import logger from '../../utils/logger';
 
 export default function ConfirmationScreen({ navigation, route }) {
 	const [addresses, setAddresses] = useState([]);
@@ -51,8 +59,11 @@ export default function ConfirmationScreen({ navigation, route }) {
 	});
 	const [loading, setLoading] = useState(false);
 	const [userData, setUserData] = useState(null);
+	const [deliveryFee, setDeliveryFee] = useState(0);
+	const [isCalculatingFee, setIsCalculatingFee] = useState(false);
 	const { theme, mode, setMode } = useTheme();
 	const auth = getAuth();
+	const functions = getFunctions();
 
 	// Get cart items and total from route params
 	const cartItems = route.params?.cartItems || [];
@@ -61,6 +72,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 	const discountApplied = route.params?.discountApplied;
 	const discountValue = route.params?.discountValue || 0;
 	const storeId = route.params?.storeId;
+	const { store } = route.params;
 
 	useEffect(() => {
 		// Check if we have cart items
@@ -107,7 +119,7 @@ export default function ConfirmationScreen({ navigation, route }) {
 					}
 				}
 			} catch (error) {
-				console.error('Error fetching user data:', error);
+				logger.error('Error fetching user data:', error);
 				Alert.alert(
 					'Error',
 					'Could not fetch your information. Please try again.'
@@ -117,8 +129,67 @@ export default function ConfirmationScreen({ navigation, route }) {
 			}
 		};
 
+		logger.log('Fetching user data...');
 		fetchUserData();
 	}, [auth.currentUser, navigation]);
+
+	useEffect(() => {
+		logger.log('Delivery fee calculation effect triggered.');
+		logger.log('Default Address:', defaultAddress);
+		logger.log('Store:', store.address);
+
+		const calculateAndSetDeliveryFee = async () => {
+			if (!defaultAddress || !store.address) {
+				return;
+			}
+
+			setIsCalculatingFee(true);
+
+			try {
+				// Get user data to check for free delivery
+				const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+				const userData = userDoc.data();
+
+				// If user has free delivery, set fee to 0 and return
+				if (userData?.hasFreeDelivery) {
+					setDeliveryFee(0);
+					return;
+				}
+
+				// Otherwise, calculate delivery fee as before
+				const userCoords = await geocodeAddress(defaultAddress);
+				const storeCoords = await geocodeAddress(store.address);
+
+				if (userCoords && storeCoords) {
+					const distance = calculateDistance(
+						userCoords.latitude,
+						userCoords.longitude,
+						storeCoords.latitude,
+						storeCoords.longitude
+					);
+					let fee;
+					if (distance < 1) {
+						fee = 1500; // Flat fee for distances less than 1km
+					} else {
+						fee = Math.round(distance * 200);
+					}
+					setDeliveryFee(fee);
+				} else {
+					// Set a default delivery fee if geocoding fails
+					logger.warn('Geocoding failed, using default delivery fee');
+					setDeliveryFee(200); // Default fee when geocoding fails
+				}
+			} catch (error) {
+				logger.error('Error calculating delivery fee:', error);
+				// Set a default delivery fee on error instead of 0
+				setDeliveryFee(2000);
+			} finally {
+				setIsCalculatingFee(false);
+			}
+		};
+
+		calculateAndSetDeliveryFee();
+	}, [defaultAddress, store.address]);
 
 	const fetchAddresses = async () => {
 		if (!auth.currentUser) return;
@@ -188,10 +259,12 @@ export default function ConfirmationScreen({ navigation, route }) {
 				...userData,
 				address: defaultAddress,
 			},
-			totalAmount,
+			totalAmount: totalAmount + deliveryFee,
 			storeId,
-			discountApplied, // pass this if you want to show a message
+			discountApplied,
 			discountValue,
+			deliveryFee,
+			store,
 		});
 	};
 
@@ -205,387 +278,422 @@ export default function ConfirmationScreen({ navigation, route }) {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
-			<View style={[styles.header, { backgroundColor: theme.cards }]}>
-				<Pressable onPress={() => navigation.goBack()}>
-					<MaterialIcons name="arrow-back" size={24} color={theme.text} />
-				</Pressable>
-				<Text style={[styles.locationText, { color: theme.primary }]}>
-					Address and Billing
-				</Text>
-				<View style={{ width: 24 }} />
-			</View>
-
-			<View
-				style={[
-					{
-						backgroundColor: 'white',
-						margin: 16,
-						borderRadius: 4,
-						padding: 16,
-						elevation: 1,
-					},
-					{ backgroundColor: theme.cards },
-				]}
-			>
-				<Text
-					style={[
-						{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 },
-						{ color: theme.text },
-					]}
-				>
-					Cart Items
-				</Text>
-				{Array.isArray(cartItems) && cartItems.length > 0 ? (
-					<>
-						{cartItems.map((item, idx) => (
-							<View
-								key={item.id || item.name + idx}
-								style={[
-									{
-										flexDirection: 'row',
-										justifyContent: 'space-between',
-										marginBottom: 6,
-									},
-									{ color: theme.text },
-								]}
-							>
-								<Text style={[{ fontSize: 15 }, { color: theme.text }]}>
-									{item.name} x {item.quantity}
-								</Text>
-								<Text style={[{ fontSize: 15 }, { color: theme.primary }]}>
-									₦
-									{(
-										parseFloat(item.price) * (parseInt(item.quantity, 10) || 0)
-									).toLocaleString()}
-								</Text>
-							</View>
-						))}
-						{discountApplied && (
-							<View style={styles.discountText}>
-								<Text style={styles.discountText2}>Discount Applied:</Text>
-								<Text style={styles.discountText2}>
-									- ₦{discountValue.toLocaleString()}
-								</Text>
-							</View>
-						)}
-						<View
-							style={{
-								borderTopWidth: 1,
-								borderTopColor: '#eee',
-								marginTop: 8,
-								paddingTop: 8,
-								flexDirection: 'row',
-								justifyContent: 'space-between',
-							}}
-						>
-							<Text
-								style={[
-									{ fontWeight: 'bold', fontSize: 16 },
-									{ color: theme.text },
-								]}
-							>
-								Total:
-							</Text>
-							<Text
-								style={[
-									{ fontWeight: 'bold', fontSize: 16 },
-									{ color: theme.text },
-								]}
-							>
-								₦{totalAmount.toLocaleString()}
-							</Text>
-						</View>
-					</>
-				) : (
-					<Text style={[{ color: theme.text }]}>Your cart is empty.</Text>
-				)}
-			</View>
-
-			<View style={[styles.deliveryAddress, { backgroundColor: theme.cards }]}>
-				<Text style={[styles.addressHeader, { color: theme.text }]}>
-					Delivery Address
-				</Text>
-				{defaultAddress ? (
-					<>
-						<Text style={[styles.addressText, { color: theme.text }]}>
-							{defaultAddress.street}
-						</Text>
-						<Text style={[styles.addressText, { color: theme.text }]}>
-							{defaultAddress.city}, {defaultAddress.state},{' '}
-							{defaultAddress.country}
-						</Text>
-						<Text style={[styles.addressText, { color: theme.text }]}>
-							Landmark: {defaultAddress.landmark}
-						</Text>
-						<Text style={[styles.addressText, { color: theme.text }]}>
-							District: {defaultAddress.district}
-						</Text>
-					</>
-				) : (
-					<Text style={[styles.addressText, { color: theme.text }]}>
-						No default address set
+			<View style={[styles.container, { backgroundColor: theme.background }]}>
+				<View style={[styles.header, { backgroundColor: theme.cards }]}>
+					<Pressable onPress={() => navigation.goBack()}>
+						<MaterialIcons name="arrow-back" size={24} color={theme.text} />
+					</Pressable>
+					<Text style={[styles.locationText, { color: theme.primary }]}>
+						Address and Billing
 					</Text>
-				)}
-				<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-					<Pressable
-						onPress={() => {
-							fetchAddresses();
-							setShowAddressesModal(true);
-						}}
-						style={{ marginTop: 10 }}
-					>
-						<Text style={[{ color: theme.secondary }]}>My Addresses</Text>
-					</Pressable>
-					<Pressable
-						onPress={() => setShowAddAddressModal(true)}
-						style={{ marginTop: 10 }}
-					>
-						<Text style={[{ color: theme.primary }]}>
-							Add New Delivery Address
-						</Text>
-					</Pressable>
+					<View style={{ width: 24 }} />
 				</View>
-				<Modal visible={showAddressesModal} animationType="slide" transparent>
-					<View style={styles.modalOverlay}>
-						<View
-							style={[styles.modalContent, { backgroundColor: theme.cards }]}
-						>
-							<Pressable
-								onPress={() => setShowAddressesModal(false)}
-								style={{
-									position: 'absolute',
-									top: 10,
-									right: 10,
-									zIndex: 10,
-									padding: 4,
-								}}
-							>
-								<MaterialIcons name="close" size={24} color={theme.text} />
-							</Pressable>
-							<Text
-								style={[
-									{
-										fontWeight: 'bold',
-										fontSize: 16,
-										marginBottom: 8,
-										textAlign: 'center',
-									},
-									{ color: theme.text },
-								]}
-							>
-								My Addresses
+				<View
+					style={[styles.deliveryAddress, { backgroundColor: theme.cards }]}
+				>
+					<Text style={[styles.addressHeader, { color: theme.text }]}>
+						Delivery Address
+					</Text>
+					{defaultAddress ? (
+						<>
+							<Text style={[styles.addressText, { color: theme.text }]}>
+								{defaultAddress.street}
 							</Text>
-							<FlatList
-								data={addresses}
-								keyExtractor={(item) => item.id}
-								renderItem={({ item }) => (
-									<Pressable
-										style={{
-											flexDirection: 'row',
-											alignItems: 'center',
-											marginVertical: 4,
-										}}
-										onPress={() => {
-											setDefaultAddress(item);
-											setShowAddressesModal(false);
-										}}
-									>
-										<Checkbox
-											value={defaultAddress?.id === item.id}
-											onValueChange={() => {
+							<Text style={[styles.addressText, { color: theme.text }]}>
+								{defaultAddress.city}, {defaultAddress.state},{' '}
+								{defaultAddress.country}
+							</Text>
+							<Text style={[styles.addressText, { color: theme.text }]}>
+								Landmark: {defaultAddress.landmark}
+							</Text>
+							<Text style={[styles.addressText, { color: theme.text }]}>
+								District: {defaultAddress.district}
+							</Text>
+						</>
+					) : (
+						<Text style={[styles.addressText, { color: theme.text }]}>
+							No default address set
+						</Text>
+					)}
+					<View
+						style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+					>
+						<Pressable
+							onPress={() => {
+								fetchAddresses();
+								setShowAddressesModal(true);
+							}}
+							style={{ marginTop: 10 }}
+						>
+							<Text style={[{ color: theme.secondary }]}>My Addresses</Text>
+						</Pressable>
+						<Pressable
+							onPress={() => setShowAddAddressModal(true)}
+							style={{ marginTop: 10 }}
+						>
+							<Text style={[{ color: theme.primary }]}>
+								Add New Delivery Address
+							</Text>
+						</Pressable>
+					</View>
+					<Modal visible={showAddressesModal} animationType="slide" transparent>
+						<View style={styles.modalOverlay}>
+							<View
+								style={[styles.modalContent, { backgroundColor: theme.cards }]}
+							>
+								<Pressable
+									onPress={() => setShowAddressesModal(false)}
+									style={{
+										position: 'absolute',
+										top: 10,
+										right: 10,
+										zIndex: 10,
+										padding: 4,
+									}}
+								>
+									<MaterialIcons name="close" size={24} color={theme.text} />
+								</Pressable>
+								<Text
+									style={[
+										{
+											fontWeight: 'bold',
+											fontSize: 16,
+											marginBottom: 8,
+											textAlign: 'center',
+										},
+										{ color: theme.text },
+									]}
+								>
+									My Addresses
+								</Text>
+								<FlatList
+									data={addresses}
+									keyExtractor={(item) => item.id}
+									renderItem={({ item }) => (
+										<Pressable
+											style={{
+												flexDirection: 'row',
+												alignItems: 'center',
+												marginVertical: 4,
+											}}
+											onPress={() => {
 												setDefaultAddress(item);
 												setShowAddressesModal(false);
 											}}
-											color="#FF521B"
-										/>
-										<Text style={[{ marginLeft: 8 }, { color: theme.text }]}>
-											{item.street?.slice(0, 10) +
-												(item.street?.length > 10 ? '...' : '')}
-										</Text>
-										{item.isDefault && (
-											<Text style={[{ color: theme.secondary, marginLeft: 8 }]}>
-												(Default)
+										>
+											<Checkbox
+												value={defaultAddress?.id === item.id}
+												onValueChange={() => {
+													setDefaultAddress(item);
+													setShowAddressesModal(false);
+												}}
+												color="#FF521B"
+											/>
+											<Text style={[{ marginLeft: 8 }, { color: theme.text }]}>
+												{item.street?.slice(0, 10) +
+													(item.street?.length > 10 ? '...' : '')}
 											</Text>
-										)}
-									</Pressable>
-								)}
-								ListEmptyComponent={
-									<Text style={[{ marginVertical: 8 }, { color: theme.text }]}>
-										No addresses found.
-									</Text>
-								}
-								style={{ maxHeight: 180, marginBottom: 12 }}
-							/>
-						</View>
-					</View>
-				</Modal>
-				<Modal visible={showAddAddressModal} animationType="slide" transparent>
-					<View style={styles.modalOverlay}>
-						<View
-							style={[styles.modalContent, { backgroundColor: theme.cards }]}
-						>
-							<Text
-								style={[
-									{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 },
-									{ color: theme.text },
-								]}
-							>
-								Add New Address
-							</Text>
-							{['street', 'city', 'state', 'country', 'landmark'].map(
-								(field) => (
-									<TextInput
-										key={field}
-										placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-										value={form[field]}
-										onChangeText={(text) =>
-											setForm((f) => ({ ...f, [field]: text }))
-										}
-										style={[styles.input, { borderColor: theme.accent }]}
-									/>
-								)
-							)}
-							<View style={styles.pickerContainer}>
-								<Text style={[styles.pickerLabel, { color: theme.text }]}>
-									District *
-								</Text>
-								<Picker
-									selectedValue={form.district}
-									onValueChange={(itemValue) =>
-										setForm((f) => ({ ...f, district: itemValue }))
+											{item.isDefault && (
+												<Text
+													style={[{ color: theme.secondary, marginLeft: 8 }]}
+												>
+													(Default)
+												</Text>
+											)}
+										</Pressable>
+									)}
+									ListEmptyComponent={
+										<Text
+											style={[{ marginVertical: 8 }, { color: theme.text }]}
+										>
+											No addresses found.
+										</Text>
 									}
-									style={styles.picker}
-									mode="dropdown"
-								>
-									<Picker.Item label="Select district" value="" />
-									{districts.map((district) => (
-										<Picker.Item
-											key={district}
-											label={district}
-											value={district}
-										/>
-									))}
-								</Picker>
-							</View>
-							<View
-								style={{
-									flexDirection: 'row',
-									alignItems: 'center',
-									marginVertical: 8,
-								}}
-							>
-								<Checkbox
-									value={form.isDefault}
-									onValueChange={(val) =>
-										setForm((f) => ({ ...f, isDefault: val }))
-									}
-									color="#FF521B"
+									style={{ maxHeight: 180, marginBottom: 12 }}
 								/>
-								<Text style={[{ marginLeft: 8 }, { color: theme.text }]}>
-									Set as default address
+							</View>
+						</View>
+					</Modal>
+					<Modal
+						visible={showAddAddressModal}
+						animationType="slide"
+						transparent
+					>
+						<View style={styles.modalOverlay}>
+							<View
+								style={[styles.modalContent, { backgroundColor: theme.cards }]}
+							>
+								<Text
+									style={[
+										{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 },
+										{ color: theme.text },
+									]}
+								>
+									Add New Address
 								</Text>
+								{['street', 'city', 'state', 'country', 'landmark'].map(
+									(field) => (
+										<TextInput
+											key={field}
+											placeholder={
+												field.charAt(0).toUpperCase() + field.slice(1)
+											}
+											value={form[field]}
+											onChangeText={(text) =>
+												setForm((f) => ({ ...f, [field]: text }))
+											}
+											style={[styles.input, { borderColor: theme.accent }]}
+										/>
+									)
+								)}
+								<View style={styles.pickerContainer}>
+									<Text style={[styles.pickerLabel, { color: theme.text }]}>
+										District *
+									</Text>
+									<Picker
+										selectedValue={form.district}
+										onValueChange={(itemValue) =>
+											setForm((f) => ({ ...f, district: itemValue }))
+										}
+										style={styles.picker}
+										mode="dropdown"
+									>
+										<Picker.Item label="Select district" value="" />
+										{districts.map((district) => (
+											<Picker.Item
+												key={district}
+												label={district}
+												value={district}
+											/>
+										))}
+									</Picker>
+								</View>
+								<View
+									style={{
+										flexDirection: 'row',
+										alignItems: 'center',
+										marginVertical: 8,
+									}}
+								>
+									<Checkbox
+										value={form.isDefault}
+										onValueChange={(val) =>
+											setForm((f) => ({ ...f, isDefault: val }))
+										}
+										color="#FF521B"
+									/>
+									<Text style={[{ marginLeft: 8 }, { color: theme.text }]}>
+										Set as default address
+									</Text>
+								</View>
+								<View
+									style={{
+										flexDirection: 'row',
+										justifyContent: 'space-between',
+									}}
+								>
+									<Pressable
+										style={[styles.modalButton, { backgroundColor: '#FF521B' }]}
+										onPress={async () => {
+											if (
+												!form.street ||
+												!form.city ||
+												!form.state ||
+												!form.country ||
+												!form.district
+											) {
+												Alert.alert(
+													'Missing Fields',
+													'Please fill in all required fields.'
+												);
+												return;
+											}
+											const userDocRef = doc(db, 'users', auth.currentUser.uid);
+
+											// Generate a unique id for the address
+											const newId = Date.now().toString();
+											const newAddress = {
+												...form,
+												isDefault: !!form.isDefault,
+											};
+
+											// Fetch current addresses map
+											const userSnap = await getDoc(userDocRef);
+											const data = userSnap.exists() ? userSnap.data() : {};
+											let addressesMap = data.addresses || {};
+
+											// If setting as default, unset previous default
+											if (form.isDefault) {
+												Object.keys(addressesMap).forEach((key) => {
+													addressesMap[key].isDefault = false;
+												});
+											}
+
+											addressesMap[newId] = newAddress;
+
+											await updateDoc(userDocRef, {
+												addresses: addressesMap,
+											});
+
+											await fetchAddresses();
+
+											// Update local state
+											const addressArray = Object.keys(addressesMap).map(
+												(key) => ({
+													...addressesMap[key],
+													id: key,
+												})
+											);
+											setAddresses(addressArray);
+
+											// Always show the newly added address, regardless of isDefault
+											setDefaultAddress({ ...newAddress, id: newId });
+
+											setShowAddAddressModal(false);
+											setForm({
+												street: '',
+												city: '',
+												state: '',
+												country: '',
+												landmark: '',
+												district: '',
+												isDefault: false,
+											});
+										}}
+									>
+										<Text style={{ color: '#fff' }}>Save</Text>
+									</Pressable>
+									<Pressable
+										style={[styles.modalButton, { backgroundColor: '#aaa' }]}
+										onPress={() => setShowAddAddressModal(false)}
+									>
+										<Text style={{ color: '#fff' }}>Cancel</Text>
+									</Pressable>
+								</View>
+							</View>
+						</View>
+					</Modal>
+				</View>
+				<View
+					style={[
+						{
+							backgroundColor: 'white',
+							margin: 16,
+							borderRadius: 4,
+							padding: 16,
+							elevation: 1,
+						},
+						{ backgroundColor: theme.cards },
+					]}
+				>
+					<Text
+						style={[
+							{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 },
+							{ color: theme.text },
+						]}
+					>
+						Cart Items
+					</Text>
+					{Array.isArray(cartItems) && cartItems.length > 0 ? (
+						<>
+							{cartItems.map((item, idx) => (
+								<View
+									key={item.id || item.name + idx}
+									style={[
+										{
+											flexDirection: 'row',
+											justifyContent: 'space-between',
+											marginBottom: 6,
+										},
+										{ color: theme.text },
+									]}
+								>
+									<Text style={[{ fontSize: 15 }, { color: theme.text }]}>
+										{item.name} x {item.quantity}
+									</Text>
+									<Text style={[{ fontSize: 15 }, { color: theme.primary }]}>
+										₦
+										{(
+											parseFloat(item.price) *
+											(parseInt(item.quantity, 10) || 0)
+										).toLocaleString()}
+									</Text>
+								</View>
+							))}
+							{discountApplied && (
+								<View style={styles.discountText}>
+									<Text style={styles.discountText2}>Discount Applied:</Text>
+									<Text style={styles.discountText2}>
+										- ₦{discountValue.toLocaleString()}
+									</Text>
+								</View>
+							)}
+							<View style={styles.totalText}>
+								<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+									Delivery Fee:
+								</Text>
+								{userData?.hasFreeDelivery ? (
+									<Text
+										style={{
+											fontWeight: 'bold',
+											fontSize: 16,
+											color: '#4CAF50',
+										}}
+									>
+										FREE
+									</Text>
+								) : isCalculatingFee ? (
+									<ActivityIndicator size="small" color="#FF521B" />
+								) : (
+									<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+										₦{deliveryFee.toLocaleString()}
+									</Text>
+								)}
 							</View>
 							<View
 								style={{
 									flexDirection: 'row',
 									justifyContent: 'space-between',
+									marginTop: 8,
 								}}
 							>
-								<Pressable
-									style={[styles.modalButton, { backgroundColor: '#FF521B' }]}
-									onPress={async () => {
-										if (
-											!form.street ||
-											!form.city ||
-											!form.state ||
-											!form.country ||
-											!form.district
-										) {
-											Alert.alert(
-												'Missing Fields',
-												'Please fill in all required fields.'
-											);
-											return;
-										}
-										const userDocRef = doc(db, 'users', auth.currentUser.uid);
-
-										// Generate a unique id for the address
-										const newId = Date.now().toString();
-										const newAddress = {
-											...form,
-											isDefault: !!form.isDefault,
-										};
-
-										// Fetch current addresses map
-										const userSnap = await getDoc(userDocRef);
-										const data = userSnap.exists() ? userSnap.data() : {};
-										let addressesMap = data.addresses || {};
-
-										// If setting as default, unset previous default
-										if (form.isDefault) {
-											Object.keys(addressesMap).forEach((key) => {
-												addressesMap[key].isDefault = false;
-											});
-										}
-
-										addressesMap[newId] = newAddress;
-
-										await updateDoc(userDocRef, {
-											addresses: addressesMap,
-										});
-
-										await fetchAddresses();
-
-										// Update local state
-										const addressArray = Object.keys(addressesMap).map(
-											(key) => ({
-												...addressesMap[key],
-												id: key,
-											})
-										);
-										setAddresses(addressArray);
-
-										// Always show the newly added address, regardless of isDefault
-										setDefaultAddress({ ...newAddress, id: newId });
-
-										setShowAddAddressModal(false);
-										setForm({
-											street: '',
-											city: '',
-											state: '',
-											country: '',
-											landmark: '',
-											district: '',
-											isDefault: false,
-										});
-									}}
+								<Text
+									style={[
+										{ fontWeight: 'bold', fontSize: 16 },
+										{ color: theme.text },
+									]}
 								>
-									<Text style={{ color: '#fff' }}>Save</Text>
-								</Pressable>
-								<Pressable
-									style={[styles.modalButton, { backgroundColor: '#aaa' }]}
-									onPress={() => setShowAddAddressModal(false)}
+									Total:
+								</Text>
+								<Text
+									style={[
+										{ fontWeight: 'bold', fontSize: 16 },
+										{ color: theme.text },
+									]}
 								>
-									<Text style={{ color: '#fff' }}>Cancel</Text>
-								</Pressable>
+									₦{(totalAmount + deliveryFee).toLocaleString()}
+								</Text>
 							</View>
-						</View>
-					</View>
-				</Modal>
-			</View>
+						</>
+					) : (
+						<Text style={[{ color: theme.text }]}>Your cart is empty.</Text>
+					)}
+				</View>
 
-			<Pressable
-				style={[
-					styles.proceedButton,
-					(!defaultAddress || !cartItems.length) && styles.disabledButton,
-				]}
-				onPress={handleProceedToPayment}
-				disabled={!defaultAddress || !cartItems.length}
-			>
-				<Text style={{ color: '#fff', fontSize: 16, textAlign: 'center' }}>
-					Proceed to Payment
-				</Text>
-			</Pressable>
+				<Pressable
+					style={[
+						styles.proceedButton,
+						(!defaultAddress || !cartItems.length) && styles.disabledButton,
+					]}
+					onPress={handleProceedToPayment}
+					disabled={!defaultAddress || !cartItems.length}
+				>
+					<Text style={{ color: '#fff', fontSize: 16, textAlign: 'center' }}>
+						Proceed to Payment
+					</Text>
+				</Pressable>
+			</View>
+			<View style={{ padding: 20 }}></View>
 		</SafeAreaView>
 	);
 }
@@ -605,6 +713,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			},
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			},
+		}),
 	},
 	locationText: {
 		fontSize: 18,
@@ -695,5 +813,14 @@ const styles = StyleSheet.create({
 		borderRadius: 4,
 		padding: 8,
 		backgroundColor: '#fff',
+	},
+	totalText: {
+		borderTopWidth: 1,
+		borderTopColor: '#eee',
+		marginTop: 8,
+		paddingTop: 8,
+		paddingBottom: 8,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
 	},
 });

@@ -8,6 +8,7 @@ import {
 	Alert,
 	ActivityIndicator,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Paystack } from 'react-native-paystack-webview';
@@ -23,6 +24,10 @@ import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { useCart } from '../app/CartContext';
 import { PAYSTACK_PUBLIC_KEY } from '@env';
+import { useTheme } from '../../utils/ThemeContext';
+import { calculateCommission } from '../../services/paymentOrchestrationAPI';
+import { updateDoc } from 'firebase/firestore';
+import logger from '../../utils/logger';
 
 export default function PaymentScreen({ navigation, route }) {
 	const {
@@ -32,12 +37,14 @@ export default function PaymentScreen({ navigation, route }) {
 		restaurantId,
 		discountApplied,
 		discountAmount = 0,
+		deliveryFee,
 	} = route.params || {};
 	const [processing, setProcessing] = useState(false);
 	const [selectedMethod, setSelectedMethod] = useState('card'); // 'card' or 'bank'
 	const auth = getAuth();
 	const { clearCart } = useCart();
 	const paystackWebViewRef = useRef();
+	const theme = useTheme();
 
 	// Redirect to cart if no items
 	React.useEffect(() => {
@@ -80,7 +87,7 @@ export default function PaymentScreen({ navigation, route }) {
 					restaurantDistrict = restaurantData.address?.district || '';
 				}
 			} catch (e) {
-				console.warn('Could not fetch restaurant district:', e);
+				logger.warn('Could not fetch restaurant district:', e);
 			}
 
 			// Create order document
@@ -90,6 +97,7 @@ export default function PaymentScreen({ navigation, route }) {
 				items: cartItems,
 				totalAmount,
 				status: 'Pending',
+				deliveryFee,
 				dropOffLocation: userData.address.district,
 				pickUpLocation: restaurantDistrict, // <-- set from restaurant address
 				paymentStatus: selectedMethod === 'bank' ? 'pending' : 'paid',
@@ -100,14 +108,64 @@ export default function PaymentScreen({ navigation, route }) {
 				deliveryAddress: userData.address,
 				createdAt: serverTimestamp(),
 				restaurantId,
+				vendorId: restaurantId, // For payment orchestration
 				discountApplied, // boolean
 				discountAmount,
 			};
-			console.log('ORDER DATA:', orderData);
+			logger.log('ORDER DATA:', orderData);
 			Object.keys(orderData).forEach(
 				(key) => orderData[key] === undefined && delete orderData[key]
 			);
 			await setDoc(orderRef, orderData);
+
+			// Call VPS API to calculate commission (for restaurant orders)
+			try {
+				// Validate required fields before making API call
+				const orderValue = Math.round((totalAmount || 0) * 100);
+				const deliveryFeeKobo = Math.round((deliveryFee || 0) * 100);
+				const orderIdValue = response.transactionRef.reference;
+
+				if (!orderIdValue) {
+					throw new Error('Order ID is missing');
+				}
+
+				if (!restaurantId) {
+					throw new Error('Restaurant ID is missing');
+				}
+
+				if (orderValue <= 0) {
+					logger.warn(
+						'Order value is 0 or invalid, skipping commission calculation'
+					);
+				} else {
+					const commissionResult = await calculateCommission({
+						orderId: orderIdValue,
+						orderValue: orderValue, // in kobo
+						deliveryFee: deliveryFeeKobo, // in kobo
+						vendorId: restaurantId,
+						restaurantId: restaurantId, // Some APIs expect this field name
+						storeId: null, // Not a store order
+						agentId: null, // Will be set when agent is assigned
+					});
+
+					// Update order with transaction ledger ID
+					if (commissionResult?.transactionLedgerId) {
+						await updateDoc(orderRef, {
+							transactionLedgerId: commissionResult.transactionLedgerId,
+						});
+					}
+
+					logger.log('Commission calculated successfully:', commissionResult);
+				}
+			} catch (commissionError) {
+				logger.error('Commission calculation failed:', commissionError);
+				// Log detailed error information
+				if (commissionError.message) {
+					logger.error('Error message:', commissionError.message);
+				}
+				// Log error but don't block order creation
+				// The order is already created, commission can be calculated later if needed
+			}
 
 			// Create notification for the user
 			await addDoc(collection(db, 'notifications'), {
@@ -127,7 +185,7 @@ export default function PaymentScreen({ navigation, route }) {
 				isPendingTransfer: selectedMethod === 'bank',
 			});
 		} catch (error) {
-			console.error('Error processing payment:', error);
+			logger.error('Error processing payment:', error);
 			Alert.alert(
 				'Error',
 				'There was an error processing your payment. Please try again.'
@@ -172,6 +230,14 @@ export default function PaymentScreen({ navigation, route }) {
 							</Text>
 						</View>
 					))}
+					<View style={styles.orderItem}>
+						<Text style={[styles.itemName2, { color: theme.text }]}>
+							Delivery Fee:
+						</Text>
+						<Text style={[styles.itemPrice2, { color: theme.primary }]}>
+							₦{deliveryFee?.toLocaleString() || '0'}
+						</Text>
+					</View>
 					<View
 						style={{
 							flexDirection: 'row',
@@ -308,7 +374,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			},
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			},
+		}),
 	},
 	headerTitle: {
 		fontSize: 18,
@@ -350,6 +425,17 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: '#2A324B',
 		fontWeight: '500',
+	},
+	itemName2: {
+		fontSize: 16,
+		color: '#2A324B',
+		flex: 1,
+		fontWeight: '600',
+	},
+	itemPrice2: {
+		fontSize: 16,
+		color: '#2A324B',
+		fontWeight: '600',
 	},
 	discountText2: {
 		fontStyle: 'italic',

@@ -8,6 +8,7 @@ import {
 	Image,
 	Alert,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -264,9 +265,19 @@ const styles = StyleSheet.create({
 		color: '#FF521B',
 	},
 	profileHeader: {
-		marginTop: 40,
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			  },
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			  },
+		  }),
 		marginBottom: 30,
 		alignItems: 'center',
+		
 	},
 	title: {
 		fontSize: 24,

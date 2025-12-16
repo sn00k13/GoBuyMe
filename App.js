@@ -50,6 +50,7 @@ import { MaterialIcons, FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import { ThemeProvider } from './utils/ThemeContext';
 import { useTheme } from './utils/ThemeContext';
 import PushNotificationService from './utils/PushNotificationService';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -225,36 +226,38 @@ export default function App() {
 	}, []);
 
 	return (
-		<ThemeProvider>
-			<NavigationContainer ref={navigationRef}>
-				<Stack.Navigator
-					screenOptions={{
-						headerShown: false,
-					}}
-				>
-					<Stack.Screen name="Drawer" component={DrawerNavigator} />
-					<Stack.Screen
-						name="Appearance"
-						component={AppearancePersonalization}
-					/>
-					<Stack.Screen name="Language" component={LanguageInput} />
-					<Stack.Screen name="DataStorage" component={DataStorage} />
-					<Stack.Screen
-						name="NotificationsOptions"
-						component={NotificationsOptions}
-					/>
-					<Stack.Screen name="Chat" component={ChatScreen} />
-					<Stack.Screen
-						name="PushNotifications"
-						component={PushNotifications}
-					/>
-					<Stack.Screen name="AboutScreen" component={AboutScreen} />
-					<Stack.Screen name="OffersScreen" component={OffersScreen} />
-					<Stack.Screen name="Permissions" component={Permissions} />
-					<Stack.Screen name="TermsService" component={TermsService} />
-					<Stack.Screen name="Notifications" component={NotificationsScreen} />
-				</Stack.Navigator>
-			</NavigationContainer>
-		</ThemeProvider>
+		<ErrorBoundary>
+			<ThemeProvider>
+				<NavigationContainer ref={navigationRef}>
+					<Stack.Navigator
+						screenOptions={{
+							headerShown: false,
+						}}
+					>
+						<Stack.Screen name="Drawer" component={DrawerNavigator} />
+						<Stack.Screen
+							name="Appearance"
+							component={AppearancePersonalization}
+						/>
+						<Stack.Screen name="Language" component={LanguageInput} />
+						<Stack.Screen name="DataStorage" component={DataStorage} />
+						<Stack.Screen
+							name="NotificationsOptions"
+							component={NotificationsOptions}
+						/>
+						<Stack.Screen name="Chat" component={ChatScreen} />
+						<Stack.Screen
+							name="PushNotifications"
+							component={PushNotifications}
+						/>
+						<Stack.Screen name="AboutScreen" component={AboutScreen} />
+						<Stack.Screen name="OffersScreen" component={OffersScreen} />
+						<Stack.Screen name="Permissions" component={Permissions} />
+						<Stack.Screen name="TermsService" component={TermsService} />
+						<Stack.Screen name="Notifications" component={NotificationsScreen} />
+					</Stack.Navigator>
+				</NavigationContainer>
+			</ThemeProvider>
+		</ErrorBoundary>
 	);
 }

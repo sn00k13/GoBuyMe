@@ -7,13 +7,14 @@ import {
 	ScrollView,
 	Pressable,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useCart } from '../app/CartContext';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function RestaurantMenuItemScreen({ route, navigation }) {
-	const { menuItem, restaurantId, restaurantName } = route.params;
+	const { menuItem, restaurantId, restaurantName, restaurantAddress, restaurantLocation } = route.params;
 	const [quantity, setQuantity] = useState(1);
 	const { cart, addToCart, getCartTotal, getCartItemCount } = useCart();
 	const [cartTotal, setCartTotal] = useState(0);
@@ -92,7 +93,7 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
 			<Pressable
 				style={styles.cartButtonFab}
 				onPress={() =>
-					navigation.navigate('Cart', { restaurantId, restaurantName })
+					navigation.navigate('Cart', { restaurantId, restaurantName, restaurantAddress, restaurantLocation })
 				}
 			>
 				<MaterialIcons name="shopping-cart" size={28} color="#fff" />
@@ -115,6 +116,7 @@ export default function RestaurantMenuItemScreen({ route, navigation }) {
 					<Text style={styles.addButtonText}>Add to Cart</Text>
 				</Pressable>
 			</View>
+			<View style={styles.bottomPad}></View>
 		</SafeAreaView>
 	);
 }
@@ -131,6 +133,28 @@ const styles = StyleSheet.create({
 		padding: 16,
 		backgroundColor: '#fff',
 		elevation: 2,
+		...Platform.select({
+					ios: {
+						marginTop: 0,
+						// iOS specific styles
+					  },
+					android: {
+						marginTop: 40,
+						// Android specific styles
+					  },
+				  }),
+	},
+	bottomPad: {
+		...Platform.select({
+			ios: {
+			  paddingBottom: 0,
+			  // iOS specific styles
+			},
+			android: {
+			  paddingBottom: 40,
+			  // Android specific styles
+			},
+		  }),
 	},
 	headerText: {
 		fontSize: 18,
@@ -229,7 +253,7 @@ const styles = StyleSheet.create({
 	},
 	cartButtonFab: {
 		position: 'absolute',
-		bottom: 100, // Positioned above the bottom bar
+		bottom: 150, // Positioned above the bottom bar
 		right: 24,
 		backgroundColor: '#FF521B',
 		borderRadius: 32,

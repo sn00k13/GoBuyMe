@@ -6,6 +6,7 @@ import {
 	Pressable,
 	FlatList,
 	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../../utils/ThemeContext';
@@ -83,7 +84,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 16,
 		backgroundColor: 'white',
-		marginTop: 40,
+		...Platform.select({
+			ios: {
+				marginTop: 0,
+				// iOS specific styles
+			  },
+			android: {
+				marginTop: 40,
+				// Android specific styles
+			  },
+		  }),
 		borderBottomWidth: 1,
 		borderBottomColor: '#F0F0F0',
 		marginBottom: 16,
